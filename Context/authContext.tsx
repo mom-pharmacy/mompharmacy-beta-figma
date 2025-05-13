@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const getUserDetails = useCallback(async (authToken) => {
     try {
       if (!authToken) return;
-      const response = await fetch('https://mom-beta-server1.onrender.com/api/user/user-details', {
+      const response = await fetch('https://mom-beta-server.onrender.com/api/user/user-details', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

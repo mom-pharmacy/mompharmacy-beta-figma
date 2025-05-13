@@ -1,6 +1,6 @@
 
 import { COLOR } from '@/constants/color';
-import { JWT_TOKEN } from '@env';
+import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -57,16 +57,16 @@ const profileSections = [
 
 export default function ProfileScreen() {
   const [user, setUser] = useState({ name: '', email: '', mobileNo: '' });
-
+  const {ExtractParseToken} = userAuth()
   const fetchUserDetails = async () => {
     try {
-      const token = JWT_TOKEN;
+      const tokenAuth = await ExtractParseToken() ;
 
-      const response = await fetch('https://mom-beta-server1.onrender.com/api/user/user-details', {
+      const response = await fetch('https://mom-beta-server.onrender.com/api/user/user-details', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${tokenAuth}`,
         },
       });
 

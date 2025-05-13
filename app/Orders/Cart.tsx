@@ -56,6 +56,12 @@ const OrderReviewScreen = () => {
     );
   };
 
+  if(cartItems.length<1){
+   return <View style={{flex:1 , justifyContent:"center" , alignItems:"center"}}>
+    <Text style={{fontSize:18 , color:"gray" , fontWeight:"bold"}}>Your cart is Empty</Text>
+   </View>
+  }
+
   return (
     <View style={styles.mainContainer}>
       <StatusHeader />
