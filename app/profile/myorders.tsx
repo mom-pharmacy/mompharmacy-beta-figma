@@ -1,8 +1,11 @@
-import { JWT_TOKEN } from '@env';
+
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+const JWT_TOKEN = process.env.JWT_TOKEN;
+
 
 const OrderSummaryScreen = () => {
   const [orders, setOrders] = useState([]);
