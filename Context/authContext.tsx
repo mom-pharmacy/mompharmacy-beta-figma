@@ -1,7 +1,7 @@
 import LoadingScreen from "@/components/LoadingScreen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { createContext, useEffect, useState, useCallback, useContext } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 export const AuthContext = createContext(null);
