@@ -3,23 +3,23 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const UploadPrescription = () => (
-     <TouchableOpacity onPress={() => { router.push("/prescription") }}>
-    <View style={styles.container}>
-       
-        <View >
-            <Image source={require('../../assets/images/prescription.jpeg')} style={{ height: 32, width: 24.54, }} />
+    <TouchableOpacity onPress={() => { router.push("/prescription") }}>
+        <View style={styles.container}>
+
+            <View >
+                <Image source={require('../../assets/images/prescription.jpeg')} style={{ height: 32, width: 24.54, }} />
+            </View>
+            <View style={styles.buttontext}>
+                <Text style={{ fontWeight: 600, fontSize: 16, color: '#444444' }}>Upload Prescription</Text>
+                <Text style={{ fontWeight: 400, fontSize: 14, color: '#444444' }}>Need a quick Service ?</Text>
+            </View>
+
+
+            <Text style={styles.register}>Upload Now </Text>
+            <MaterialIcons name="arrow-forward" size={40} style={{ fontSize: 30, color: "#00a99d" }} />
+
+
         </View>
-        <View style={styles.buttontext}>
-            <Text style={{ fontWeight: 600, fontSize: 16, color: '#444444' }}>Upload Prescription</Text>
-            <Text style={{ fontWeight: 400, fontSize: 14, color: '#444444' }}>Need a quick Service ?</Text>
-        </View>
-        
-            
-                <Text style={styles.register}>Upload Now </Text>
-                <MaterialIcons name="arrow-forward" size={40} style={{ fontSize: 30, color: "#00a99d" }} />
-            
-        
-    </View>
     </TouchableOpacity>
 
 );

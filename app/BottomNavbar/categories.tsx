@@ -14,6 +14,7 @@ const Categories = () => {
   return (
     <View style={styles.screen}>
       <TopNavbar />
+      
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
