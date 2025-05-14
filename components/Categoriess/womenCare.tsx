@@ -1,5 +1,7 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 const womenCare = ({ name, Icon }) => {
     return (
@@ -11,8 +13,8 @@ const womenCare = ({ name, Icon }) => {
                 <Text style={styles.center}>{name}</Text>
             </View>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     box: {
@@ -20,28 +22,24 @@ const styles = StyleSheet.create({
         margin: 8,
         alignItems: 'center',
         justifyContent: 'center',
-      },
-      
-      items: {
-        height: 111,
-        width: 110,
-        gap: 5,
-        padding: 16,
-        
-        flexDirection: "column",
-        alignItems: "center",      
-        justifyContent: "center",   
-      },
-      
-    center: {
-        textAlign: "center",
-        marginBottom:-10,
-        fontSize:12
-       
-
+        marginHorizontal:6,
     },
-    
+    items: {
+        height: 111,
+        width: width * 0.22, 
+        gap: 5,
+        padding: 20,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop:10,
+        marginBottom:10,
+    },
+    center: {
+        textAlign: 'center',
+        marginTop: 5, 
+        fontSize: 11,
+    },
+});
 
-})
-
-export default womenCare
+export default womenCare;

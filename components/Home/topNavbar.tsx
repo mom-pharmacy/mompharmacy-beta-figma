@@ -39,9 +39,9 @@ const TopNavbar = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: height * 0.22,
+    height: height * 0.25,
     width: width,
-    backgroundColor: COLOR.background,
+    backgroundColor: COLOR.light,
     paddingHorizontal: 20,
   },
   title: {

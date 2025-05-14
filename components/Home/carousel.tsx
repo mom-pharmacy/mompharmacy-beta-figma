@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
+
+const ITEM_WIDTH = screenWidth * 0.9; 
+const SPACING = screenWidth * 0.05; 
 
 const banners = [
   {
@@ -47,13 +50,11 @@ const banners = [
   },
 ];
 
-const ITEM_WIDTH = screenWidth * 0.919;
-const SPACING = screenWidth * 0.010;
-
 const BannerCarousel = () => {
   const flatListRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     const interval = setInterval(() => {
       let nextIndex = (currentIndex + 1) % banners.length;
@@ -79,13 +80,25 @@ const BannerCarousel = () => {
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.description}>{item.description}</Text>
           <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText} onPress={()=>{router.push(item.link)}}>{item.buttonText} →</Text>
+            <Text
+              style={styles.buttonText}
+              onPress={() => {
+                router.push(item.link || '/');
+              }}
+            >
+              {item.buttonText} →
+            </Text>
           </TouchableOpacity>
         </View>
         <Image source={item.image} style={styles.image} />
       </View>
     </View>
   );
+
+  const handlePaginationPress = useCallback((i) => {
+    flatListRef.current.scrollToIndex({ index: i, animated: true });
+    setCurrentIndex(i);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -98,7 +111,7 @@ const BannerCarousel = () => {
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
         onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }], 
           { useNativeDriver: false }
         )}
         onViewableItemsChanged={onViewRef.current}
@@ -110,7 +123,7 @@ const BannerCarousel = () => {
           offset: (ITEM_WIDTH + SPACING) * index,
           index,
         })}
-        contentContainerStyle={{ paddingHorizontal: SPACING }}
+        contentContainerStyle={{ paddingHorizontal: SPACING }} // Added padding on both sides
       />
       <View style={styles.pagination}>
         {banners.map((_, i) => (
@@ -120,10 +133,7 @@ const BannerCarousel = () => {
               styles.dot,
               { backgroundColor: i === currentIndex ? '#00bfa5' : '#ccc' },
             ]}
-            onPress={() => {
-              flatListRef.current.scrollToIndex({ index: i, animated: true });
-              setCurrentIndex(i);
-            }}
+            onPress={() => handlePaginationPress(i)}
           />
         ))}
       </View>
@@ -132,14 +142,11 @@ const BannerCarousel = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { marginTop: 10,},
+  container: { marginTop: 10 },
   bannerWrapper: {
-    width: ITEM_WIDTH,
-    marginRight: SPACING,
-    marginBottom:10,
-    
-    
-    
+    width: ITEM_WIDTH, 
+    marginRight: SPACING, 
+    marginBottom: 10,
   },
   card: {
     backgroundColor: '#f2f9f9',
@@ -147,7 +154,6 @@ const styles = StyleSheet.create({
     padding: 9,
     flexDirection: 'row',
     alignItems: 'center',
-  
   },
   image: {
     width: 125,
@@ -184,7 +190,7 @@ const styles = StyleSheet.create({
   },
   dot: {
     width: 6,
-    height:6,
+    height: 6,
     borderRadius: 5,
     marginHorizontal: 4,
   },

@@ -1,50 +1,69 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+// Get device width for responsive scaling
+const { width } = Dimensions.get('window');
+
 const BloodDonation = () => (
-  <View style={styles.container}>
-    <View >
-        <Image source={require('../../assets/images/blooddonation.jpeg')} style={{height:32,width:24.54}} />
+  <TouchableOpacity style={styles.container} onPress={() => router.push('/BloodDonor/front')}>
+    <Image source={require('../../assets/images/blooddonation.jpeg')} style={styles.image} />
+
+    <View style={styles.textContainer}>
+      <Text style={styles.title}>Blood Donation</Text>
+      <Text style={styles.subtitle}>Want to donate blood?</Text>
     </View>
-    <View style={styles.buttontext} >
-    <Text style={{fontWeight:600, fontSize:16, color:'#444444'}}>Blood Donation</Text>
-    <Text style={{fontWeight:400, fontSize:14, color:'#444444'}}>Want to donate blood ?</Text>
+
+    <View style={styles.rightContainer}>
+      <Text style={styles.register}>Register Now</Text>
+      <MaterialIcons name="arrow-forward" size={22} color="#B5000A" />
     </View>
-    <Text style={styles.register} onPress={()=>{router.push('/BloodDonor/front')}}>Register Now </Text>
-    <MaterialIcons name="arrow-forward" size={40} style={{fontSize:30,color:"#B5000A"}} />
-    
-  </View>
+  </TouchableOpacity>
 );
-const styles=StyleSheet.create({
-    container:{
-        height:62,
-        borderRadius:10,
-        backgroundColor:'#B5000A0D',
-        padding:12,
-        paddingHorizontal:5,
-        borderColor:'#B5000A',
-        borderWidth:1,
-        flexDirection:'row',
-        paddingVertical:10,
-        paddingLeft:10
 
+const styles = StyleSheet.create({
+  container: {
+    width: width * 0.95,
+    height: 60,
+    borderRadius: 10,
+    backgroundColor: '#B5000A0D',
+    borderColor: '#B5000A',
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    alignSelf: 'center',
+  },
+  image: {
+    height: 32,
+    width: 26,
+    resizeMode: 'contain',
+  },
+  textContainer: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  title: {
+    fontWeight: '600',
+    fontSize: 16,
+    color: '#444444',
+  },
+  subtitle: {
+    fontWeight: '400',
+    fontSize: 14,
+    color: '#444444',
+  },
+  rightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5, // spacing between text and icon (React Native 0.71+)
+  },
+  register: {
+    color: "#B5000A",
+    fontWeight: '600',
+    fontSize: 14,
+  },
+});
 
-    },
-    buttontext:{
-        marginLeft:10,
-        marginTop:-4,
-    },
-    register:{
-        color:"#B5000A",
-        fontWeight:600,
-        fontSize:16,
-        width:125.75,
-        paddingVertical:5,
-        paddingLeft:30,
-        
-    }
-})
-
-
-export default BloodDonation
+export default BloodDonation;
