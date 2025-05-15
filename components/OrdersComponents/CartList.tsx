@@ -5,6 +5,7 @@ import CartItem from './cartItem'
 
 export default function CartList() {
   const { cartItems } = useCart()
+  console.log("jgyft",cartItems)
   return (
     <View style={styles.deliveryBox}>
       <Text style={styles.deliveryTime}>Delivery on 10 minutes</Text>

@@ -44,7 +44,7 @@ const AddAddress = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableHighlight onPress={() => router.back()}>
+        <TouchableHighlight onPress={() => router.push('/Maps/myAddress')}>
           <AntDesign name="arrowleft" size={26} color="black" />
         </TouchableHighlight>
         <Text style={styles.title}>Select Address</Text>

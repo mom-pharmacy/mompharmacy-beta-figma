@@ -125,6 +125,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginHorizontal: 16,
     marginVertical: 10,
+    marginLeft:-1,
+    marginRight:-1
   },
   addressTitle: {
     fontWeight: 'bold',
@@ -148,6 +150,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  changeBtn: {
+    marginLeft: 60,
+    fontWeight: 'bold',
+    marginTop: -20,
+  }
 });
 
 export default OrderReviewScreen;

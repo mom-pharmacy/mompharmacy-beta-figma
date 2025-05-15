@@ -69,6 +69,7 @@ export default function Recommended() {
                   store: item.store,
                   expiryDate: item.expiryDate,
                   manufactureDate: item.manufactureDate,
+                  subcategories:item.subcategories
                 },
               })
             }

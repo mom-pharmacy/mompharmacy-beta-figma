@@ -1,108 +1,103 @@
-import TopNavbar from '@/components/Home/topNavbar';
+import Search from '@/components/Home/search';
 import { useCart } from '@/Context/cartContext';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Medicines({ limit }) {
   const [sortType, setSortType] = useState('low');
-const [showDropdown, setShowDropdown] = useState(false);
-// 'low' or 'high'
+  const [showDropdown, setShowDropdown] = useState(false);
   const [medicine, setMedicine] = useState([]);
   const { subcategoryId } = useLocalSearchParams();
-  const { addToCart, cartItems, incrementItem, decrementItem, removeFromCart } = useCart();
+  const {
+    addToCart,
+    cartItems,
+    incrementItem,
+    decrementItem,
+    removeFromCart,
+  } = useCart();
 
   const quantity = (itemId) => {
-    const findItem = cartItems.find(item => item._id === itemId);
+    const findItem = cartItems.find((item) => item._id === itemId);
     return findItem ? findItem.quantity : 0;
   };
 
   useEffect(() => {
-    fetch(`https://mom-beta-server1.onrender.com/api/medicines/subcategories/${subcategoryId}/medicines`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `https://mom-beta-server1.onrender.com/api/medicines/subcategories/${subcategoryId}/medicines`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         setMedicine(data);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Failed to fetch medicines:', err);
       });
   }, []);
 
-  // Sort the medicines before rendering
-  const sortedMedicines = [...medicine].sort((a, b) => {
-    if (sortType === 'low') {
-      return a.price - b.price;
-    } else {
-      return b.price - a.price;
-    }
-  });
+  const sortedMedicines = [...medicine].sort((a, b) =>
+    sortType === 'low' ? a.price - b.price : b.price - a.price
+  );
+
+  const getSortLabel = () =>
+    sortType === 'low' ? 'Sort: Low to High' : 'Sort: High to Low';
 
   return (
-    <View style={styles.container}>
-      <TopNavbar />
+    <SafeAreaView style={styles.container}>
+     
+      <Search />
 
       <View style={styles.header}>
-        <Text style={styles.title}>Popular Medicines</Text>
+        <Text style={styles.title} allowFontScaling={false}>
+          Popular Medicines
+        </Text>
+
+        <View style={styles.sortWrapper}>
+          <TouchableOpacity
+            onPress={() => setShowDropdown((prev) => !prev)}
+            style={styles.sortButton}
+          >
+            <Text style={styles.sortButtonText} allowFontScaling={false}>
+              {getSortLabel()}
+            </Text>
+          </TouchableOpacity>
+
+          {showDropdown && (
+            <View style={styles.dropdown}>
+              <TouchableOpacity
+                style={styles.dropdownOption}
+                onPress={() => {
+                  setSortType('low');
+                  setShowDropdown(false);
+                }}
+              >
+                <Text allowFontScaling={false}>Low to High</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.dropdownOption}
+                onPress={() => {
+                  setSortType('high');
+                  setShowDropdown(false);
+                }}
+              >
+                <Text allowFontScaling={false}>High to Low</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
-
-     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 15, marginBottom: 10 }}>
-  <View>
-    <TouchableOpacity 
-      onPress={() => setShowDropdown(!showDropdown)} 
-      style={{
-        backgroundColor: '#00a99d',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 8,
-      }}
-    >
-      <Text style={{ color: 'white', fontWeight: 'bold' }}>
-        Sort: {sortType === 'low' ? 'Low to High' : 'High to Low'}
-      </Text>
-    </TouchableOpacity>
-
-    {showDropdown && (
-      <View style={{
-        backgroundColor: '#e0f7fa',
-        borderRadius: 8,
-        marginTop: 5,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
-      }}>
-        <TouchableOpacity
-          style={{ padding: 8 }}
-          onPress={() => {
-            setSortType('low');
-            setShowDropdown(false);
-          }}
-        >
-          <Text>Low to High</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ padding: 8 }}
-          onPress={() => {
-            setSortType('high');
-            setShowDropdown(false);
-          }}
-        >
-          <Text>High to Low</Text>
-        </TouchableOpacity>
-      </View>
-    )}
-  </View>
-</View>
-
 
       <FlatList
         data={limit ? sortedMedicines.slice(0, limit) : sortedMedicines}
@@ -127,6 +122,7 @@ const [showDropdown, setShowDropdown] = useState(false);
                   store: item.store,
                   expiryDate: item.expiryDate,
                   manufactureDate: item.manufactureDate,
+                  subcategories: JSON.stringify(item.subcategories || [])
                 },
               })
             }
@@ -147,81 +143,130 @@ const [showDropdown, setShowDropdown] = useState(false);
         contentContainerStyle={styles.grid}
         scrollEnabled={true}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
-const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, removeFromCart, quantity }) => {
-  const isInCart = cartItems.some(cartItem => cartItem._id === item._id);
+const Womencare = ({
+  item,
+  cartItems,
+  addToCart,
+  incrementItem,
+  decrementItem,
+  removeFromCart,
+  quantity,
+}) => {
+  const isInCart = cartItems.some((cartItem) => cartItem._id === item._id);
 
   return (
     <View style={styles.cardContainer}>
-      <ScrollView>
-        <View style={styles.card}>
-          <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-          <Text style={styles.cardTitle}>{item.medicine_name}</Text>
-          <View style={styles.nameContainer}>
-            <Text style={styles.cardPrice}>Rs {item.price}</Text>
-          </View>
-
-          {!isInCart ? (
-            <TouchableOpacity style={styles.medicineBtn} onPress={() => addToCart(item)}>
-              <Text style={styles.btnText}>Add To Cart</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity
-                style={styles.quantityBtn}
-                onPress={() =>
-                  quantity(item._id) > 1 ? decrementItem(item._id) : removeFromCart(item._id)
-                }
-              >
-                <Text style={styles.quantityBtnText}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantity}>{quantity(item._id)}</Text>
-              <TouchableOpacity
-                style={styles.quantityBtn}
-                onPress={() => incrementItem(item._id)}
-              >
-                <Text style={styles.quantityBtnText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+      <View style={styles.card}>
+        <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
+        <Text style={styles.cardTitle} numberOfLines={2} allowFontScaling={false}>
+          {item.medicine_name}
+        </Text>
+        <View style={styles.nameContainer}>
+          <Text style={styles.cardPrice} allowFontScaling={false}>
+            Rs {item.price}
+          </Text>
         </View>
-      </ScrollView>
+
+        {!isInCart ? (
+          <TouchableOpacity
+            style={styles.medicineBtn}
+            onPress={() => addToCart(item)}
+          >
+            <Text style={styles.btnText} allowFontScaling={false}>Add To Cart</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.medicineBtn}>
+            <TouchableOpacity
+              style={styles.quantityIcon}
+              onPress={() =>
+                quantity(item._id) > 1
+                  ? decrementItem(item._id)
+                  : removeFromCart(item._id)
+              }
+            >
+              <Text style={styles.btnText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.quantity} allowFontScaling={false}>
+              {quantity(item._id)}
+            </Text>
+            <TouchableOpacity
+              style={styles.quantityIcon}
+              onPress={() => incrementItem(item._id)}
+            >
+              <Text style={styles.btnText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     backgroundColor: '#fff',
-    marginTop: -20,
   },
   header: {
-    padding: 10,
-    backgroundColor: '#fff',
+    paddingHorizontal: wp('4%'),
+    paddingTop: hp('1%'),
+    marginBottom: hp('1.5%'),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: wp('5%'),
     color: '#333',
   },
-  sortButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
-    marginBottom: 10,
+  sortWrapper: {
+    position: 'relative',
+  },
+  sortButton: {
+    backgroundColor: '#00a99d',
+    paddingHorizontal: wp('4%'),
+    paddingVertical: hp('1%'),
+    borderRadius: 8,
+    zIndex: 1,
+  },
+  sortButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  dropdown: {
+    position: 'absolute',
+    top: hp('6%'),
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    zIndex: 10,
+    width: wp('35%'),
+  },
+  dropdownOption: {
+    padding: 10,
   },
   grid: {
-    paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingBottom: hp('3%'),
+    flexGrow: 1,
   },
   columnWrapper: {
     justifyContent: 'space-between',
+    paddingHorizontal: wp('4%'),
+    marginBottom: hp('2%'),
   },
   cardContainer: {
-    width: 180,
+    width: wp('45%'),
+    marginBottom: hp('2%'),
   },
   card: {
     backgroundColor: '#fff',
@@ -229,19 +274,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: '#b2d8d833',
-    margin: 10,
   },
   cardImage: {
     width: '100%',
-    height: 100,
+    height: hp('13%'),
     resizeMode: 'contain',
     marginBottom: 10,
+    borderRadius: 6,
+    backgroundColor: '#fff',
   },
   cardTitle: {
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: wp('3.5%'),
     marginBottom: 6,
     color: '#333',
+    lineHeight: wp('4.5%'),
   },
   nameContainer: {
     flexDirection: 'row',
@@ -254,34 +301,27 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
   },
   medicineBtn: {
-    backgroundColor: '#00a99d',
-    paddingVertical: 6,
-    borderRadius: 16,
-    alignItems: 'center',
+  backgroundColor: '#00a99d',
+  height: 36, 
+  borderRadius: 16,
+  alignItems: 'center',
+  flexDirection: 'row',
+  justifyContent: 'space-evenly',
+  paddingHorizontal: 10,
   },
   btnText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  quantityBtn: {
-    backgroundColor: '#00a99d',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  quantityBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: wp('3.5%'),
   },
   quantity: {
     marginHorizontal: 10,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: wp('4.5%'),
+    color: '#fff',
+  },
+  quantityIcon: {
+    paddingHorizontal: 10,
+    
   },
 });

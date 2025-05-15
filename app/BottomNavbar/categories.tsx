@@ -6,6 +6,7 @@ import { Dimensions, ScrollView, StyleSheet, TouchableHighlight, View } from 're
 
 import Categories1 from '../../components/Categoriess/categories';
 
+import Search from '@/components/Home/search';
 import Footer from "../../components/Home/footer";
 
 const { height } = Dimensions.get('window');
@@ -14,7 +15,8 @@ const Categories = () => {
   return (
     <View style={styles.screen}>
       <TopNavbar />
-      <ScrollView
+      <Search />
+      <ScrollView  
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >

@@ -1,6 +1,7 @@
 import Categories1 from '@/components/Categoriess/categories';
 import Ordering from '@/components/Categoriess/ordering';
 import Footer from '@/components/Home/footer';
+import Search from '@/components/Home/search';
 import TopNavbar from '@/components/Home/topNavbar';
 import UploadPrescription from '@/components/Home/uploadPrescription';
 import { useCart } from '@/Context/cartContext';
@@ -37,13 +38,14 @@ export default function Medicines() {
       });
   }, []);
 
-  // Limit to only 2 medicines
-  const limitedMedicines = medicine.slice(0, 2);
+ 
+  const limitedMedicines = medicine.slice(-3,-1);
 
   return (
     <ScrollView >
     <View style={styles.container}>
       <TopNavbar />
+      <Search />
       <View style={{padding:15}}>
       <UploadPrescription />
       </View>
@@ -58,7 +60,7 @@ export default function Medicines() {
         keyExtractor={(item) => item._id}
         renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() =>
+            onPress={() =>{
               router.push({
                 pathname: '/Details/details',
                 params: {
@@ -76,10 +78,12 @@ export default function Medicines() {
                   store: item.store,
                   expiryDate: item.expiryDate,
                   manufactureDate: item.manufactureDate,
-                  subcategoryId:item.subcategories
+                  subcategories: JSON.stringify(item.subcategories || [])
                 },
+                
               })
-            }
+              console.log("essienstail",item.subcategories)
+            }}
           >
             <Womencare
               item={item}
@@ -203,6 +207,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     alignItems: 'center',
+
   },
   btnText: {
     color: '#fff',

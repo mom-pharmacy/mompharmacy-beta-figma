@@ -1,28 +1,33 @@
 import { COLOR } from '@/constants/color';
 import { MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function search() {
+export default function Search() {
+  const handleSearchPress = () => {
+    router.push('/Searching');
+  };
+
   return (
-    <View>
-        <TouchableOpacity  >
+    <View style={styles.search}>
+    <TouchableOpacity onPress={handleSearchPress} activeOpacity={0.8}>
       <View style={styles.searchContainer}>
         <MaterialIcons name="search" size={24} color={COLOR.primary} />
-        <TextInput
-          style={styles.search}
-          placeholder="Search..."
-          placeholderTextColor={COLOR.textLight}
-        />
+        <Text style={styles.fakeInput}>Search...</Text>
         <MaterialIcons name="mic" size={30} color={COLOR.primary} />
       </View>
-      </TouchableOpacity>
+    </TouchableOpacity>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-searchContainer: {
+  search:{
+      backgroundColor: COLOR.light,
+      padding:15
+  },
+  searchContainer: {
     width: '100%',
     height: 56,
     borderRadius: 10,
@@ -33,14 +38,12 @@ searchContainer: {
     borderWidth: 1,
     paddingHorizontal: 15,
     marginTop: 10,
-
+    
   },
-  search: {
+  fakeInput: {
     flex: 1,
-    height: '100%',
     fontSize: 16,
-    borderRadius: 10,
     paddingLeft: 10,
-    color: COLOR.text,
+    color: COLOR.textLight,
   },
-})
+});
