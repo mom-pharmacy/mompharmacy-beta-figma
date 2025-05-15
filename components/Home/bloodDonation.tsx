@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 const BloodDonation = () => (
@@ -11,7 +10,7 @@ const BloodDonation = () => (
     <Text style={{fontWeight:600, fontSize:16, color:'#444444'}}>Blood Donation</Text>
     <Text style={{fontWeight:400, fontSize:14, color:'#444444'}}>Want to donate blood ?</Text>
     </View>
-    <Text style={styles.register} onPress={()=>{router.push('/BloodDonor/front')}}>Register Now </Text>
+    <Text style={styles.register} >Register Now </Text>
     <MaterialIcons name="arrow-forward" size={40} style={{fontSize:30,color:"#B5000A"}} />
     
   </View>
