@@ -1,0 +1,217 @@
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
+} from 'react-native';
+
+const EditUserScreen = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('https://mom-beta-server1.onrender.com/api/user/all');
+        const data = await res.json();
+        if (data.users && data.users.length > 0) {
+          setUser(data.users[3]); 
+          console.log('Fetched user ID:', data.users[23]?._id);
+        } else {
+          Alert.alert('No users found');
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        Alert.alert('Error', 'Failed to fetch user');
+      } finally 
+      {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleUpdate = async () => {
+    if (!user || !user._id) return;
+
+    setUpdating(true);
+    try {
+      const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/updat/${user._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        Alert.alert('Success', 'User updated successfully');
+      } else {
+        Alert.alert('Error', data.message || 'Update failed');
+      }
+    } catch (error) {
+      console.error('Update failed:', error);
+      Alert.alert('Error', 'Something went wrong during update');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#008080" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return (
+      <View style={styles.center}>
+        <Text>No user found</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Edit User Details</Text>
+
+      <View style={styles.avatarContainer}>
+        <Image
+          source={require('../../assets/images/profileimg.png')}
+          style={styles.avatar}
+        />
+        <Text style={styles.changePhotoText}>Change Profile Picture</Text>
+      </View>
+
+      <Text style={styles.label}>Name:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.name}
+        onChangeText={(text) => setUser({ ...user, name: text })}
+      />
+
+      <Text style={styles.label}>Mobile:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.mobileNo}
+        onChangeText={(text) => setUser({ ...user, mobileNo: text })}
+        keyboardType="phone-pad"
+      />
+  
+      <Text style={styles.label}>Gender:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.gender}
+        onChangeText={(text) => setUser({ ...user, gender: text })}
+      />
+
+      <Text style={styles.label}>Date of Birth:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.dateOfBirth?.substring(0, 10)}
+        onChangeText={(text) => setUser({ ...user, dateOfBirth: text })}
+        placeholder="YYYY-MM-DD"
+      />
+
+      <Text style={styles.label}>Address:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.primaryAddress}
+        onChangeText={(text) => setUser({ ...user, primaryAddress: text })}
+      />
+
+      <Text style={styles.label}>Email:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.email}
+        onChangeText={(text) => setUser({ ...user, email: text })}
+        keyboardType="email-address"
+      />
+
+      <Text style={styles.label}>Age:</Text>
+      <TextInput
+        style={styles.input}
+        value={String(user.age)}
+        onChangeText={(text) => setUser({ ...user, age: parseInt(text) || 0 })}
+        keyboardType="numeric"
+      />
+
+      <Text style={styles.label}>Blood Group:</Text>
+      <TextInput
+        style={styles.input}
+        value={user.bloodgroup}
+        onChangeText={(text) => setUser({ ...user, bloodgroup: text })}
+      />
+
+      <Button
+        title={updating ? 'Updating...' : 'Submit'}
+        onPress={handleUpdate}
+        disabled={updating}
+        color="#008080"
+      />
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    paddingBottom: 40,
+    backgroundColor: '#fff',
+    flexGrow: 1,
+  },
+  changePhotoText: {
+    color: '#008080',
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#00A99D',
+  },
+  label: {
+    marginTop: 10,
+    fontWeight: '600',
+    color: '#333',
+  },
+  avatar: {
+    width: 100,
+    height: 89,
+    borderRadius: 50,
+    backgroundColor: '#ddd',
+  },
+  input: {
+    backgroundColor: '#e9f0eb',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: '#333',
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  avatarContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+});
+
+export default EditUserScreen;
