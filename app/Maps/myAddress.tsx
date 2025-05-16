@@ -1,9 +1,12 @@
+import { COLOR } from '@/constants/color';
+import { AntDesign } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Button,
   Linking,
   Modal,
+  Pressable,
   ScrollView,
   Share,
   StyleSheet,
@@ -12,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const MyAddressesScreen = () => {
@@ -65,98 +69,106 @@ const MyAddressesScreen = () => {
 
 
   useEffect(() => {
-      getData();
-    }, []);
-  
-    const getData = async () => {
-      try {
-        console.log("error")
-        const response = await fetch("https://mom-beta-server1.onrender.com/address/alladdress");
-        
-        const res = await response.json();
-        console.log("jashoww", res);
-  
-        if (Array.isArray(res)) {
-          setData(res);
-        } else if (res.data) {
-          setData([res.data]);
-        } else {
-          setData([]);
-        }
-      } catch (err) {
-        console.log(err);
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      console.log("error")
+      const response = await fetch("https://mom-beta-server1.onrender.com/address/alladdress");
+
+      const res = await response.json();
+      console.log("jashoww", res);
+
+      if (Array.isArray(res)) {
+        setData(res);
+      } else if (res.data) {
+        setData([res.data]);
+      } else {
+        setData([]);
       }
-    };
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
-    <ScrollView style={styles.container}>
-      {/* Add Address */}
-      <TouchableOpacity style={styles.button}  onPress={()=>router.push('./addAddress')}>
-        <Icon name="plus-circle" size={24} color="#5cb85c" style={styles.icon}  />
-        <Text style={styles.buttonText}>Add new address</Text>
-        <Icon name="chevron-right" size={20} color="gray" style={styles.arrowIcon} />
-      </TouchableOpacity>
-
-      {/* Request Address */}
-      <TouchableOpacity style={styles.button} onPress={handleWhatsAppClick}>
-        <View style={styles.iconBackground}>
-          <Icon name="whatsapp" size={24} color="white" />
+    <SafeAreaView style={styles.screen}>
+      <ScrollView style={styles.container}>
+        <View style={styles.statusContainer}>
+          <Pressable style={styles.Container} onPress={() => router.back()}>
+            <AntDesign name="left" size={24} color={COLOR.secondary} />
+            <Text style={styles.Text}>Add Address</Text>
+          </Pressable>
         </View>
-        <Text style={styles.buttonText}>Request address from someone else</Text>
-        <Icon name="chevron-right" size={20} color="gray" style={styles.arrowIcon} />
-      </TouchableOpacity>
+        {/* Add Address */}
+        <TouchableOpacity style={styles.button} onPress={() => router.push('./addAddress')}>
+          <Icon name="plus-circle" size={24} color="#5cb85c" style={styles.icon} />
+          <Text style={styles.buttonText}>Add new address</Text>
+          <Icon name="chevron-right" size={20} color="gray" style={styles.arrowIcon} />
+        </TouchableOpacity>
 
-      <Text style={styles.sectionTitle}>Your saved addresses</Text>
-
-      {/* Address Card */}
-      {data.map((item, index) => (
-       
-  <View key={index} style={styles.addressCard}>
-    <View style={styles.addressHeader}>
-      <View style={styles.homeIconBackground}>
-        <Icon name="home" size={20} color="#f0ad4e" />
-      </View>
-     
-      <Text style={styles.addressTitle}>{item.name || "Saved Address"}</Text>
-    </View>
-    <Text style={styles.addressDetails}>
-      {item.name}, {item.houseNo}, {item.buildingName}, {item.street}, {item.city}, {item.state}, {item.pincode}
-    </Text>
-    <View style={styles.addressActions}>
-      <TouchableOpacity style={styles.actionButton} onPress={() => {
-        setCustomAddress(`${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}`);
-        setSelectedAddress(`${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}`);
-        setModalVisible(true);
-      }}>
-        <Icon name="ellipsis-h" size={20} color="gray" />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.actionButton} onPress={() => {
-        Share.share({ message: `Address: ${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}` });
-      }}>
-        <Icon name="upload" size={20} color="gray" />
-      </TouchableOpacity>
-    </View>
-  </View>
-))}
-
-
-      {/* Modal */}
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalView}>
-          <TextInput
-            style={styles.input}
-            value={customAddress}
-            onChangeText={setCustomAddress}
-            placeholder="Edit your address"
-            multiline
-          />
-          <View style={styles.modalButtons}>
-            <Button title="Save" onPress={handleEditAddress} />
-            <Button title="Delete" color="red" onPress={handleDeleteAddress} />
-            <Button title="Cancel" color="gray" onPress={() => setModalVisible(false)} />
+        {/* Request Address */}
+        <TouchableOpacity style={styles.button} onPress={handleWhatsAppClick}>
+          <View style={styles.iconBackground}>
+            <Icon name="whatsapp" size={24} color="white" />
           </View>
-        </View>
-      </Modal>
-    </ScrollView>
+          <Text style={styles.buttonText}>Request address from someone else</Text>
+          <Icon name="chevron-right" size={20} color="gray" style={styles.arrowIcon} />
+        </TouchableOpacity>
+
+        <Text style={styles.sectionTitle}>Your saved addresses</Text>
+
+        {/* Address Card */}
+        {data.map((item, index) => (
+
+          <View key={index} style={styles.addressCard}>
+            <View style={styles.addressHeader}>
+              <View style={styles.homeIconBackground}>
+                <Icon name="home" size={20} color="#f0ad4e" />
+              </View>
+
+              <Text style={styles.addressTitle}>{item.name || "Saved Address"}</Text>
+            </View>
+            <Text style={styles.addressDetails}>
+              {item.name}, {item.houseNo}, {item.buildingName}, {item.street}, {item.city}, {item.state}, {item.pincode}
+            </Text>
+            <View style={styles.addressActions}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => {
+                setCustomAddress(`${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}`);
+                setSelectedAddress(`${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}`);
+                setModalVisible(true);
+              }}>
+                <Icon name="ellipsis-h" size={20} color="gray" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.actionButton} onPress={() => {
+                Share.share({ message: `Address: ${item.name}, ${item.houseNo}, ${item.buildingName}, ${item.street}, ${item.city}, ${item.state}, ${item.pincode}` });
+              }}>
+                <Icon name="upload" size={20} color="gray" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+
+
+        {/* Modal */}
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+          <View style={styles.modalView}>
+            <TextInput
+              style={styles.input}
+              value={customAddress}
+              onChangeText={setCustomAddress}
+              placeholder="Edit your address"
+              multiline
+            />
+            <View style={styles.modalButtons}>
+              <Button title="Save" onPress={handleEditAddress} />
+              <Button title="Delete" color="red" onPress={handleDeleteAddress} />
+              <Button title="Cancel" color="gray" onPress={() => setModalVisible(false)} />
+            </View>
+          </View>
+        </Modal>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -249,4 +261,26 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: 10,
   },
+  screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+
+  },
+  statusContainer: {
+    
+    backgroundColor: "white",
+    marginBottom:25
+    
+     }
+  ,
+  Container: {
+    flexDirection: 'row',
+    gap: 20
+  },
+  Text: {
+    fontWeight: 700,
+    fontSize: 22,
+    color: '#00a99d'
+
+  }
 });

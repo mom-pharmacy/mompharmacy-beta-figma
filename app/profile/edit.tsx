@@ -1,15 +1,20 @@
+import { COLOR } from '@/constants/color';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Button,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditUserScreen = () => {
   const [user, setUser] = useState(null);
@@ -83,8 +88,15 @@ const EditUserScreen = () => {
   }
 
   return (
+    <SafeAreaView >
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Edit User Details</Text>
+      
+      <View style={styles.statusContainer}>
+      <Pressable style={styles.Container1} onPress={()=>router.back()}>
+      <AntDesign name="left" size={24} color={COLOR.secondary} />
+      <Text style={styles.Text}>Edit User Details</Text>
+      </Pressable>
+    </View>
 
       <View style={styles.avatarContainer}>
         <Image
@@ -161,12 +173,13 @@ const EditUserScreen = () => {
         color="#008080"
       />
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: 10,
     paddingBottom: 40,
     backgroundColor: '#fff',
     flexGrow: 1,
@@ -212,6 +225,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
+     statusContainer:{
+        padding:12 , 
+        backgroundColor:"white" ,
+        paddingLeft:20,
+       
+       
+      }
+      ,
+      Container1:{
+ flexDirection:'row',
+ gap:30
+      },
+      Text:{
+        fontWeight:700,
+        fontSize:22,
+        color:'#00a99d'
+
+      }
 });
 
 export default EditUserScreen;

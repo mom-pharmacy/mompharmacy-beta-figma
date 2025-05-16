@@ -1,10 +1,11 @@
 import React from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import Cart1 from '../Orders/Cart'
 
 const Cart = () => {
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       {/* <TopNavbar /> */}
       <ScrollView
         style={styles.scrollView}
@@ -23,7 +24,7 @@ const Cart = () => {
         </View> */}
         <Cart1 />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 

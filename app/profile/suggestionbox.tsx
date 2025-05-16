@@ -1,3 +1,4 @@
+import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,6 +14,7 @@ import {
   UIManager,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -28,11 +30,14 @@ const SuggestProductsScreen: React.FC = () => {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ Modal state
 
+  const {userDetails, ExtractParseToken} = userAuth()
+
   const toggleSection = (type: 'tech' | 'nonTech') => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (type === 'tech') setShowTechnical(!showTechnical);
     else setShowNonTechnical(!showNonTechnical);
   };
+
 
   const handleSubmit = async (type: string) => {
     let suggestionText = '';
@@ -60,19 +65,21 @@ const SuggestProductsScreen: React.FC = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/suggestions/add/', {
+      const response = await fetch('https://mom-beta-server1.onrender.com/api/suggestions/add/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: '1234567890',
+          userId: userDetails._id,
           suggestion: suggestionText,
           suggestionType,
           isTechnical,
           isNonTechincal,
         }),
       });
+      
+      console.log("this is from suggestions" , response)
 
       const data = await response.json();
 
@@ -96,6 +103,7 @@ const SuggestProductsScreen: React.FC = () => {
   };
 
   return (
+    <SafeAreaView>
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.sugimg}>
         <View style={styles.headerRow}>
@@ -175,6 +183,7 @@ const SuggestProductsScreen: React.FC = () => {
         </View>
       </Modal>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

@@ -3,12 +3,14 @@ import React from 'react';
 import {
   Dimensions,
   Image,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -111,33 +113,41 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 250,
+    marginTop: Platform.select({
+      ios: hp('18%'),
+      android: hp('15%'),
+      default: hp('17%'),
+    }),
   },
   logo: {
-    width: 250,
-    height: 250,
+    width: wp('60%'),
+    height: wp('60%'),
+    maxWidth: 300,
+    maxHeight: 300,
   },
   title: {
-    fontSize: 32,
+    fontSize: hp('4%'),
     color: '#007E71',
-    marginTop: 20,
+    marginTop: hp('2.5%'),
     fontWeight: 'bold',
     textTransform: 'capitalize',
+    textAlign: 'center',
   },
   button: {
     backgroundColor: '#007E71',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
+    paddingVertical: hp('2%'),
+    paddingHorizontal: wp('12%'),
     borderRadius: 30,
     elevation: 5,
-    height: 58,
-    width: 219,
+    height: hp('7%'),
+    width: wp('55%'),
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: hp('3%'),
+    justifyContent: 'center',
   },
   buttonText: {
     color: 'white',
-    fontSize: 24,
+    fontSize: hp('2.8%'),
     fontWeight: 'bold',
     textAlign: 'center',
   },

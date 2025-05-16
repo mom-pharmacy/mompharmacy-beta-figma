@@ -9,7 +9,8 @@ export default function MomPharmacy() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
+    <View style={styles.container}>
       
         <TouchableOpacity style={styles.backButton} onPress={() => { router.back()}}>
           <Ionicons name="chevron-back" size={24} color="#0d7377" />
@@ -28,6 +29,7 @@ export default function MomPharmacy() {
 
         <Text style={styles.comingSoon}>Coming soon..</Text>
      
+    </View>
     </SafeAreaView>
   );
 }
@@ -38,7 +40,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     justifyContent: 'center',
     alignItems: 'center',
-   
 height:'100%'
   },
   

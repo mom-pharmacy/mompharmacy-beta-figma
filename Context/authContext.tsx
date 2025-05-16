@@ -15,9 +15,10 @@ export const AuthProvider = ({ children }) => {
   const isRegistrationComplete = userDetails?.name && userDetails?.email && userDetails?.mobileNo;
 
   const getUserDetails = useCallback(async (authToken) => {
+    console.log(authToken)
     try {
-      if (!authToken) return;
-      const response = await fetch('https://mom-beta-server.onrender.com/api/user/user-details', {
+      if (!authToken) throw new Error("Token not found! you are not loggedin");
+      const response = await fetch('https://mom-beta-server1.onrender.com/api/user/user-details', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const storedToken = await AsyncStorage.getItem('user');
+        const storedToken = await AsyncStorage.getItem('jwt_token');
         if (storedToken) {
           const parsedToken = JSON.parse(storedToken);
           setToken(parsedToken);
@@ -56,6 +57,7 @@ export const AuthProvider = ({ children }) => {
   }, [getUserDetails]);
 
   const loginWithOtp = async (mobileNo) => {
+    
     try {
       const response = await fetch('https://mom-beta-server1.onrender.com/api/user/login', {
         method: 'POST',
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyOtp = async (otp, mobileNo) => {
+    console.log(mobileNo)
     try {
       const response = await fetch('https://mom-beta-server1.onrender.com/api/user/verify-otp', {
         method: 'POST',
@@ -88,15 +91,15 @@ export const AuthProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        await AsyncStorage.setItem('user', JSON.stringify(data.token));
+        await AsyncStorage.setItem('jwt_token', JSON.stringify(data.token));
         setToken(data.token);
         setIsLoggedIn(true);
         await getUserDetails(data.token); // ✅ Update user details after login
         console.log('OTP verified:', data);
-        return true;
+        return data;
       } else {
         Alert.alert('OTP verification failed', 'Invalid OTP. Please try again.');
-        return false;
+        return null;
       }
     } catch (error) {
       console.error('Error during OTP verification:', error);
@@ -107,7 +110,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('jwt_token');
       setToken(null);
       setIsLoggedIn(false);
       setUserDetails(null);
@@ -120,7 +123,7 @@ export const AuthProvider = ({ children }) => {
 
   const postData = async (name, dob, gender) => {
     try {
-      const storedToken = await AsyncStorage.getItem("user");
+      const storedToken = await AsyncStorage.getItem("jwt_token");
       const parsedToken = JSON.parse(storedToken);
 
       const response = await fetch("https://mom-beta-server1.onrender.com/api/user/register", {
@@ -155,7 +158,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const ExtractParseToken = async ()=>{
-    const token = await AsyncStorage.getItem("user")
+    const token = await AsyncStorage.getItem("jwt_token")
     const parsedToken = JSON.parse(token)
     return parsedToken
     }

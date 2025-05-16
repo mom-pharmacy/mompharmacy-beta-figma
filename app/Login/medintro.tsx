@@ -1,7 +1,9 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+
+const { width, height} = Dimensions.get('window');
 
 const OnboardingScreen = () => {
   return (
@@ -44,22 +46,22 @@ const OnboardingScreen = () => {
 };
 
 export default OnboardingScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#7DD0CA',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    borderRadius: 4
+    borderRadius: 4,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
   },
   skipBox: {
-    backgroundColor: '#00A99D', 
+    backgroundColor: '#00A99D',
     borderRadius: 30,
     paddingVertical: 5,
     paddingHorizontal: 20,
     position: 'absolute',
-    top: 55, 
+    top: Platform.OS === 'ios' ? 60 : 40,
     right: 20,
     zIndex: 1,
   },
@@ -68,31 +70,57 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   skipText: {
-    fontSize: 20,
+    fontSize: width * 0.05,
     color: 'black',
     fontWeight: 'bold',
   },
-  backButton: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    padding: 5,
-  },
   placeholderBox: {
-    height: 300,
-    width: 100,
-    marginBottom: 90,
+    height: height * 0.35,
+    width: width * 0.8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
-    height: 255,
-    width: 300,
-    right: 110,
-    marginTop: -200,
+    height: height * 0.3,
+    width: width * 0.7,
+    position: 'absolute',
+    ...Platform.select({
+      android: {
+        top: 85
+      },
+      ios: {
+        top: 70
+      }
+    })
+  },
+  imgBackground1: {
+    height: width * 0.65,
+    width: width * 0.65,
+    borderRadius: width * 0.65,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    position: 'absolute',
+    top: 60,
+  },
+  imgBackground2: {
+    height: width * 0.45,
+    width: width * 0.45,
+    borderRadius: width * 0.45,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    position: 'absolute',
+    top: 100,
   },
   indicatorContainer: {
     flexDirection: 'row',
-    marginVertical: 60,
-    marginTop: 10,
+    marginTop: 20,
+    marginBottom: 40,
+    ...Platform.select({
+      ios: {
+        left: 10
+      },
+      android: {
+        left: 10
+      }
+    })
   },
   indicator: {
     width: 8,
@@ -100,10 +128,28 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: '#ccc',
     marginHorizontal: 4,
+    ...Platform.select({
+      android: {
+        top: 40
+      },
+      ios: {
+        top: 20
+      }
+    })
   },
   activeIndicator: {
     backgroundColor: 'white',
     width: 22,
+    position: 'absolute',
+    ...Platform.select({
+      android: {
+        top: 40,
+        right:30
+      },
+      ios: {
+        right: 30
+      }
+    })
   },
   textBox: {
     backgroundColor: '#00A99D',
@@ -112,48 +158,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     width: '90%',
     alignItems: 'center',
-    marginTop: 60,
-    height: 200,
+    marginTop: 20,
+    // height: height * 0.25,
+    height: 210,
+    ...Platform.select({
+      android: {
+        top:100
+      },
+      ios: {
+        top: 130
+      }
+    })
   },
   messageText: {
     color: '#fff',
-    fontSize: 27,
+    fontSize: width * 0.065,
     textAlign: 'center',
   },
   tBox: {
     height: 110,
     width: 110,
     backgroundColor: '#7DD0CA',
-    marginTop: 40,
-    marginBottom: -50,
+    marginTop: 48,
     borderRadius: 100,
-  },
-  highlight: {
-    fontWeight: 'bold',
   },
   centeredButton: {
     backgroundColor: '#FF9D24',
     borderRadius: 50,
     width: 80,
-    height: 85,
+    height: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -50,
-  },
-  imgBackground1: {
-    height: 250,
-    width: 250,
-    right: 80,
-    marginTop: 100,
-    borderRadius: 200,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
-  },
-  imgBackground2: {
-    height: 180,
-    width: 180,
-    right: 45,
-    marginTop: -210,
-    borderRadius: 200,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)', 
+    marginTop: -25,
+    ...Platform.select({
+      android: {
+        top:75
+      },
+      ios: {
+        top: 100
+      }
+    })
   },
 });

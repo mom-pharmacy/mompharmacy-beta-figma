@@ -1,9 +1,12 @@
 // app/profile/ProfileItem.jsx
 import { Link } from 'expo-router';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function ProfileItem({ title, icon, link }) {
   return (
+    <SafeAreaView>
     <Link href={link} asChild>
       <Pressable
         style={({ pressed }) => [
@@ -22,6 +25,7 @@ function ProfileItem({ title, icon, link }) {
         </View>
       </Pressable>
     </Link>
+    </SafeAreaView>
   );
 }
 

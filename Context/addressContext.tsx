@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 
 const AddressContext = createContext(null)
@@ -10,17 +11,22 @@ export const AddressProvider = ({ children }) => {
 
     useEffect(() => {
         async function getAddress() {
+            const token = await AsyncStorage.getItem('jwt_token')
+            const parsedToken = JSON.parse(token)
             try {
                 const options = {
                     headers: {
-                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODBmNTAyZTJhZjgzMTM5ODFjMDdjOTUiLCJpYXQiOjE3NDU4NDE3NjV9.Rw2q8d83dOOSvqlusMd-7IOW2QBCl8KT6_sCnEzTlcQ",
+                        "Authorization": `Bearer ${parsedToken}`,
                         "Content-Type": "application/json"
                     }
                 }
-                const response = await fetch("", options)
+                const response = await fetch("https://mom-beta-server1.onrender.com/address/address", options)
                 if (response.ok) {
                     const data = await response.json()
-                    console.log(data)
+                    setAddress(data.data)
+            
+                }else{
+                    console.log("something is" , response)
                 }
             } catch (e) {
                 console.log("Error in Fetching data", e)
@@ -30,12 +36,14 @@ export const AddressProvider = ({ children }) => {
     }, [])
 
 
-    function updateAddress() {
 
-    }
-
-    function setAddressAsPrimary() {
-
+    async function setAddressAsPrimary() {
+        try{
+            const options = {} 
+            const response = await fetch("" , options)
+        }catch(e){
+            console.log("Error in updating address", e)
+        }
     }
 
     function addAddress() {

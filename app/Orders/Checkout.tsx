@@ -1,5 +1,6 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
+import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,23 +14,31 @@ const OrderReviewScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [ medicine, setMedicine]=useState([])
 
+  const {ExtractParseToken} = userAuth()
+
   const handleQuantityChange = (id, type) => {
     const item = cartItems.find((item) => item.id === id);
     if (!item) return;
     const newQty = type === 'inc' ? item.quantity + 1 : item.quantity - 1;
     updateQuantity(id, newQty > 0 ? newQty : 1);
+
   };
 
   async function postOrders(medicines) {
+
+    const tokenAuth = await ExtractParseToken()
     
     const addressId = "6815a9c9f92b58dc500aa3da";
 
-    const orderMedicines = medicines.map((item) => ({
-      medicine_id: item.id,
+    const orderMedicines = medicines.map((item) => {
+      console.log(item)
+      return({
+      medicine_id: item._id,
       quantity: item.quantity,
       price: item.price,
-      image: item.imageUrl,
-    }));
+      imageUrl: item.imageUrl,
+      name:item.medicine_name
+   })});
 
     const orderData = {
       address_id: addressId,
@@ -47,6 +56,7 @@ const OrderReviewScreen = () => {
       const response = await fetch('https://mom-beta-server1.onrender.com/api/add-order', {
         method: 'POST',
         headers: {
+          "Authorization":`Bearer ${tokenAuth}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(orderData),
@@ -72,7 +82,7 @@ const OrderReviewScreen = () => {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Order Review</Text>
 
-      <CartList items={cartItems} handleQuantityChange={handleQuantityChange} />
+      <CartList/>
 
       <View style={styles.addressBox}>
         <Ionicons name="location-outline" size={24} color="#007F5F" style={styles.icon} />
@@ -86,11 +96,11 @@ const OrderReviewScreen = () => {
         <TouchableOpacity onPress={()=>{
           router.push("/Maps/myAddress")
         }}>
-          <Text style={styles.changeBtn}>Change</Text>
+          <Text>Change</Text>
         </TouchableOpacity>
       </View>
 
-      <OrderSummary items={cartItems} subtotal={subtotal} />
+      <OrderSummary />
 
       <TouchableOpacity
         style={styles.proceedButton}

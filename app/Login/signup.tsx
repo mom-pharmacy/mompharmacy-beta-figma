@@ -1,11 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { userAuth } from '@/Context/authContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
   Alert,
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -19,74 +18,122 @@ import {
   View,
 } from 'react-native';
 import { Button, Checkbox } from 'react-native-paper';
-
-import { userAuth } from '../../Context/authContext';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import WelcomeCard from './success';
 
+const GENDER_OPTIONS = [
+  'Male',
+  'Female',
+  'Non-binary',
+  'Prefer not to answer',
+];
+
+// --- Type for GenderDropdown props ---
+type GenderDropdownProps = {
+  selectedGender: string;
+  setSelectedGender: (gender: string) => void;
+};
+
+function GenderDropdown({ selectedGender, setSelectedGender }: GenderDropdownProps) {
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const handleSelect = (option: string) => {
+    setSelectedGender(option);
+    setDropdownVisible(false);
+  };
+
+  return (
+    <View style={genderStyles.container}>
+      <Text style={genderStyles.heading}>Gender</Text>
+      <TouchableOpacity
+        style={genderStyles.dropdownField}
+        onPress={() => setDropdownVisible(true)}
+        activeOpacity={0.7}
+      >
+        <Text style={[
+          genderStyles.selectedText,
+          !selectedGender && { color: '#888' }
+        ]}>
+          {selectedGender || 'Select your gender'}
+        </Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={dropdownVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDropdownVisible(false)}
+      >
+        <TouchableOpacity
+          style={genderStyles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setDropdownVisible(false)}
+        >
+          <View style={genderStyles.dropdownBox}>
+            {GENDER_OPTIONS.map((option) => (
+              <TouchableOpacity
+                key={option}
+                style={genderStyles.option}
+                onPress={() => handleSelect(option)}
+              >
+                <Text style={genderStyles.optionText}>{option}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    </View>
+  );
+}
+
 const SignUpScreen = () => {
-  const { postData, loginWithOtp } = userAuth();
+  const { ExtractParseToken, getUserDetails } = userAuth();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dob, setDob] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [gender, setGender] = useState('');
 
-  const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
-  const validatePhone = (phone: string) => /^[0-9]{10}$/.test(phone);
+  async function signupUser() {
+    const AuthToken = await ExtractParseToken();
+
+    try {
+      const options = {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${AuthToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: `${firstName} ${lastName}`,
+          dateOfBirth: dob,
+          gender,
+        })
+      }
+      const response = await fetch("https://mom-beta-server1.onrender.com/api/user/register", options)
+      if (response.ok) {
+        await getUserDetails(AuthToken)
+        router.replace("/Login/success")
+      } else {
+        router.replace("/BottomNavbar/home")
+      }
+    } catch (e) {
+      console.log("Error in signing up", e)
+    }
+  }
 
   const handleSignUp = async () => {
     if (!firstName.trim()) return Alert.alert('Validation Error', 'First name is required');
     if (!lastName.trim()) return Alert.alert('Validation Error', 'Last name is required');
     if (!dob.trim()) return Alert.alert('Validation Error', 'Date of birth is required');
-    if (!email.trim()) return Alert.alert('Validation Error', 'Email is required');
-    if (!validateEmail(email)) return Alert.alert('Validation Error', 'Enter a valid email address');
-    if (!phone.trim()) return Alert.alert('Validation Error', 'Phone number is required');
-    if (!validatePhone(phone)) return Alert.alert('Validation Error', 'Enter a valid 10-digit phone number');
-
-    try {
-      console.log('Starting signup process for phone:', phone);
-      
-      // First, send OTP
-      const loginResult = await loginWithOtp(phone);
-      console.log('Login/OTP result:', loginResult);
-      
-      if (!loginResult.success) {
-        console.error('Failed to send OTP:', loginResult.message);
-        return; // Alert is shown by loginWithOtp
-      }
-
-      // Store the registration details temporarily
-      const registrationData = {
-        firstName,
-        lastName,
-        dob,
-        email,
-        gender: 'not_specified'
-      };
-      console.log('Storing registration data:', registrationData);
-      
-      await AsyncStorage.setItem('pendingRegistration', JSON.stringify(registrationData));
-
-      // Navigate to OTP screen with registration flag
-      console.log('Navigating to OTP screen for registration');
-      router.push({
-        pathname: '/Login/otp',
-        params: { 
-          phone, 
-          isRegistration: 'true',
-          registrationData: JSON.stringify(registrationData) // Pass registration data in params
-        }
-      });
-    } catch (error) {
-      console.error("Error during sign-up:", error);
-      Alert.alert(
-        "Registration Error", 
-        "Something went wrong during signup. Please try again."
-      );
+    if (!gender) return Alert.alert('Validation Error', 'Gender is required');
+    if (isChecked) {
+      signupUser()
+    } else {
+      Alert.alert("Please accept the terms and conditions")
     }
   };
 
@@ -111,13 +158,16 @@ const SignUpScreen = () => {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView contentContainerStyle={styles.outerContainer} keyboardShouldPersistTaps="handled">
+
+            <TouchableOpacity
+              style={styles.skipButton}
+              onPress={() => router.push('/Login/medintro')}
+            >
+              <Text style={styles.skipText}>Skip</Text>
+            </TouchableOpacity>
+
             <View style={styles.headerRow}>
               <Text style={styles.header}>Sign Up</Text>
-              <TouchableOpacity onPress={() => router.push('./medintro')}>
-                <View style={styles.skipbox}>
-                  <Text style={styles.skipText}>skip</Text>
-                </View>
-              </TouchableOpacity>
             </View>
 
             <Text style={styles.label}>First Name</Text>
@@ -160,29 +210,11 @@ const SignUpScreen = () => {
               />
             )}
 
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              placeholderTextColor="#888"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-            />
+            <GenderDropdown selectedGender={gender} setSelectedGender={setGender} />
 
-            <Text style={styles.label}>Phone number</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your phone number"
-              placeholderTextColor="#888"
-              keyboardType="phone-pad"
-              value={phone}
-              onChangeText={setPhone}
-            />
-
-            <Button 
-              mode="contained" 
-              style={styles.signUpButton} 
+            <Button
+              mode="contained"
+              style={styles.signUpButton}
               onPress={handleSignUp}
               disabled={!isChecked}
             >
@@ -200,25 +232,16 @@ const SignUpScreen = () => {
               </View>
               <Text style={styles.checkboxText}>
                 By clicking, I accept the{' '}
-                <TouchableOpacity onPress={() => router.push('./t_and_c')}>
-                  <Text style={styles.link}>terms of services</Text>
-                </TouchableOpacity>
+                <Text style={styles.link} onPress={() => router.push('./t_and_c')}>
+                  terms of services
+                </Text>
                 {' '}and{' '}
-                <TouchableOpacity onPress={() => router.push('./privacy')}>
-                  <Text style={styles.link}>privacy policy</Text>
-                </TouchableOpacity>
+                <Text style={styles.link} onPress={() => router.push('./privacy')}>
+                  privacy policy
+                </Text>
               </Text>
             </View>
 
-            <View style={styles.socialContainer}>
-              <Image source={require('../../assets/images/google.png')} style={styles.socialIcon} />
-              <Image source={require('../../assets/images/fb.png')} style={styles.fbIcon} />
-              <Image source={require('../../assets/images/x.png')} style={styles.twit} />
-            </View>
-
-            <TouchableOpacity onPress={() => router.push('./Login')}>
-              <Text style={styles.loginLink}>Already have an account? Login</Text>
-            </TouchableOpacity>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -282,11 +305,6 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
   },
-  skipText: {
-    fontSize: 16,
-    color: 'white',
-    fontWeight: 'bold',
-  },
   label: {
     fontWeight: '600',
     marginTop: 12,
@@ -319,55 +337,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
   },
-  terms: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 12,
-  },
-  orText: {
-    textAlign: 'center',
-    marginVertical: 16,
-    fontWeight: '600',
-    color: '#555',
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '100%',
-    marginBottom: 20,
-  },
-  loginLink: {
-    textAlign: 'center',
-    color: '#00A99D',
-    fontWeight: '600',
-    fontSize: 16,
-    marginTop: 15,
-  },
-  socialIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginHorizontal: 10,
-  },
-  fbIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginHorizontal: 10,
-  },
-  twit: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginHorizontal: 10,
-  },
-  skipbox: {
-    backgroundColor: '#007E71',
-    paddingHorizontal: 18,
-    paddingVertical: 6,
-    borderRadius: 15,
-  },
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -392,6 +361,94 @@ const styles = StyleSheet.create({
     color: '#00A99D',
     textDecorationLine: 'underline',
   },
+  skipButton: {
+    position: 'absolute',
+    top: Platform.select({
+      ios: hp('7%'),
+      android: hp('3%')
+    }),
+    right: wp('5%'),
+    zIndex: 1,
+  },
+  skipText: {
+    fontSize: hp('2%'),
+    color: '#007E71',
+    fontWeight: '600',
+  },
+});
+
+const genderStyles = StyleSheet.create({
+  container: {
+    width: 326,
+    marginTop: 20,
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#000',
+    paddingLeft: 2,
+  },
+  dropdownField: {
+    borderWidth: 1,
+    borderColor: '#bbb',
+    borderRadius: 25,
+    paddingVertical: Platform.OS === 'ios' ? 14 : 10,
+    paddingHorizontal: 16,
+    backgroundColor: '#E8F1F0', // Matches input field
+    justifyContent: 'center',
+    height: 52, // Matches input field
+  },
+  selectedText: {
+    fontSize: 16,
+    color: '#222',
+    fontWeight: 'bold'
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.15)',
+  },
+  dropdownBox: {
+    marginHorizontal: 32,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingVertical: 8,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 5,
+  },
+  option: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#222',
+  },
 });
 
 export default SignUpScreen;
+
+function setModalVisible(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+function setShowDatePicker(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+
+function setDob(formatted: string) {
+  throw new Error('Function not implemented.');
+}
+
+function signupUser() {
+  throw new Error('Function not implemented.');
+}
+
+function getUserDetails(AuthToken: any) {
+  throw new Error('Function not implemented.');
+}

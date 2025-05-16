@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const MomPharmacyScreen = () => {
   return (
+    <SafeAreaView>
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => { router.back()}}>
@@ -15,6 +17,7 @@ const MomPharmacyScreen = () => {
       <Text style={styles.subtitle}>Your health, your home, our tests</Text>
       <Text style={styles.comingSoon}>Coming soon..</Text>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -23,6 +26,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f8f8', 
     padding: 20,
+    height:"100%"
   },
   header: {
     flexDirection: 'row',

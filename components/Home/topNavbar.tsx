@@ -40,6 +40,8 @@ const styles = StyleSheet.create({
     width: width,
     backgroundColor: COLOR.light,
     paddingHorizontal: 20,
+    marginTop:-10
+  
   },
   title: {
     color: COLOR.primary,

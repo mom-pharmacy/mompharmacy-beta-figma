@@ -3,9 +3,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MyReports() {
   return (
+    <SafeAreaView style={styles.screen}>
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Ionicons
@@ -22,6 +24,7 @@ export default function MyReports() {
         <Text style={styles.comingSoonText}>Coming Soon</Text>
       </View>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -55,6 +58,11 @@ const styles = StyleSheet.create({
   comingSoonText: {
     fontSize: 22,
     color: '#555',
+  },
+   screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+
   },
 });
 

@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import MapView, { MapPressEvent, Marker, PoiClickEvent, Region } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const AddAddress = () => {
@@ -42,9 +43,11 @@ const AddAddress = () => {
   };
 
   return (
+    <SafeAreaView style={styles.screen}>
+     
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableHighlight onPress={() => router.push('/Maps/myAddress')}>
+        <TouchableHighlight onPress={() => router.back()}>
           <AntDesign name="arrowleft" size={26} color="black" />
         </TouchableHighlight>
         <Text style={styles.title}>Select Address</Text>
@@ -74,6 +77,7 @@ const AddAddress = () => {
         </TouchableHighlight>
       </View>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -90,4 +94,9 @@ const styles = StyleSheet.create({
   saveButtonWrapper: { alignItems: 'center' },
   saveButton: { height: 50, width: 350, backgroundColor: "#00a99d", borderRadius: 10, margin: 10, alignItems: 'center', justifyContent: 'center' },
   saveButtonText: { color: "white", fontSize: 18 },
+   screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+  
+  },
 });

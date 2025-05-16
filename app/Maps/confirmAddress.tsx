@@ -1,11 +1,14 @@
 import { AntDesign } from '@expo/vector-icons';
 import * as Contacts from 'expo-contacts';
 import { useState } from 'react';
-import { Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 
 
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+
+import { COLOR } from '@/constants/color';
 import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddressForm() {
   const { address } = useLocalSearchParams();
@@ -81,11 +84,18 @@ export default function AddressForm() {
 
   return (
     <>
+      <SafeAreaView style={styles.screen}>
 
-      <View style={{ padding: 20, }}>
+        <View style={styles.statusContainer}>
+          <Pressable style={styles.Container} onPress={() => router.back()}>
+            <AntDesign name="left" size={24} color={COLOR.secondary} />
+            <Text style={styles.Text}>Confirm Address</Text>
+          </Pressable>
+        </View>
+        <View style={{ padding: 20, }}>
 
 
-        {/* <TouchableOpacity style={styles.headerRow}  onPress={()=>router.push('/Maps/addAddress')}>
+          {/* <TouchableOpacity style={styles.headerRow}  onPress={()=>router.push('/Maps/addAddress')}>
             <Ionicons name="chevron-back-outline" size={20} color="#00A99D"  />
             <Text style={styles.title}>Address</Text>
 
@@ -94,57 +104,58 @@ export default function AddressForm() {
 
 
 
-        <TextInput
-          placeholder="House No."
-          style={styles.input}
-          value={houseNumber}
-          onChangeText={setHouseNumber}
-        />
-
-
-        <TextInput
-          placeholder="Building & Block No."
-          style={styles.input}
-          value={buildingBlockNumber}
-          onChangeText={setBuildingBlockNumber}
-        />
-
-
-        <View style={{
-          height: 50,
-          borderColor: '#ccc',
-          borderWidth: 1,
-          borderRadius: 10,
-          paddingHorizontal: 15,
-          marginBottom: 15,
-          fontSize: 16,
-          backgroundColor: '#fff',
-          flexDirection: 'row',
-        }}>
           <TextInput
-            placeholder="Receiver Name"
-            value={contactName}
-            editable={false}
-            style={{ flex: 1 }}
+            placeholder="House No."
+            style={styles.input}
+            value={houseNumber}
+            onChangeText={setHouseNumber}
           />
-          <TouchableHighlight onPress={pickContact} style={{ padding: 10 }}>
-            <AntDesign name="contacts" size={24} color="black" />
-          </TouchableHighlight>
+
+
+          <TextInput
+            placeholder="Building & Block No."
+            style={styles.input}
+            value={buildingBlockNumber}
+            onChangeText={setBuildingBlockNumber}
+          />
+
+
+          <View style={{
+            height: 50,
+            borderColor: '#ccc',
+            borderWidth: 1,
+            borderRadius: 10,
+            paddingHorizontal: 15,
+            marginBottom: 15,
+            fontSize: 16,
+            backgroundColor: '#fff',
+            flexDirection: 'row',
+          }}>
+            <TextInput
+              placeholder="Receiver Name"
+              value={contactName}
+              editable={false}
+              style={{ flex: 1 }}
+            />
+            <TouchableHighlight onPress={pickContact} style={{ padding: 10 }}>
+              <AntDesign name="contacts" size={24} color="black" />
+            </TouchableHighlight>
+          </View>
+
+          {/* Receiver Contact */}
+          <TextInput
+            placeholder="Receiver Number"
+            value={contact}
+            style={styles.input}
+            editable={false}
+          />
+
+          {/* Save Address Button */}
+          <TouchableOpacity style={styles.button} onPress={handleLocation}>
+            <Text style={styles.buttonText}>Save Address</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Receiver Contact */}
-        <TextInput
-          placeholder="Receiver Number"
-          value={contact}
-          style={styles.input}
-          editable={false}
-        />
-
-        {/* Save Address Button */}
-        <TouchableOpacity style={styles.button} onPress={handleLocation}>
-          <Text style={styles.buttonText}>Save Address</Text>
-        </TouchableOpacity>
-      </View>
+      </SafeAreaView >
     </>
 
   );
@@ -187,4 +198,27 @@ const styles = {
     fontSize: 18,
     fontWeight: 'bold',
   },
+  screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+
+  },
+  statusContainer: {
+    padding: 12,
+    backgroundColor: "white",
+    paddingLeft: 20,
+
+
+  }
+  ,
+  Container: {
+    flexDirection: 'row',
+    gap: 30
+  },
+  Text: {
+    fontWeight: 700,
+    fontSize: 22,
+    color: '#00a99d'
+
+  }
 };

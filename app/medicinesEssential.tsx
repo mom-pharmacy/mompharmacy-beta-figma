@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Medicines() {
   const [medicine, setMedicine] = useState([]);
@@ -42,9 +43,12 @@ export default function Medicines() {
   const limitedMedicines = medicine.slice(-3,-1);
 
   return (
+    <SafeAreaView>
+      
+       <TopNavbar />
     <ScrollView >
     <View style={styles.container}>
-      <TopNavbar />
+     
       <Search />
       <View style={{padding:15}}>
       <UploadPrescription />
@@ -105,6 +109,7 @@ export default function Medicines() {
       <Footer />
     </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

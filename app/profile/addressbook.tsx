@@ -1,3 +1,4 @@
+import { useAddress } from '@/Context/addressContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
@@ -5,6 +6,9 @@ import { Alert, Image, Linking, ScrollView, Share, StyleSheet, Text, TouchableOp
 
 const AddressBookScreen = () => {
   const router = useRouter();
+
+  const {address}  = useAddress()
+  console.log("this is running " , address)
 
   const handleEdit = () => {
     Alert.alert('Edit', 'Edit functionality coming soon!');

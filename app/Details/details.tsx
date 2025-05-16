@@ -1,4 +1,5 @@
 import Footer from '@/components/Home/footer';
+import { userAuth } from '@/Context/authContext';
 import { useCart } from '@/Context/cartContext';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -69,11 +70,13 @@ export default function Details() {
     const findItem = cartItems.find((item) => item._id === itemId);
     return findItem ? findItem.quantity : 0;
   };
-
+const {ExtractParseToken} = userAuth()
 
    const handleWishlistToggle = async () => {
     const newState = !isSaved
     setIsSaved(newState)
+    const tokenAuth = await ExtractParseToken()
+    
 
     if (newState) {
       try {
@@ -81,6 +84,7 @@ export default function Details() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization':`Bearer ${tokenAuth}`,
           },
           body: JSON.stringify({
             userId: '682354e783196e87d42a7cbc', 
@@ -408,5 +412,6 @@ const styles = StyleSheet.create({
 
   }
 });
+
 
 

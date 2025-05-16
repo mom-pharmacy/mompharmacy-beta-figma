@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -32,6 +33,7 @@ export default function SettingsScreen() {
   };
 
   return (
+    <SafeAreaView style={styles.screen}>
     <View style={[styles.container, { backgroundColor: darkTheme ? '#1e1e1e' : '#fff' }]}>
       <View style={styles.headerRow}>
         <Ionicons
@@ -66,6 +68,7 @@ export default function SettingsScreen() {
         <Text style={styles.deleteText}>Delete Account</Text>
       </TouchableOpacity>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -113,5 +116,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+   screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+
   },
 });

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const notifications = [
@@ -50,13 +51,14 @@ const NotificationItem = ({ item }) => (
 
 const NotificationsScreen = ({ navigation }) => {
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
+    <View >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Icon name="chevron-left" size={40} color="#00a99d" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
-        <View style={{ width: 28 }} />
+        <View style={{ width: "40%" }} />
       </View>
 
       <FlatList
@@ -66,6 +68,7 @@ const NotificationsScreen = ({ navigation }) => {
         contentContainerStyle={styles.listContent}
       />
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -73,7 +76,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: 'white',
-    paddingTop: 10,
+  
     paddingHorizontal: 16,
   },
   header: {

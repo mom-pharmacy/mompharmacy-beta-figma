@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import Icon from 'react-native-vector-icons/Feather';
 
 const OnboardingScreen = ({ navigation }) => {
@@ -54,52 +55,128 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
+  skipbox: {
+    position: 'absolute',
+    top: hp('6%'),
+    right: wp('2%'),
+    zIndex: 1,
+    borderRadius: 30,
+    paddingVertical: hp('0.5%'),
+    paddingHorizontal: wp('5%'),
+  },
   skipButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 20,
+    paddingVertical: hp('0.7%'),
+    paddingHorizontal: wp('4%'),
     backgroundColor: '#DA7C08',
     borderRadius: 30,
     flexDirection: 'row',
     alignItems: 'center',
+    ...Platform.select({
+      android: {
+        bottom: 15
+      }
+    })
   },
   skipText: {
-    fontSize: 20,
+    fontSize: hp('2.2%'),
     color: 'black',
     fontWeight: 'bold',
   },
   backButton: {
     position: 'absolute',
-    top: 60,
-    left: 20,
-    padding: 5,
+    // top: hp('7.5%'),
+    left: wp('5%'),
+    padding: hp('0.5%'),
     color: 'black',
+    zIndex: 1,
+    ...Platform.select({
+      android: {
+        top: 30
+      },
+      ios: {
+        top: 60
+      }
+    })
+    
   },
   placeholderBox: {
-    height: 300,
-    width: 100,
-    marginBottom: 90,
+    height: hp('35%'),
+    width: wp('60%'),
+    marginBottom: hp('10%'),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imgBackground1: {
+    height: hp('28%'),
+    width: hp('28%'),
+    right: wp('10%'),
+    marginTop: hp('13%'),
+    borderRadius: 200,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    position: 'absolute',
+    zIndex: 0,
+    ...Platform.select({
+      andorid: {
+        right: 40
+      },
+      ios: {
+        right: 0
+      }
+    })
+  },
+  imgBackground2: {
+    height: hp('20%'),
+    width: hp('20%'),
+    right: wp('6%'),
+    marginTop: hp('1%'),
+    borderRadius: 200,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    position: 'absolute',
+    zIndex: 1,
+    ...Platform.select({
+      ios: {
+        bottom: 10
+      },
+      andorid: {
+        bottom: 10
+        },
+    })
   },
   image: {
-    height: 255,
-    width: 300,
-    right: 110,
-    marginTop: -200,
+    height: hp('30%'),
+    width: wp('75%'),
+    marginTop: hp('2%'),
+    alignSelf: 'center',
+    zIndex: 2,
+    ...Platform.select({
+      android: { 
+        top: 70
+      },
+      ios: { 
+        top: 70
+      }
+    })
   },
   indicatorContainer: {
     flexDirection: 'row',
-    marginVertical: 60,
-    marginTop: 10,
+    marginVertical: hp('4%'),
+    marginTop: hp('1.5%'),
   },
   indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: wp('2.2%'),
+    height: wp('2.2%'),
+    borderRadius: wp('1.1%'),
     backgroundColor: '#ccc',
-    marginHorizontal: 4,
+    marginHorizontal: wp('1%'),
+    ...Platform.select({
+      ios: {
+        top: 30
+      }
+    })
   },
   activeIndicator: {
     backgroundColor: 'white',
-    width: 22,
+    width: wp('6%'),
   },
   textBox: {
     backgroundColor: '#DA7C08',
@@ -108,57 +185,54 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     width: '90%',
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: 40,
     height: 200,
+    ...Platform.select({
+      ios: {
+        top: 97
+      },
+      android: {
+        top: 50
+      }
+    })
   },
   messageText: {
     color: '#fff',
-    fontSize: 24,
+    fontSize: hp('2.7%'),
     textAlign: 'center',
   },
   tBox: {
     height: 110,
     width: 110,
     backgroundColor: '#FF9D24',
-    marginTop: 40,
+    marginTop: 35,
     marginBottom: -50,
     borderRadius: 100,
-  },
-  highlight: {
-    fontWeight: 'bold',
+    ...Platform.select({
+      ios: {
+        marginTop: 40
+      },
+      android: {
+        marginTop: 40
+      }
+    })
   },
   centeredButton: {
     backgroundColor: '#E5322E',
     borderRadius: 50,
     width: 80,
-    height: 85,
+    height: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -56,
-  },
-  imgBackground1: {
-    height: 250,
-    width: 250,
-    right: 80,
-    marginTop: 100,
-    borderRadius: 200,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-  },
-  imgBackground2: {
-    height: 180,
-    width: 180,
-    right: 45,
-    marginTop: -210,
-    borderRadius: 200,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-  },
-  skipbox: {
-    position: 'absolute',
-    top: 48,
-    right: 2,
-    zIndex: 1,
-    borderRadius: 30,
-    paddingVertical: 5,
-    paddingHorizontal: 20,
+    marginTop: -50,
+    alignSelf: 'center',
+    ...Platform.select({
+      android: {
+        top: 50
+      },
+      ios: { 
+       top: 90 
+      }
+    })
   },
 });

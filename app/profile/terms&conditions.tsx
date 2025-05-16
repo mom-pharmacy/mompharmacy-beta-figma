@@ -3,6 +3,7 @@ import CheckBox from 'expo-checkbox';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Suppress harmless layout animation warning
@@ -12,6 +13,7 @@ export default function Terms_n_Conditions() {
   const [isSelected, setSelection] = useState(false);
 
   return (
+    <SafeAreaView>
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.headerRow}>
         <Ionicons
@@ -90,6 +92,7 @@ export default function Terms_n_Conditions() {
         </Text>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 

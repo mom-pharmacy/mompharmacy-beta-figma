@@ -1,4 +1,5 @@
-
+import { userAuth } from '@/Context/authContext';
+import { useCart } from '@/Context/cartContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -11,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-const JWT_TOKEN = process.env.JWT_TOKEN;
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Product = {
   _id: string;
@@ -22,39 +23,38 @@ type Product = {
   imageUrl: string;
 };
 
+
 export default function SavedListScreen() {
+  const { cartItem, addToCart } = useCart()
   const [wishlist, setWishlist] = useState<Product[]>([]);
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
-  const userId = 'YOUR_USER_ID';
+  const { ExtractParseToken } = userAuth();
 
   useEffect(() => {
-
     const fetchWishlist = async () => {
       try {
-        // Get JWT token from AsyncStorage
-        const token = JWT_TOKEN;
-        console.log(token)
-    
+        const token = await ExtractParseToken();
         if (!token) {
           console.warn('No token found');
+          setLoading(false);
           return;
         }
-    
-        console.log('JWT Token:', token);
-    
+
         const options = {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         };
-    
-        const res = await fetch(`https://mom-beta-server1.onrender.com/api/wishlist/getwishlist`, options);
-        
+
+        const res = await fetch(
+          `https://mom-beta-server1.onrender.com/api/wishlist/getwishlist`,
+          options
+        );
         const data = await res.json();
-        console.log(data)
+
         if (res.ok) {
           setWishlist(data.wishlist.products);
         } else {
@@ -66,36 +66,58 @@ export default function SavedListScreen() {
         setLoading(false);
       }
     };
-    
 
     fetchWishlist();
-  }, []);
+  }, [ExtractParseToken]);
 
-  const handleAddToCart = (id: string) => {
-    setCart((prev) => ({ ...prev, [id]: 1 }));
-  };
+ const handleAddToCart = (item: Product) => {
+  const updatedCart = { ...cart, [item._id]: 1 };
+  setCart(updatedCart);
 
-  const handleIncrement = (id: string) => {
-    setCart((prev) => ({ ...prev, [id]: prev[id] + 1 }));
-  };
+  // Use the global cart context to add the item
+  addToCart([{ ...item, quantity: 1 }]);
+};
 
-  const handleDecrement = (id: string) => {
-    if (cart[id] > 1) {
-      setCart((prev) => ({ ...prev, [id]: prev[id] - 1 }));
-    } else {
-      const updatedCart = { ...cart };
-      delete updatedCart[id];
-      setCart(updatedCart);
-    }
-  };
+
+const handleIncrement = (item: Product) => {
+  const newQuantity = (cart[item._id] || 0) + 1;
+  setCart((prev) => ({ ...prev, [item._id]: newQuantity }));
+  addToCart([{ ...item, quantity: newQuantity }]);
+};
+
+const handleDecrement = (item: Product) => {
+  const currentQty = cart[item._id];
+  if (currentQty > 1) {
+    const newQty = currentQty - 1;
+    setCart((prev) => ({ ...prev, [item._id]: newQty }));
+    addToCart([{ ...item, quantity: newQty }]);
+  } else {
+    const updatedCart = { ...cart };
+    delete updatedCart[item._id];
+    setCart(updatedCart);
+    addToCart([]); // Or remove item via another method
+  }
+};
+
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch('https://mom-beta-server1.onrender.com/api/wishlist/remove', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, productId: id }),
-      });
+      const token = await ExtractParseToken();
+      if (!token) {
+        console.warn('No token found for deletion');
+        return;
+      }
+      const res = await fetch(
+        'https://mom-beta-server1.onrender.com/api/wishlist/remove',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productId: id }),
+        }
+      );
       const data = await res.json();
       if (res.ok) {
         setWishlist((prev) => prev.filter((item) => item._id !== id));
@@ -119,23 +141,36 @@ export default function SavedListScreen() {
           <Text style={styles.name}>{item.name}</Text>
           <Text style={styles.price}>
             Rs {item.price}{' '}
-            <Text style={styles.strikethrough}>Rs {item.originalPrice}</Text> {item.discount}
+            <Text style={styles.strikethrough}>Rs {item.originalPrice}</Text>{' '}
+            {item.discount}
           </Text>
 
           {quantity === 0 ? (
-            <TouchableOpacity style={styles.addButton} onPress={() => handleAddToCart(item._id)}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => handleAddToCart(item)}
+            >
               <Text style={styles.addButtonText}>Add to cart</Text>
             </TouchableOpacity>
           ) : (
             <View style={styles.controlsRow}>
-              <TouchableOpacity style={styles.controlButton} onPress={() => handleDecrement(item._id)}>
+              <TouchableOpacity
+                style={styles.controlButton}
+                onPress={() => handleDecrement(item)}
+              >
                 <Text style={styles.controlText}>−</Text>
               </TouchableOpacity>
               <Text style={styles.quantityText}>{quantity}</Text>
-              <TouchableOpacity style={styles.controlButton} onPress={() => handleIncrement(item._id)}>
+              <TouchableOpacity
+                style={styles.controlButton}
+                onPress={() => handleIncrement(item)}
+              >
                 <Text style={styles.controlText}>+</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item._id)}>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDelete(item._id)}
+              >
                 <Text style={styles.deleteText}>Delete</Text>
               </TouchableOpacity>
             </View>
@@ -146,9 +181,14 @@ export default function SavedListScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons name="chevron-back-outline" size={24} color="#00A99D" onPress={() => router.back()} />
+        <Ionicons
+          name="chevron-back-outline"
+          size={24}
+          color="#00A99D"
+          onPress={() => router.back()}
+        />
         <Text style={styles.title}>Saved Items</Text>
       </View>
 
@@ -157,23 +197,38 @@ export default function SavedListScreen() {
       ) : wishlist.length === 0 ? (
         <Text style={styles.emptyText}>Your wishlist is empty</Text>
       ) : (
-        wishlist.map(renderItem)
+        <ScrollView>
+          {wishlist.map(renderItem)}
+        </ScrollView>
       )}
 
       {wishlist.length > 0 && (
         <TouchableOpacity
           style={styles.proceedButton}
           onPress={() => {
-            setWishlist([]);
-            setCart({});
+            const itemsToAdd = wishlist
+              .filter((item) => cart[item._id]) // Only include items in the local cart
+              .map((item) => ({
+                ...item,
+                quantity: cart[item._id],
+              }));
+
+            if (itemsToAdd.length > 0) {
+              addToCart(itemsToAdd);
+              setWishlist([]);
+              setCart({});
+            } else {
+              console.warn('No items selected to add to cart.');
+            }
           }}
+
         >
           <Text style={styles.proceedButtonText}>
-            Proceed with Cart Items ({Object.keys(cart).length})
+            Proceed with Cart Items ({Object.keys(wishlist).length})
           </Text>
         </TouchableOpacity>
       )}
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -182,6 +237,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 40,
     backgroundColor: '#fff',
+    flex: 1,
   },
   headerRow: {
     flexDirection: 'row',

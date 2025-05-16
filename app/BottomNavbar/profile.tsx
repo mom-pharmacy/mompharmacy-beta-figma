@@ -1,10 +1,10 @@
-
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Alert, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileCompletionCard from '../profile/Percentage';
 
 const profileSections = [
@@ -50,117 +50,100 @@ const profileSections = [
   },
   {
     title: 'About Us',
-    icon: <Image source={require('@/assets/images/about .png')} style={{ height: 20, width: 20 }} />,
+    icon: <Image source={require('@/assets/images/settings.png')} style={{ height: 20, width: 20 }} />,
     link: '../profile/About',
   },
 ];
 
 export default function ProfileScreen() {
-  const [user, setUser] = useState({ name: '', email: '', mobileNo: '' });
-  const {ExtractParseToken} = userAuth()
-  const fetchUserDetails = async () => {
-    try {
-      const tokenAuth = await ExtractParseToken() ;
+  const { logout, userDetails } = userAuth();
+  console.log("User Details: ", userDetails);
 
-      const response = await fetch('https://mom-beta-server.onrender.com/api/user/user-details', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${tokenAuth}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setUser(data.userDetails); // assuming API returns { userDetails: { name, email, ... } }
-    } catch (error) {
-      console.error('Error fetching user details:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserDetails();
-  }, []);
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout();
     Alert.alert('Logged Out', 'You have been logged out successfully.');
   };
 
   return (
-    <ScrollView style={styles.screen}>
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => {}}>
-            <Ionicons name="chevron-back-outline" size={32} color="#1A7563" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Account & Settings</Text>
-        </View>
-      </View>
-
-      <View style={styles.box}>
-        <View style={styles.editContainer}>
-          <Pressable onPress={() => router.push('/profile/edit')}>
-            <Image source={require('@/assets/images/edit.png')} style={{ height: 20, width: 20 }} />
-          </Pressable>
-        </View>
-
-        <View style={styles.profileContainer}>
-          <Image style={styles.avatar} source={require('../../assets/images/profileimg.png')} />
-          <View style={styles.profileDetails}>
-            <Text style={styles.name}>{user.name || 'Loading...'}</Text>
-            <Text style={styles.email}>{user.email || ''}</Text>
+      <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 20 }}>
+        <View style={styles.header}>
+          <View style={styles.headerRow}>
+            <TouchableOpacity onPress={() => {router.back()}}>
+              <Ionicons name="chevron-back-outline" size={32} color="#1A7563" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Account & Settings</Text>
           </View>
         </View>
 
-        <ProfileCompletionCard />
-      </View>
+        <View style={styles.box}>
+          <View style={styles.editContainer}>
+            <Pressable onPress={() => router.push('/profile/edit')}>
+              <Image source={require('@/assets/images/edit.png')} style={{ height: 20, width: 20 }} />
+            </Pressable>
+          </View>
 
-      <FlatList
-        data={profileSections}
-        keyExtractor={(item) => item.title}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => router.push(item.link)} style={styles.profileBox}>
-            <View style={styles.row}>
-              {item.icon}
-              <Text style={styles.sectionTitle}>{item.title}</Text>
+          <View style={styles.profileContainer}>
+            <Image style={styles.avatar} source={require('../../assets/images/profileimg.png')} />
+            <View style={styles.profileDetails}>
+              <Text style={styles.name}>{userDetails.name || 'Loading...'}</Text>
+              <Text style={styles.email}>{userDetails.mobileNo || ''}</Text>
             </View>
-          </TouchableOpacity>
-        )}
-        scrollEnabled={false}
-      />
+          </View>
 
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
-
-      <View style={styles.footerTextContainer}>
-        <Text style={styles.footerText}>Care Like Your Mom</Text>
-        <Text style={styles.footerText}>Made with Love by mom Fam</Text>
-      </View>
-
-      <View style={styles.bottomLogosContainer}>
-        <View style={styles.logoBlock}>
-          <Image source={require('../../assets/images/momlogo.png')} style={styles.logoImage} resizeMode="contain" />
-          <Text style={styles.logoText}>mom pharmacy</Text>
+          <ProfileCompletionCard />
         </View>
-        <View style={styles.logoBlock}>
-          <Image source={require('../../assets/images/momlabs.png')} style={styles.logoImage} resizeMode="contain" />
-          <Text style={styles.logoText}>mom labs</Text>
+
+        <FlatList
+          data={profileSections}
+          keyExtractor={(item) => item.title}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => router.push(item.link)} style={styles.profileBox}>
+              <View style={styles.row}>
+                {item.icon}
+                <Text style={styles.sectionTitle}>{item.title}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          scrollEnabled={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+
+        <View style={styles.footerTextContainer}>
+          <Text style={styles.footerText}>Care Like Your Mom</Text>
+          <Text style={styles.footerText}>Made with Love by mom Fam</Text>
         </View>
-      </View>
-    </ScrollView>
+
+        <View style={styles.bottomLogosContainer}>
+          <View style={styles.logoBlock}>
+            <Image source={require('../../assets/images/momlogo.png')} style={styles.logoImage} resizeMode="contain" />
+            <Text style={styles.logoText}>mom pharmacy</Text>
+          </View>
+          <View style={styles.logoBlock}>
+            <Image source={require('../../assets/images/momlabs.png')} style={styles.logoImage} resizeMode="contain" />
+            <Text style={styles.logoText}>mom labs</Text>
+          </View>
+        </View>
+      </ScrollView>
+      </SafeAreaView>
+  
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  
+  },
   screen: {
     flex: 1,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+ 
   },
   box: {
     backgroundColor: '#42beb5',
@@ -276,3 +259,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+

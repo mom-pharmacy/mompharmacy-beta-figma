@@ -6,14 +6,18 @@ import { Dimensions, ScrollView, StyleSheet, TouchableHighlight, View } from 're
 
 import Categories1 from '../../components/Categoriess/categories';
 
+import GlobalStatusBar from '@/components/GlobalStatusBar';
 import Search from '@/components/Home/search';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Footer from "../../components/Home/footer";
 
 const { height } = Dimensions.get('window');
 
 const Categories = () => {
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
+      <GlobalStatusBar />
+
       <TopNavbar />
       <Search />
       <ScrollView  
@@ -31,7 +35,7 @@ const Categories = () => {
           <Footer />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   )
 }
 

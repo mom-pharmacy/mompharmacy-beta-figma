@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ProfileCompletionCard: React.FC = () => {
   const navigation = useNavigation();
@@ -13,6 +14,7 @@ const ProfileCompletionCard: React.FC = () => {
   return (
     // <Pressable onPress={handleCompletePress}>
     <>
+    <SafeAreaView>
     <View  style={styles.container}>
     <View style={styles.progressSection}>
         <Ionicons name="chevron-back-outline" size={32} color="#1A7563" />
@@ -27,6 +29,7 @@ const ProfileCompletionCard: React.FC = () => {
       </View>
 
     </View>
+    </SafeAreaView>
     
     </>
       

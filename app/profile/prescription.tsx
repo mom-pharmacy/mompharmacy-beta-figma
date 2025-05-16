@@ -14,6 +14,7 @@ import {
 import prescriptionImage from '@/assets/images/prescriptionimg.jpg';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Prescription = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -63,6 +64,7 @@ const Prescription = () => {
   );
 
   return (
+    <SafeAreaView style={styles.screen}>
     <View style={styles.container}>
         <View style={styles.headerRow}>
             <Ionicons name="chevron-back-outline" size={24} color="#00A99D" style={styles.arrowIcon} onPress={()=>router.back()} />
@@ -90,6 +92,7 @@ const Prescription = () => {
           </TouchableOpacity>
         </View>
     </View>
+    </SafeAreaView>
   );
 };
 
@@ -140,11 +143,10 @@ const styles = StyleSheet.create({
   uploadButton: {
     backgroundColor: '#00A99D',
     paddingVertical: 12,
-    paddingHorizontal: 30,
-    marginLeft: 'auto',
+   
     borderRadius: 20,
     height: 45,
-    width: 380,
+    width: 350,
     alignItems: 'center',
   },
   selectButton: {
@@ -170,6 +172,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#000',
     fontWeight: 'bold',
+  },
+   screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+
   },
 });
 

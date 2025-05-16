@@ -1,8 +1,11 @@
+import LoadingScreen from '@/components/LoadingScreen';
+import { userAuth } from '@/Context/authContext';
 
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const JWT_TOKEN = process.env.JWT_TOKEN;
 
@@ -10,23 +13,31 @@ const JWT_TOKEN = process.env.JWT_TOKEN;
 const OrderSummaryScreen = () => {
   const [orders, setOrders] = useState([]);
   const [showSummary, setShowSummary] = useState(false);
+  const [loading , setLoading] = useState(false)
+
+  const {ExtractParseToken} = userAuth()
+
+ 
 
   useEffect(() => {
-    const token = JWT_TOKEN;
     const fetchOrders = async () => {
+      const tokenAuth = await ExtractParseToken()
+      console.log(tokenAuth)
       try {
-        const response = await fetch('https://mom-beta-server1.onrender.com/api/allorders', {
+        setLoading(true)
+        const response = await fetch('https://mom-beta-server1.onrender.com/api/getorderuser', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${tokenAuth}`,
           },
         });
-
+        setLoading(false)
         const data = await response.json();
         if (data.success) {
+          console.log(data)
           setOrders(data.orders);
-        } else {
+        } else {  
           console.error('Error fetching orders:', data.message);
         }
       } catch (error) {
@@ -37,7 +48,12 @@ const OrderSummaryScreen = () => {
     fetchOrders();
   }, []);
 
+  if(loading){
+    return <LoadingScreen/>
+  }
+
   return (
+    <SafeAreaView style={styles.screen}>
     <ScrollView style={styles.container}>
       <View style={styles.headerRow}>
         <Ionicons
@@ -59,22 +75,24 @@ const OrderSummaryScreen = () => {
 
           {/* Loop through the medicines */}
           {order.medicines.length > 0 ? (
-            order.medicines.map((medicine, idx) => (
+            order.medicines.map((medicine, idx) => {
+               
+              return (
               <View key={idx} style={styles.productItem}>
-                <Image source={{ uri: medicine.imageUrl }} style={styles.productImage} />
-                <View>
-                  <Text style={styles.productName}>{medicine.name}</Text>
+                <Image source={{ uri:medicine?.medicine_id?.imageUrl??"this is not there" }} style={styles.productImage} />
+                <View >
+                  <Text style={styles.productName}>{medicine?.medicine_id?.medicine_name ?? "this is not there"}</Text>
                   <Text style={styles.productQty}>{medicine.quantity}</Text>
                   <Text style={styles.saveText}>Save for later</Text>
                 </View>
               </View>
-            ))
+            )})
           ) : (
             <Text>No medicines in this order</Text>
           )}
 
           {/* Total Text */}
-          <Text style={styles.totalText}>Total: ₹297</Text>
+          <Text style={styles.totalText}>Total: {order.total_amount}</Text>
 
           {/* Added margin for spacing */}
           <View style={{ height: 25 }} />
@@ -92,7 +110,7 @@ const OrderSummaryScreen = () => {
             <View style={styles.orderSummary}>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryLabel}>Subtotal</Text>
-                <Text style={styles.summaryValue}>₹30.50</Text>
+                <Text style={styles.summaryValue}>{order.subtotal}</Text>
               </View>
               <View style={styles.summaryItem}>
                 <Text style={styles.summaryLabel}>Shipping</Text>
@@ -114,7 +132,7 @@ const OrderSummaryScreen = () => {
               </View>
               <View style={[styles.summaryItem, styles.totalAmount]}>
                 <Text style={styles.summaryLabel}>Total</Text>
-                <Text style={[styles.summaryValue, { fontWeight: 'bold' }]}>₹35.00</Text>
+                <Text style={[styles.summaryValue, { fontWeight: 'bold' }]}>{order.total_amount}</Text>
               </View>
             </View>
           )}
@@ -124,6 +142,7 @@ const OrderSummaryScreen = () => {
       {/* Extra bottom spacing */}
       <View style={{ height: 30 }} />
     </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -131,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 40,
+    
     backgroundColor: '#f9f9f9',
   },
   headerRow: {
@@ -183,6 +202,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#333',
+    width:'70%'
   },
   productQty: {
     fontSize: 13,
@@ -244,6 +264,11 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     paddingTop: 12,
     marginTop: 12,
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: '#fff',
+
   },
 });
 

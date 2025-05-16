@@ -63,6 +63,8 @@ const OrderReviewScreen = () => {
   }
 
   return (
+    
+   
     <View style={styles.mainContainer}>
       <StatusHeader />
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -95,6 +97,7 @@ const OrderReviewScreen = () => {
         </View>
       </View>
     </View>
+
   );
 
 };

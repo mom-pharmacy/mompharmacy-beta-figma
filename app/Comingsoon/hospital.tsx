@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as React from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MomPharmacy() {
   React.useEffect(() => {
@@ -9,7 +10,8 @@ export default function MomPharmacy() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView>
+    <View style={styles.container}>
       
         <TouchableOpacity style={styles.backButton} onPress={() => { router.back()}}>
           <Ionicons name="chevron-back" size={24} color="#0d7377" />
@@ -28,6 +30,7 @@ export default function MomPharmacy() {
 
         <Text style={styles.comingSoon}>Your Emergency, Our Priority</Text>
      
+    </View>
     </SafeAreaView>
   );
 }

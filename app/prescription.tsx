@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const PrescriptionUploadScreen = () => {
@@ -100,6 +101,7 @@ const PrescriptionUploadScreen = () => {
   };
 
   return (
+    <SafeAreaView>
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Upload Prescription</Text>
 
@@ -182,6 +184,7 @@ const PrescriptionUploadScreen = () => {
         </View>
       </Modal>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

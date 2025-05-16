@@ -13,6 +13,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCart } from '../Context/cartContext';
 
 const SearchComponent = () => {
@@ -62,7 +63,9 @@ const SearchComponent = () => {
         <ScrollView style={{backgroundColor:"white"}}>
             <View style={styles.wrapper}>
                 <View style={styles.row}>
+                    <TouchableOpacity onPress={()=>{router.back()}} >
                     <MaterialIcons name="keyboard-arrow-left" size={40} color="#00a99d" />
+                    </TouchableOpacity>
 
                     <View style={styles.searchContainer}>
                         <EvilIcons name="search" size={24} color="black" />
@@ -74,8 +77,14 @@ const SearchComponent = () => {
                             placeholderTextColor="#888"
                         />
                     </View>
-
+                     <TouchableOpacity onPress={()=>{router.push('/BottomNavbar/cart')}} >
                     <FontAwesome6 name="cart-plus" size={28} color="#00a99d" />
+                    {cartItems.length > 0 && (
+                                    <View style={styles.badge}>
+                                      <Text style={styles.badgeText}>{cartItems.length}</Text>
+                                    </View>
+                                  )}
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -133,6 +142,7 @@ const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, r
     const isInCart = cartItems.some(cartItem => cartItem._id === item._id);
 
     return (
+        <SafeAreaView>
         <View style={styles.cardContainer}>
             <View style={styles.card}>
                 <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
@@ -166,6 +176,7 @@ const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, r
                 )}
             </View>
         </View>
+        </SafeAreaView>
     );
 };
 
@@ -181,11 +192,13 @@ const styles = StyleSheet.create({
 
     wrapper: {
         flex: 1,
-        justifyContent: 'center', // vertical centering
-        alignItems: 'center',     // horizontal centering
+        justifyContent: 'center', 
+        alignItems: 'center',     
         paddingHorizontal: 10,
         backgroundColor: '#fff',
-        margin: 10
+        margin: 10,
+        marginTop:60,
+        marginBottom:30
     },
     row: {
         flexDirection: 'row',
@@ -201,7 +214,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 10,
         paddingHorizontal: 10,
-        height: 40,
+        height: 50,
         borderColor: COLOR.primary,
         borderWidth: 1,
     },
@@ -288,6 +301,23 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
     },
+      badge: {
+    position: 'absolute',
+    right: -6,
+    top: -3,
+    backgroundColor: '#00a99d',
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 2,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
 });
 
 export default SearchComponent;

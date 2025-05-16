@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -34,7 +33,7 @@ export default function OtpScreen() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const { verifyOtp, postData } = userAuth();
   const params = useLocalSearchParams();
-  const user = params.phone as string;
+  const user = params.user ;
   const isRegistration = params.isRegistration === "true";
 
   useEffect(() => {
@@ -86,130 +85,16 @@ export default function OtpScreen() {
   const handleVerifyOtp = async () => {
     const fullOtp = otp.join("");
     console.log("Submitting OTP:", fullOtp);
-
-    try {
-      const isValid = await verifyOtp(fullOtp, user);
-      console.log("OTP verification result:", isValid);
-
-      if (isValid) {
-        if (isRegistration) {
-          console.log(
-            "OTP verified for registration, proceeding to complete registration"
-          );
-
-          // Get registration data from params or AsyncStorage
-          let registrationData;
-          try {
-            if (params.registrationData) {
-              registrationData = JSON.parse(params.registrationData as string);
-            } else {
-              const storedData = await AsyncStorage.getItem(
-                "pendingRegistration"
-              );
-              if (!storedData) {
-                throw new Error("No registration data found");
-              }
-              registrationData = JSON.parse(storedData);
-            }
-          } catch (e) {
-            console.error("Error getting registration data:", e);
-            Alert.alert(
-              "Error",
-              "Registration data not found. Please try again."
-            );
-            router.replace("/Login/signup");
-            return;
-          }
-
-          console.log("Completing registration with data:", registrationData);
-
-          // Complete registration with full name
-          const fullName = `${registrationData.firstName} ${registrationData.lastName}`;
-          const registrationResult = await postData(
-            fullName,
-            registrationData.dob,
-            registrationData.gender,
-            user
-          );
-
-          if (registrationResult.success) {
-            // Clear stored registration data
-            await AsyncStorage.removeItem("pendingRegistration");
-            console.log("Registration completed successfully");
-
-            // Show success message
-            Alert.alert(
-              "Registration Successful!",
-              "Your account has been created successfully.",
-              [
-                {
-                  text: "Continue",
-                  onPress: () => router.replace("/Login/medintro"),
-                },
-              ]
-            );
-          } else {
-            console.error("Registration failed:", registrationResult.message);
-            Alert.alert(
-              "Registration Failed",
-              registrationResult.message ||
-                "Failed to complete registration. Please try again.",
-              [
-                {
-                  text: "Try Again",
-                  onPress: () => router.replace("/Login/signup"),
-                },
-                {
-                  text: "Cancel",
-                  style: "cancel",
-                },
-              ]
-            );
-          }
-        } else {
-          // Normal login flow
-          console.log("Login successful, navigating to medintro");
-          router.replace("/Login/medintro");
-        }
-      } else {
-        console.error("OTP verification failed:", isValid.message);
-        Alert.alert(
-          "Invalid OTP",
-          isValid.message || "Please check the OTP and try again.",
-          [
-            {
-              text: "Try Again",
-              onPress: () => {
-                setOtp(["", "", "", "", "", ""]);
-                inputRefs.current[0]?.focus();
-              },
-            },
-            {
-              text: "Cancel",
-              style: "cancel",
-            },
-          ]
-        );
+    const data = await verifyOtp(fullOtp, user);
+    console.log("this is veeffnakf" , data)
+    if(data){
+      if(data.isExist){
+        router.replace("/Login/medintro")
+      }else{
+        router.replace("/Login/signup")
       }
-    } catch (error) {
-      console.error("Error during OTP verification:", error);
-      Alert.alert(
-        "Error",
-        "An error occurred while verifying OTP. Please try again.",
-        [
-          {
-            text: "Try Again",
-            onPress: () => {
-              setOtp(["", "", "", "", "", ""]);
-              inputRefs.current[0]?.focus();
-            },
-          },
-          {
-            text: "Cancel",
-            style: "cancel",
-          },
-        ]
-      );
+    }else{
+      router.back()
     }
   };
 
