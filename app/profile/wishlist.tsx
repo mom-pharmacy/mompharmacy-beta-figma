@@ -95,7 +95,7 @@ const handleDecrement = (item: Product) => {
     const updatedCart = { ...cart };
     delete updatedCart[item._id];
     setCart(updatedCart);
-    addToCart([]); // Or remove item via another method
+    addToCart([]); 
   }
 };
 
@@ -207,7 +207,7 @@ const handleDecrement = (item: Product) => {
           style={styles.proceedButton}
           onPress={() => {
             const itemsToAdd = wishlist
-              .filter((item) => cart[item._id]) // Only include items in the local cart
+              .filter((item) => cart[item._id]) 
               .map((item) => ({
                 ...item,
                 quantity: cart[item._id],

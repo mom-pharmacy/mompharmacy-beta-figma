@@ -3,7 +3,7 @@ import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileCompletionCard from '../profile/Percentage';
 
@@ -59,10 +59,7 @@ export default function ProfileScreen() {
   const { logout, userDetails } = userAuth();
   console.log("User Details: ", userDetails);
 
-  const handleLogout = async () => {
-    await logout();
-    Alert.alert('Logged Out', 'You have been logged out successfully.');
-  };
+  
 
   return (
       <SafeAreaView style={styles.safeArea}>
@@ -109,9 +106,9 @@ export default function ProfileScreen() {
           contentContainerStyle={{ paddingBottom: 20 }}
         />
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        {/* <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={styles.footerTextContainer}>
           <Text style={styles.footerText}>Care Like Your Mom</Text>
@@ -215,19 +212,19 @@ const styles = StyleSheet.create({
     color: '#007e71',
     marginLeft: 12,
   },
-  logoutButton: {
-    backgroundColor: '#B5000A',
-    marginHorizontal: 20,
-    marginTop: 20,
-    borderRadius: 30,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  logoutText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '800',
-  },
+  // logoutButton: {
+  //   backgroundColor: '#B5000A',
+  //   marginHorizontal: 20,
+  //   marginTop: 20,
+  //   borderRadius: 30,
+  //   paddingVertical: 12,
+  //   alignItems: 'center',
+  // },
+  // logoutText: {
+  //   color: '#fff',
+  //   fontSize: 16,
+  //   fontWeight: '800',
+  // },
   footerTextContainer: {
     marginTop: 30,
     alignItems: 'center',

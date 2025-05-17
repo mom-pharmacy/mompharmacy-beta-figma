@@ -1,7 +1,8 @@
 import { COLOR } from '@/constants/color';
+import { userAuth } from '@/Context/authContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,39 +18,21 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EditUserScreen = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {userDetails} = userAuth()
+  console.log(userDetails)
+  const [user, setUser] = useState(userDetails);
+  const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch('https://mom-beta-server1.onrender.com/api/user/all');
-        const data = await res.json();
-        if (data.users && data.users.length > 0) {
-          setUser(data.users[3]); // Use first user for now
-          console.log('Fetched user ID:', data.users[23]?._id);
-        } else {
-          Alert.alert('No users found');
-        }
-      } catch (error) {
-        console.error('Error fetching user:', error);
-        Alert.alert('Error', 'Failed to fetch user');
-      } finally 
-      {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-  }, []);
+  
 
   const handleUpdate = async () => {
     if (!user || !user._id) return;
+   
 
     setUpdating(true);
     try {
-      const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/updat/${user._id}`, {
+      const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/updat/${userDetails._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -58,6 +41,7 @@ const EditUserScreen = () => {
       });
 
       const data = await res.json();
+      console.log(data)
       if (res.ok) {
         Alert.alert('Success', 'User updated successfully');
       } else {
@@ -119,6 +103,7 @@ const EditUserScreen = () => {
         value={user.mobileNo}
         onChangeText={(text) => setUser({ ...user, mobileNo: text })}
         keyboardType="phone-pad"
+        editable={false}
       />
   
       <Text style={styles.label}>Gender:</Text>
@@ -143,28 +128,7 @@ const EditUserScreen = () => {
         onChangeText={(text) => setUser({ ...user, primaryAddress: text })}
       />
 
-      <Text style={styles.label}>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.email}
-        onChangeText={(text) => setUser({ ...user, email: text })}
-        keyboardType="email-address"
-      />
-
-      <Text style={styles.label}>Age:</Text>
-      <TextInput
-        style={styles.input}
-        value={String(user.age)}
-        onChangeText={(text) => setUser({ ...user, age: parseInt(text) || 0 })}
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Blood Group:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.bloodgroup}
-        onChangeText={(text) => setUser({ ...user, bloodgroup: text })}
-      />
+     
 
       <Button
         title={updating ? 'Updating...' : 'Submit'}

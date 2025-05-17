@@ -1,3 +1,4 @@
+import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
@@ -9,9 +10,16 @@ export default function SettingsScreen() {
   const navigation = useNavigation();
   const router = useRouter();
 
+  const {logout} = userAuth()
+
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [remindersEnabled, setRemindersEnabled] = useState(false);
   const [darkTheme, setDarkTheme] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    Alert.alert('Logged Out', 'You have been logged out successfully.');
+  };
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -64,9 +72,13 @@ export default function SettingsScreen() {
         />
       </View>
 
-      <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
+      {/* <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
         <Text style={styles.deleteText}>Delete Account</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+
+       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <Text style={styles.logoutText}>Log Out</Text>
+              </TouchableOpacity>
     </View>
     </SafeAreaView>
   );
@@ -102,20 +114,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  deleteButton: {
-    backgroundColor: '#e5322e',
-    paddingVertical: 14,
-    marginTop: 30,
-    borderRadius: 25,
-    justifyContent: 'center',
+  // deleteButton: {
+  //   backgroundColor: '#e5322e',
+  //   paddingVertical: 14,
+  //   marginTop: 30,
+  //   borderRadius: 25,
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   width: '50%',
+  //   alignSelf: 'center',
+  // },
+  // deleteText: {
+  //   color: '#fff',
+  //   fontSize: 16,
+  //   fontWeight: '600',
+  // },
+  logoutButton: {
+    backgroundColor: '#fbd9d3',
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 30,
+    paddingVertical: 12,
     alignItems: 'center',
-    width: '50%',
-    alignSelf: 'center',
   },
-  deleteText: {
+  logoutText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '800',
   },
    screen: {
     flex: 1,
