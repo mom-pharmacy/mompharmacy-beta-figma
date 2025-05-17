@@ -7,16 +7,21 @@ import { Pressable, Text, TextInput, TouchableHighlight, TouchableOpacity, View 
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { COLOR } from '@/constants/color';
+import { useAddress } from '@/Context/addressContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddressForm() {
-  const { address } = useLocalSearchParams();
-
+  const { address , googleLoc } = useLocalSearchParams();
+  const addressDetails = address.split(",")
+  console.log(addressDetails)
+  
   const [contactName, setContactName] = useState("");
   const [contact, setContact] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [buildingBlockNumber, setBuildingBlockNumber] = useState("");
+
+  const {addAddress} = useAddress()
 
 
   const addressParts = (address as string)?.split(',') || [];
@@ -32,9 +37,7 @@ export default function AddressForm() {
   const pickContact = async () => {
     const { status } = await Contacts.requestPermissionsAsync();
     if (status === 'granted') {
-      const pickedContact = await Contacts.presentContactPickerAsync({
-        fields: [Contacts.Fields.PhoneNumbers],
-      });
+      const pickedContact = await Contacts.presentContactPickerAsync();
 
       if (pickedContact) {
         setContactName(pickedContact.name || '');
@@ -46,40 +49,17 @@ export default function AddressForm() {
   };
 
   const handleLocation = async () => {
-    try {
-
-
-      const url = "https://mom-beta-server1.onrender.com/address/add-address";
-
-      const bodyData = {
-        userid: 1,
-        state: "telff",
-        city: "djf",
-        street: "jrtinj",
-
-
-      };
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bodyData),
-      });
-      console.log(region)
-      console.log("Response received");
-
-      const result = await response.json();
-      console.log(result);
-      console.log(region)
-
-      if (response.ok) {
-        console.warn("Address Added Successfully!");
-      } else {
-        console.warn("Failed to add address:", result.message || "Unknown error");
-      }
-    } catch (error) {
-      console.error("Error in posting address:", error);
+    const data = {
+      state:googleLoc.state ,
+      city ,
+      street,
+      pincode , 
+      currentLocation:googleLoc.currentLocation ,
     }
+
+    const isAdded = await addAddress(data)
+    if(isAdded)router.back()
+
   };
 
   return (
@@ -127,7 +107,6 @@ export default function AddressForm() {
             borderRadius: 10,
             paddingHorizontal: 15,
             marginBottom: 15,
-            fontSize: 16,
             backgroundColor: '#fff',
             flexDirection: 'row',
           }}>

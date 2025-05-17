@@ -8,7 +8,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const AddAddress = () => {
-  const { location, address, setLocation, updateAddress } = useLocationContext();
+  const { location, address, setLocation, updateAddress , shortAddress , googleLoc} = useLocationContext();
+  
 
   const [region, setRegion] = useState<Region>({
     latitude: location?.latitude || 17.385044,
@@ -71,7 +72,7 @@ const AddAddress = () => {
       <View style={styles.saveButtonWrapper}>
         <TouchableHighlight
           style={styles.saveButton}
-          onPress={() => router.push({ pathname: './confirmAddress', params: { address: address || '' } })}
+          onPress={() => router.push({ pathname: './confirmAddress', params: { address: address || '' , googleLoc} })}
         >
           <Text style={styles.saveButtonText}>Save Address</Text>
         </TouchableHighlight>

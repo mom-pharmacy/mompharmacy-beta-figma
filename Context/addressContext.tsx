@@ -1,13 +1,18 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { userAuth } from "./authContext";
 
 
 const AddressContext = createContext(null)
 
 export const AddressProvider = ({ children }) => {
 
-    const [primaryAddress, setPrimaryAddress] = useState("")
+    const [primaryAddress, setPrimaryAddress] = useState(null)
     const [address, setAddress] = useState([])
+
+    const {ExtractParseToken , userDetails} = userAuth()
+  
+    
 
     useEffect(() => {
         async function getAddress() {
@@ -35,27 +40,94 @@ export const AddressProvider = ({ children }) => {
         getAddress()
     }, [])
 
+    useEffect(()=>{
+        const primary = address.filter(item=>{
+            console.log(item)
+            return item._id===userDetails.primaryAddress
+    })
+        console.log("this is primary addrss" , primary)
+        setPrimaryAddress(primary[0])
+    } , [])
+
 
 
     async function setAddressAsPrimary() {
+        const authToken = await ExtractParseToken()
         try{
-            const options = {} 
-            const response = await fetch("" , options)
+            const options = {
+                method:"PUT",
+                headers:{
+                    "Authorization":`Bearer ${authToken}`,
+                    "Content-Type":"application/json"
+                }
+            } 
+            const response = await fetch("https://mom-beta-server1.onrender.com/address/make-primary" , options)
+            if(response.ok){
+                return true
+            }else{
+                return false
+            }
         }catch(e){
             console.log("Error in updating address", e)
+            return false
         }
     }
 
-    function addAddress() {
-
+    async function addAddress(data) {
+        const authToken = await ExtractParseToken()
+        try{
+            const options = {
+                method:"POST" , 
+                headers:{
+                    "Authorization":`Bearer ${authToken}`
+                },
+                body:JSON.stringify(data)
+            }
+            const response = await fetch("https://mom-beta-server1.onrender.com/address/add-address" , options)
+            const responseData = await response.json() 
+            if(response.ok){
+                console.log(responseData)
+                return true 
+            }else{
+                console.log(responseData)
+                return false 
+            }
+        }catch(e){
+            console.log("Error in adding address" , e)
+            return false 
+        }
     }
 
-    function deleteAddress() {
-
+    async function deleteAddress(id) {
+        const authToken = await ExtractParseToken()
+        console.log("this is" , authToken)
+        
+        try{
+            const options = {
+                method:"DELETE" , 
+                headers:{
+                    "Authorization":`Bearer ${authToken}`
+                }
+            }
+            const response = await fetch(`https://mom-beta-server1.onrender.com/address/delete/${id}` ,options)
+            const data = await response.json()
+            console.log("deleting the address" , data)
+            if(response.ok){
+                setAddress(prev=>{
+                    const filtered = prev.filter(item=>item._id!==id)
+                    return filtered
+                })
+                return true
+            }else{
+                return false
+            }
+        }catch(e){
+            return false ;
+        }
     }
 
 
-    return <AddressContext.Provider value={{ primaryAddress, address }}>
+    return <AddressContext.Provider value={{ primaryAddress, address , addAddress , deleteAddress , setAddressAsPrimary  }}>
         {children}
     </AddressContext.Provider>
 }

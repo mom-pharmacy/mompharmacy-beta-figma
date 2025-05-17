@@ -12,6 +12,7 @@ type LocationContextType = {
     shortAddress: string;
     setLocation: (location: LocationType) => void;
     updateAddress: (lat: number, lon: number) => Promise<void>;
+    googleLoc:any 
 };
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
@@ -20,6 +21,7 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     const [location, setLocation] = useState<LocationType | null>(null);
     const [address, setAddress] = useState("Fetching location...");
     const [shortAddress, setShortAddress] = useState("Fetching location...");
+    const [googleLoc  , setGoogleLoc] = useState({})
 
     const updateAddress = async (latitude: number, longitude: number) => {
         try {
@@ -28,7 +30,12 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
                 const loc = res[0];
                 const full = `${loc.name || ""}, ${loc.street || ""}, ${loc.city || ""}, ${loc.region || ""}, ${loc.country || ""}, ${loc.postalCode || ""}`;
                 const short = `${loc.name || ""}, ${loc.city || ""}`;
-
+                setGoogleLoc(()=>({
+                    pincode:loc.postalCode||"",
+                    street:loc.street || "" , 
+                    city:loc.city || "" ,
+                    country:loc.country || ""
+                }))
                 setShortAddress(short);
                 setAddress(full);
             }
@@ -53,11 +60,14 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     };
 
     useEffect(() => {
-        fetchInitialLocation();
+       async function getLocations(){
+        await fetchInitialLocation()
+       }
+       getLocations()
     }, []);
 
     return (
-        <LocationContext.Provider value={{ shortAddress, location, address, setLocation, updateAddress }}>
+        <LocationContext.Provider value={{ shortAddress, location, address, setLocation, updateAddress ,googleLoc }}>
             {children}
         </LocationContext.Provider>
     );
