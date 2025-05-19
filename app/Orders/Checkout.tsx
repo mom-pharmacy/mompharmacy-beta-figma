@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 import { useCart } from '../../Context/cartContext';
 import OrderConfirmationModal from './OrderConfirmation';
 
@@ -13,6 +14,7 @@ const OrderReviewScreen = () => {
   const [orderId, setOrderId] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [ medicine, setMedicine]=useState([])
+  const [isLoading ,setIsLoading] = useState(false)
 
   const {ExtractParseToken} = userAuth()
 
@@ -52,6 +54,8 @@ const OrderReviewScreen = () => {
       paymentMethod: "COD",
     };
 
+    setIsLoading(true)
+
     try {
       const response = await fetch('https://mom-beta-server1.onrender.com/api/add-order', {
         method: 'POST',
@@ -63,6 +67,7 @@ const OrderReviewScreen = () => {
       });
 
       const data = await response.json();
+      setIsLoading(false)
 
       if (response.ok) {
         console.log('Order placed successfully:', data.order);
@@ -105,8 +110,10 @@ const OrderReviewScreen = () => {
       <TouchableOpacity
         style={styles.proceedButton}
         onPress={() => postOrders(cartItems)}
+        disabled={isLoading}
       >
-        <Text style={styles.proceedText}>Proceed</Text>
+        {isLoading ? (<ActivityIndicator size="small" color="#fff" />) :  <Text style={styles.proceedText}>Proceed</Text>}
+       
       </TouchableOpacity>
 
       <OrderConfirmationModal visible={modalVisible} orderId={orderId} />

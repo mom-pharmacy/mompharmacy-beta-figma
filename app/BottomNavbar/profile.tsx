@@ -62,8 +62,9 @@ export default function ProfileScreen() {
   
 
   return (
-      <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 20 }}>
+        
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={() => {router.back()}}>
@@ -125,6 +126,7 @@ export default function ProfileScreen() {
             <Text style={styles.logoText}>mom labs</Text>
           </View>
         </View>
+   
       </ScrollView>
       </SafeAreaView>
   

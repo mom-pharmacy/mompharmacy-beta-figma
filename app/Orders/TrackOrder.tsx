@@ -1,42 +1,16 @@
+import OrderStatus from '@/components/OrdersComponents/OrderStatus';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { COLOR, screen } from '@/constants/color';
+import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import Feather from '@expo/vector-icons/Feather';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Octicons from '@expo/vector-icons/Octicons';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const orderStatusList = [
-  {
-    id: 1,
-    title: "Order Confirmed",
-    isDone: false,
-    icon: <Feather name="check-circle" size={24} color={COLOR.primary} />
-  },
-  {
-    id: 2,
-    title: "Order Packed",
-    isDone: false,
-    icon: <Octicons name="package" size={24} color={COLOR.primary} />
-  },
-  {
-    id: 3,
-    title: "Dispatched on the way",
-    isDone: false,
-    icon: <Feather name="truck" size={24} color={COLOR.primary} />
-  },
-  {
-    id: 4,
-    title: "Order Delivered",
-    isDone: false,
-    icon: <FontAwesome name="handshake-o" size={24} color="black" />
-  },
-];
+
 
 export default function TrackOrder() {
   const [openOrderSummary, setOpenOrderSummary] = useState(false);
@@ -44,10 +18,23 @@ export default function TrackOrder() {
   const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
 
+  const { ExtractParseToken } = userAuth();
+
   useEffect(() => {
     const fetchOrderData = async () => {
+      const tokenAuth = await ExtractParseToken();
+      if (!tokenAuth) {
+        setError('Token not found');
+        return;
+      }
       try {
-        const response = await fetch(`https://mom-beta-server1.onrender.com/api/${orderId}`);
+        const options = {
+          headers:{
+            "Authorization":`Bearer ${tokenAuth}`
+          }
+        }
+        const response = await fetch(`https://mom-beta-server1.onrender.com/api/orderbyid/${orderId}` , options);
+        console.log("this is from order " ,response)
         if (!response.ok) {
           throw new Error('Failed to fetch order data');
         }
@@ -68,6 +55,11 @@ export default function TrackOrder() {
     </View>
   );
 
+  const generateOrderId = ()=>{
+    const standaredId = orderId.slice(0 , 10).toString().toUpperCase() 
+    return standaredId
+  }
+
   const OrderItems = () => {
     if (error) {
       return <Text>Error: {error}</Text>;
@@ -80,6 +72,8 @@ export default function TrackOrder() {
     if (!order.medicines || order.medicines.length === 0) {
       return <Text>No medicines found</Text>;
     }
+
+    console.log("this is order" , order)
 
     return (
       <View style={styles.orderItemsContainer}>
@@ -104,7 +98,7 @@ export default function TrackOrder() {
       <ScrollView>
         <StatusHeader />
         <View style={trackPageStyles.deliveryBoyETA}>
-          <Image source={require("@/assets/images/Categories/babyoil.png")} style={{ width: 160, height: 180 }} />
+          <Image source={require("@/assets/images/deliveryboy.png")} style={{ width: 160, height: 180 }} />
           <View style={trackPageStyles.ETAContainer}>
             <Text style={trackPageStyles.arriving}>Arriving in</Text>
             <Text style={trackPageStyles.ETA}>10 MINS</Text>
@@ -114,10 +108,10 @@ export default function TrackOrder() {
 
         <View style={trackPageStyles.deliveryBoyContainer}>
           <View style={trackPageStyles.deliveryBoyDetailsContainer}>
-            <Image source={require("@/assets/images/Categories/babyoil.png")} style={{ width: 40, height: 40 }} />
+            <Image source={require("@/assets/images/deliveryProfile.png")} style={{ width: 40, height: 40 }} />
             <View>
               <Text>Amith Kumar</Text>
-              <Text>Heal Potter</Text>
+              <Text>Heal Porter</Text>
             </View>
           </View>
           <View style={trackPageStyles.deliveryIconsContainer}>
@@ -130,20 +124,21 @@ export default function TrackOrder() {
           </View>
         </View>
 
-        <View style={trackPageStyles.orderStatusContainer}>
+        {/* <View style={trackPageStyles.orderStatusContainer}>
           {orderStatusList.map(item => (
             <StatusRender key={item.id} title={item.title} icons={item.icon} />
           ))}
-        </View>
+        </View> */}
+     
 
         <View style={trackPageStyles.orderIdContainer}>
           <View>
             <Text style={trackPageStyles.orderStatusTitle}>Order ID</Text>
-            <Text>{orderId || 'N/A'}</Text>
+            <Text style={{color:"gray"}}>{generateOrderId() || 'N/A'}</Text>
           </View>
           <View>
             <Text style={trackPageStyles.orderStatusTitle}>Order Date & Time</Text>
-            <Text>21 DEC 2024 1:00PM</Text>
+            <Text style={{color:"gray"}}>21 DEC 2024 1:00PM</Text>
           </View>
         </View>
 
@@ -153,6 +148,10 @@ export default function TrackOrder() {
         <View style={trackPageStyles.orderItemAlign}>
           <OrderItems />
         </View>
+
+
+         <OrderStatus/>
+
 
         <TouchableOpacity style={trackPageStyles.borderSummaryBtn} onPress={() => setOpenOrderSummary(prev => !prev)}>
           <Text style={trackPageStyles.orderSummarybtnText}>Order Summary</Text>
@@ -185,8 +184,9 @@ const trackPageStyles = StyleSheet.create({
   },
   orderIdContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 20
+    justifyContent: "space-between",
+    padding: 20,
+    marginHorizontal: 12,
   },
   orderStatusTitle: {
     fontWeight: "bold",
@@ -199,7 +199,7 @@ const trackPageStyles = StyleSheet.create({
   },
   orderItemHeadingContainer: {
     padding: 12,
-    paddingHorizontal: 20,
+    marginHorizontal: 20,
   },
   orderItemHeading: {
     fontWeight: "600",
