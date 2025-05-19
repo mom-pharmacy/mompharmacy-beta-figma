@@ -1,5 +1,6 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
+import ProtectedLayout from '@/components/ProtectedRoute';
 import { COLOR, screen } from '@/constants/color';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -64,7 +65,7 @@ const OrderReviewScreen = () => {
 
   return (
     
-   
+   <ProtectedLayout>
     <View style={styles.mainContainer}>
       <StatusHeader />
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
@@ -97,7 +98,7 @@ const OrderReviewScreen = () => {
         </View>
       </View>
     </View>
-
+</ProtectedLayout>
   );
 
 };

@@ -1,16 +1,25 @@
-import { userAuth } from "@/Context/authContext";
-import { router } from "expo-router";
-import React from "react";
-import { View } from "react-native";
+import { userAuth } from '@/Context/authContext';
+import { router } from 'expo-router';
+import React, { useEffect } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
-function ProtectedRoute({ children }) {
-  const { userDetails , isLoggedIn  } = userAuth();
+export default function ProtectedLayout({children}) {
+  const { userDetails, isLoggedIn } = userAuth();
 
-  if (!userDetails && !isLoggedIn) {
-    return  router.replace("/Login/Login");
+  useEffect(() => {
+    console.log("this is from protected routr: ", userDetails);
+    if (!isLoggedIn && !userDetails) {
+      router.replace('/Login/Login'); // redirect to login
+    }
+  }, [isLoggedIn, userDetails]);
+
+  if (!isLoggedIn && !userDetails) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
-  return <View>{children}</View>;
+  return children;
 }
-
-export default ProtectedRoute;

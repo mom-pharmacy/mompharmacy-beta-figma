@@ -19,6 +19,13 @@ export default function RootLayout() {
               <CartProvider>
                 <Stack screenOptions={{ headerShown: false }}>
                   <Stack.Screen name="index" />
+                  <Stack.Screen name="Login" />
+                  <Stack.Screen name="Login/signup" />
+                  <Stack.Screen name="BottomNavbar" options={{ headerShown: false }} />
+                  <Stack.Screen name="BottomNavbar/home" />
+                  <Stack.Screen name="BottomNavbar/categories" />
+                  <Stack.Screen name="BottomNavbar/cart" />
+                  <Stack.Screen name="BottomNavbar/profile" options={{ headerShown: false }} />
                 </Stack>
               </CartProvider>
             </AddressProvider>

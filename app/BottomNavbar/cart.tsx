@@ -1,3 +1,4 @@
+import ProtectedLayout from '@/components/ProtectedRoute'
 import React from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -5,6 +6,7 @@ import Cart1 from '../Orders/Cart'
 
 const Cart = () => {
   return (
+    <ProtectedLayout>
     <SafeAreaView style={styles.screen}>
       {/* <TopNavbar /> */}
       <ScrollView
@@ -25,6 +27,7 @@ const Cart = () => {
         <Cart1 />
       </ScrollView>
     </SafeAreaView>
+    </ProtectedLayout>
   )
 }
 

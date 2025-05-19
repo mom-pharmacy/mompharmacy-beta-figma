@@ -17,6 +17,7 @@ const OrderReviewScreen = () => {
   const [isLoading ,setIsLoading] = useState(false)
 
   const {ExtractParseToken} = userAuth()
+  const {clearCart} = useCart()
 
   const handleQuantityChange = (id, type) => {
     const item = cartItems.find((item) => item.id === id);
@@ -71,6 +72,7 @@ const OrderReviewScreen = () => {
 
       if (response.ok) {
         console.log('Order placed successfully:', data.order);
+        clearCart()
         setOrderId(data.order._id);
         setMedicine(data.order.medicines)
       

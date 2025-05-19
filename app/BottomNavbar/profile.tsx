@@ -1,3 +1,4 @@
+import ProtectedLayout from '@/components/ProtectedRoute';
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -56,12 +57,17 @@ const profileSections = [
 ];
 
 export default function ProfileScreen() {
-  const { logout, userDetails } = userAuth();
+  const { logout, userDetails , isLoggedIn } = userAuth();
   console.log("User Details: ", userDetails);
 
-  
+  console.log("this is from profile" , isLoggedIn)
+
+
 
   return (
+
+    
+    <ProtectedLayout>
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 20 }}>
         
@@ -81,13 +87,13 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.profileContainer}>
+          {isLoggedIn && <View style={styles.profileContainer}>
             <Image style={styles.avatar} source={require('../../assets/images/profileimg.png')} />
             <View style={styles.profileDetails}>
               <Text style={styles.name}>{userDetails.name || 'Loading...'}</Text>
               <Text style={styles.email}>{userDetails.mobileNo || ''}</Text>
             </View>
-          </View>
+          </View>}
 
           <ProfileCompletionCard />
         </View>
@@ -129,7 +135,7 @@ export default function ProfileScreen() {
    
       </ScrollView>
       </SafeAreaView>
-  
+          </ProtectedLayout>
   );
 }
 
@@ -214,19 +220,6 @@ const styles = StyleSheet.create({
     color: '#007e71',
     marginLeft: 12,
   },
-  // logoutButton: {
-  //   backgroundColor: '#B5000A',
-  //   marginHorizontal: 20,
-  //   marginTop: 20,
-  //   borderRadius: 30,
-  //   paddingVertical: 12,
-  //   alignItems: 'center',
-  // },
-  // logoutText: {
-  //   color: '#fff',
-  //   fontSize: 16,
-  //   fontWeight: '800',
-  // },
   footerTextContainer: {
     marginTop: 30,
     alignItems: 'center',
