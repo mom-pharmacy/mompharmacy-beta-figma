@@ -72,7 +72,7 @@ const AddAddress = () => {
       <View style={styles.saveButtonWrapper}>
         <TouchableHighlight
           style={styles.saveButton}
-          onPress={() => router.push({ pathname: './confirmAddress', params: { address: address || '' , googleLoc} })}
+          onPress={() => router.push({ pathname: './confirmAddress', params: { address: address || '' , region} })}
         >
           <Text style={styles.saveButtonText}>Save Address</Text>
         </TouchableHighlight>

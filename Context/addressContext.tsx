@@ -45,7 +45,7 @@ export const AddressProvider = ({ children }) => {
             console.log(item)
             return item._id===userDetails.primaryAddress
     })
-        console.log("this is primary addrss" , primary)
+        console.log("this is primary address" , primary)
         setPrimaryAddress(primary[0])
     } , [])
 
@@ -74,12 +74,14 @@ export const AddressProvider = ({ children }) => {
     }
 
     async function addAddress(data) {
+         console.log("this is data" , data)
         const authToken = await ExtractParseToken()
         try{
             const options = {
                 method:"POST" , 
                 headers:{
-                    "Authorization":`Bearer ${authToken}`
+                    "Authorization":`Bearer ${authToken}`,
+                    "Content-Type":"application/json"
                 },
                 body:JSON.stringify(data)
             }
@@ -87,7 +89,12 @@ export const AddressProvider = ({ children }) => {
             const responseData = await response.json() 
             if(response.ok){
                 console.log(responseData)
+                setAddress(prev=>{
+                    const newAddress = [...prev , responseData.address]
+                    return newAddress
+                })
                 return true 
+
             }else{
                 console.log(responseData)
                 return false 

@@ -8,20 +8,23 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 import { COLOR } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
+import { userAuth } from '@/Context/authContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddressForm() {
-  const { address , googleLoc } = useLocalSearchParams();
+  const { address, location } = useLocalSearchParams();
+  console.log("googleLoc", location)
   const addressDetails = address.split(",")
-  console.log(addressDetails)
-  
+  console.log("this is Address", addressDetails)
+
   const [contactName, setContactName] = useState("");
   const [contact, setContact] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [buildingBlockNumber, setBuildingBlockNumber] = useState("");
 
-  const {addAddress} = useAddress()
+  const { addAddress } = useAddress()
+  const { userDetails } = userAuth()
 
 
   const addressParts = (address as string)?.split(',') || [];
@@ -50,17 +53,28 @@ export default function AddressForm() {
 
   const handleLocation = async () => {
     const data = {
-      state:googleLoc.state ,
-      city ,
-      street,
-      pincode , 
-      currentLocation:googleLoc.currentLocation ,
+      userid: userDetails._id,
+      state: addressDetails[3],
+      city: addressDetails[2],
+      country: addressDetails[4],
+      street: `${contactName},${houseNumber}, ${buildingBlockNumber}`,
+      pincode: addressDetails[5],
+      currentLocation: region
     }
 
-    const isAdded = await addAddress(data)
-    if(isAdded)router.back()
 
-  };
+    const isAdded = await addAddress(data)
+    if (isAdded) {
+      router.back(); // Go back once
+      setTimeout(() => {
+        router.back(); // Go back again after a short delay
+      }, 100);
+    }
+  }
+
+
+
+
 
   return (
     <>

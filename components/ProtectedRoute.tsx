@@ -7,7 +7,7 @@ export default function ProtectedLayout({children}) {
   const { userDetails, isLoggedIn } = userAuth();
 
   useEffect(() => {
-    console.log("this is from protected routr: ", userDetails);
+    console.log("this is : ", userDetails);
     if (!isLoggedIn && !userDetails) {
       router.replace('/Login/Login'); // redirect to login
     }
