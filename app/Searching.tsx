@@ -53,7 +53,7 @@ const SearchComponent = () => {
         setSearchQuery(text);
 
         const filtered = data.filter(item =>
-            (item.name ?? '').toLowerCase().includes(text.toLowerCase())
+            (item.medicine_name ?? '').toLowerCase().includes(text.toLowerCase())
         );
 
         setSearchData(filtered);
