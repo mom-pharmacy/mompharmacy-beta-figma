@@ -13,42 +13,55 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ProfileCompletionCard from './Percentage';
 
 const EditUserScreen = () => {
-  const {userDetails} = userAuth()
-  console.log(userDetails)
+  const { userDetails } = userAuth();
   const [user, setUser] = useState(userDetails);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
 
-  
+  const totalFields = 5;
+  const filledFields = [
+    user?.name,
+    user?.mobileNo,
+    user?.gender,
+    user?.dateOfBirth,
+    user?.primaryAddress,
+  ].filter((field) => field && field.toString().trim() !== '').length; 
+
+
+  const profileCompletion = Math.round((filledFields / totalFields) * 100);
 
   const handleUpdate = async () => {
     if (!user || !user._id) return;
-   
-
     setUpdating(true);
+
     try {
-      const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/updat/${userDetails._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      });
+      const res = await fetch(
+        `https://mom-beta-server1.onrender.com/api/user/user/update/${userDetails._id}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(user),
+        }
+      );
 
       const data = await res.json();
-      console.log(data)
+
       if (res.ok) {
         Alert.alert('Success', 'User updated successfully');
+        router.push({
+          pathname: '/BottomNavbar/profile',
+          params: { profileCompletion: profileCompletion.toString() },
+        });
       } else {
         Alert.alert('Error', data.message || 'Update failed');
       }
     } catch (error) {
-      console.error('Update failed:', error);
       Alert.alert('Error', 'Something went wrong during update');
     } finally {
       setUpdating(false);
@@ -72,71 +85,70 @@ const EditUserScreen = () => {
   }
 
   return (
-    <SafeAreaView >
-    <ScrollView contentContainerStyle={styles.container}>
-      
-      <View style={styles.statusContainer}>
-      <Pressable style={styles.Container1} onPress={()=>router.back()}>
-      <AntDesign name="left" size={24} color={COLOR.secondary} />
-      <Text style={styles.Text}>Edit User Details</Text>
-      </Pressable>
-    </View>
+    <SafeAreaView>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.statusContainer}>
+          <Pressable style={styles.Container1} onPress={() => router.back()}>
+            <AntDesign name="left" size={24} color={COLOR.secondary} />
+            <Text style={styles.Text}>Edit User Details</Text>
+          </Pressable>
+        </View>
 
-      <View style={styles.avatarContainer}>
-        <Image
-          source={require('../../assets/images/profileimg.png')}
-          style={styles.avatar}
+        <ProfileCompletionCard percentage={profileCompletion} />
+
+        <View style={styles.avatarContainer}>
+          <Image
+            source={require('../../assets/images/profileimg.png')}
+            style={styles.avatar}
+          />
+          <Text style={styles.changePhotoText}>Change Profile Picture</Text>
+        </View>
+
+        <Text style={styles.label}>Name:</Text>
+        <TextInput
+          style={styles.input}
+          value={user.name}
+          onChangeText={(text) => setUser({ ...user, name: text })}
         />
-        <Text style={styles.changePhotoText}>Change Profile Picture</Text>
-      </View>
 
-      <Text style={styles.label}>Name:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.name}
-        onChangeText={(text) => setUser({ ...user, name: text })}
-      />
+        <Text style={styles.label}>Mobile:</Text>
+        <TextInput
+          style={styles.input}
+          value={user.mobileNo}
+          onChangeText={(text) => setUser({ ...user, mobileNo: text })}
+          keyboardType="phone-pad"
+          editable={false}
+        />
 
-      <Text style={styles.label}>Mobile:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.mobileNo}
-        onChangeText={(text) => setUser({ ...user, mobileNo: text })}
-        keyboardType="phone-pad"
-        editable={false}
-      />
-  
-      <Text style={styles.label}>Gender:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.gender}
-        onChangeText={(text) => setUser({ ...user, gender: text })}
-      />
+        <Text style={styles.label}>Gender:</Text>
+        <TextInput
+          style={styles.input}
+          value={user.gender}
+          onChangeText={(text) => setUser({ ...user, gender: text })}
+        />
 
-      <Text style={styles.label}>Date of Birth:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.dateOfBirth?.substring(0, 10)}
-        onChangeText={(text) => setUser({ ...user, dateOfBirth: text })}
-        placeholder="YYYY-MM-DD"
-      />
+        <Text style={styles.label}>Date of Birth:</Text>
+        <TextInput
+          style={styles.input}
+          value={user.dateOfBirth?.substring(0, 10)}
+          onChangeText={(text) => setUser({ ...user, dateOfBirth: text })}
+          placeholder="YYYY-MM-DD"
+        />
 
-      <Text style={styles.label}>Address:</Text>
-      <TextInput
-        style={styles.input}
-        value={user.primaryAddress}
-        onChangeText={(text) => setUser({ ...user, primaryAddress: text })}
-      />
+        <Text style={styles.label}>Address:</Text>
+        <TextInput
+          style={styles.input}
+          value={user.primaryAddress}
+          onChangeText={(text) => setUser({ ...user, primaryAddress: text })}
+        />
 
-     
-
-      <Button
-        title={updating ? 'Updating...' : 'Submit'}
-        onPress={handleUpdate}
-        disabled={updating}
-        color="#008080"
-      />
-    </ScrollView>
+        <Button
+          title={updating ? 'Updating...' : 'Submit'}
+          onPress={handleUpdate}
+          disabled={updating}
+          color="#008080"
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -158,12 +170,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#00A99D',
   },
   label: {
     marginTop: 10,
@@ -189,24 +195,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-     statusContainer:{
-        padding:12 , 
-        backgroundColor:"white" ,
-        paddingLeft:20,
-       
-       
-      }
-      ,
-      Container1:{
- flexDirection:'row',
- gap:30
-      },
-      Text:{
-        fontWeight:700,
-        fontSize:22,
-        color:'#00a99d'
-
-      }
+  statusContainer: {
+    padding: 12,
+    backgroundColor: 'white',
+    paddingLeft: 20,
+  },
+  Container1: {
+    flexDirection: 'row',
+    gap: 30,
+  },
+  Text: {
+    fontWeight: '700',
+    fontSize: 22,
+    color: '#00a99d',
+  },
 });
 
 export default EditUserScreen;
+function calculateProfileCompletion(updatedData: any) {
+  throw new Error('Function not implemented.');
+}
