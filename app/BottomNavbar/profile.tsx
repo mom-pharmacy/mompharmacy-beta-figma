@@ -1,10 +1,18 @@
-import ProtectedLayout from '@/components/ProtectedRoute';
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React from 'react';
-import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useMemo } from 'react';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileCompletionCard from '../profile/Percentage';
 
@@ -57,23 +65,31 @@ const profileSections = [
 ];
 
 export default function ProfileScreen() {
-  const { logout, userDetails , isLoggedIn } = userAuth();
-  console.log("User Details: ", userDetails);
+  const { logout, userDetails } = userAuth();
+  const { profileCompletion } = useLocalSearchParams();
 
-  console.log("this is from profile" , isLoggedIn)
+  // Calculate fallback completion if param isn't passed
+  const computedCompletion = useMemo(() => {
+    const totalFields = 5;
+    const filledFields = [
+      userDetails?.name,
+      userDetails?.mobileNo,
+      userDetails?.gender,
+      userDetails?.dateOfBirth,
+      userDetails?.primaryAddress,
+    ].filter((field) => field && field.toString().trim() !== '').length;
 
+    return Math.round((filledFields / totalFields) * 100);
+  }, [userDetails]);
 
+  const percentage = profileCompletion ? parseInt(profileCompletion as string, 10) : computedCompletion;
 
   return (
-
-    
-    <ProtectedLayout>
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 20 }}>
-        
         <View style={styles.header}>
           <View style={styles.headerRow}>
-            <TouchableOpacity onPress={() => {router.back()}}>
+            <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="chevron-back-outline" size={32} color="#1A7563" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Account & Settings</Text>
@@ -87,15 +103,15 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
 
-          {isLoggedIn && <View style={styles.profileContainer}>
+          <View style={styles.profileContainer}>
             <Image style={styles.avatar} source={require('../../assets/images/profileimg.png')} />
             <View style={styles.profileDetails}>
               <Text style={styles.name}>{userDetails.name || 'Loading...'}</Text>
               <Text style={styles.email}>{userDetails.mobileNo || ''}</Text>
             </View>
-          </View>}
+          </View>
 
-          <ProfileCompletionCard />
+          <ProfileCompletionCard percentage={percentage} />
         </View>
 
         <FlatList
@@ -113,10 +129,6 @@ export default function ProfileScreen() {
           contentContainerStyle={{ paddingBottom: 20 }}
         />
 
-        {/* <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Log Out</Text>
-        </TouchableOpacity> */}
-
         <View style={styles.footerTextContainer}>
           <Text style={styles.footerText}>Care Like Your Mom</Text>
           <Text style={styles.footerText}>Made with Love by mom Fam</Text>
@@ -132,72 +144,24 @@ export default function ProfileScreen() {
             <Text style={styles.logoText}>mom labs</Text>
           </View>
         </View>
-   
       </ScrollView>
-      </SafeAreaView>
-          </ProtectedLayout>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  
-  },
-  screen: {
-    flex: 1,
-    backgroundColor: '#fff',
- 
-  },
-  box: {
-    backgroundColor: '#42beb5',
-    paddingBottom: 16,
-  },
-  header: {
-    backgroundColor: COLOR.light,
-    paddingVertical: 20,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007e71',
-    marginLeft: 12,
-  },
-  editContainer: {
-    alignItems: 'flex-end',
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    marginVertical: 20,
-  },
-  avatar: {
-    width: 150,
-    height: 100,
-    borderRadius: 40,
-  },
-  profileDetails: {
-    marginLeft: 16,
-  },
-  name: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#333',
-  },
-  email: {
-    fontSize: 14,
-    color: '#fff',
-    marginTop: 4,
-  },
+  safeArea: { flex: 1, backgroundColor: '#fff' },
+  screen: { flex: 1, backgroundColor: '#fff' },
+  box: { backgroundColor: '#42beb5', paddingBottom: 16 },
+  header: { backgroundColor: COLOR.light, paddingVertical: 20 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 },
+  headerTitle: { fontSize: 24, fontWeight: 'bold', color: '#007e71', marginLeft: 12 },
+  editContainer: { alignItems: 'flex-end', paddingHorizontal: 20, marginTop: 10 },
+  profileContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, marginVertical: 20 },
+  avatar: { width: 150, height: 100, borderRadius: 40 },
+  profileDetails: { marginLeft: 16 },
+  name: { fontSize: 20, fontWeight: '700', color: '#333' },
+  email: { fontSize: 14, color: '#fff', marginTop: 4 },
   profileBox: {
     backgroundColor: '#d1edec',
     borderRadius: 12,
@@ -210,45 +174,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#007e71',
-    marginLeft: 12,
-  },
-  footerTextContainer: {
-    marginTop: 30,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#007e71',
-    marginVertical: 4,
-  },
-  bottomLogosContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  logoBlock: {
-    alignItems: 'center',
-    width: 150,
-  },
-  logoImage: {
-    width: 100,
-    height: 60,
-    marginBottom: 10,
-  },
-  logoText: {
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'center',
-  },
+  row: { flexDirection: 'row', alignItems: 'center' },
+  sectionTitle: { fontSize: 16, fontWeight: '600', color: '#007e71', marginLeft: 12 },
+  footerTextContainer: { marginTop: 30, alignItems: 'center' },
+  footerText: { fontSize: 16, fontWeight: '600', color: '#007e71', marginVertical: 4 },
+  bottomLogosContainer: { flexDirection: 'row', justifyContent: 'space-around', marginTop: 20, marginBottom: 30 },
+  logoBlock: { alignItems: 'center', width: 150 },
+  logoImage: { width: 100, height: 60, marginBottom: 10 },
+  logoText: { fontSize: 14, color: '#333', textAlign: 'center' },
 });
-
