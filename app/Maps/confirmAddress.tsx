@@ -1,4 +1,4 @@
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import * as Contacts from 'expo-contacts';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
@@ -82,7 +82,7 @@ export default function AddressForm() {
 
         <View style={styles.statusContainer}>
           <Pressable style={styles.Container} onPress={() => router.back()}>
-            <AntDesign name="left" size={24} color={COLOR.secondary} />
+            <MaterialIcons name="arrow-back" size={24} color={COLOR.secondary} />
             <Text style={styles.Text}>Confirm Address</Text>
           </Pressable>
         </View>

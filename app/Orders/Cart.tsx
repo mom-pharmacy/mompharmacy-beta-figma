@@ -1,5 +1,4 @@
 import CartList from '@/components/OrdersComponents/CartList';
-import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import ProtectedLayout from '@/components/ProtectedRoute';
 import { COLOR, screen } from '@/constants/color';
 import { router } from 'expo-router';
@@ -67,7 +66,7 @@ const OrderReviewScreen = () => {
     
    <ProtectedLayout>
     <View style={styles.mainContainer}>
-      <StatusHeader />
+      {/* <StatusHeader title={"Cart"} /> */}
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 120 }}>
        
         <CartList/>

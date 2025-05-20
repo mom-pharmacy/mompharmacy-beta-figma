@@ -1,5 +1,5 @@
 import { COLOR } from '@/constants/color';
-import { AntDesign } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -96,7 +96,7 @@ const MyAddressesScreen = () => {
       <ScrollView style={styles.container}>
         <View style={styles.statusContainer}>
           <Pressable style={styles.Container} onPress={() => router.back()}>
-            <AntDesign name="left" size={24} color={COLOR.secondary} />
+            <MaterialIcons name="arrow-back" size={24} color={COLOR.secondary} />
             <Text style={styles.Text}>Add Address</Text>
           </Pressable>
         </View>

@@ -22,6 +22,7 @@ const banners = [
     title: 'Medicine delivery',
     description: 'Get your health, delivered within 10 minutes',
     buttonText: 'Book Now',
+    link: '/BottomNavbar/categories'
   },
   {
     image: require('../../assets/images/below.png'),
@@ -35,18 +36,21 @@ const banners = [
     title: 'Doctor consultations',
     description: 'Consult a doctor instantly anytime-anywhere',
     buttonText: 'Book Now',
+    link: '/Comingsoon/doctor'
   },
   {
     image: require('../../assets/images/labtech.png'),
     title: 'Lab tests',
     description: 'Book lab tests from home fast, easy, 24/7',
     buttonText: 'Schedule Now',
+    link: '/Comingsoon/bloodtest'
   },
   {
     image: require('../../assets/images/hospital1.png'),
     title: 'Hospital Finder',
     description: 'Find nearby hospitals for urgent needs',
     buttonText: 'Find Now',
+    link: '/Comingsoon/hospital'
   },
 ];
 

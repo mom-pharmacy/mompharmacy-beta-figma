@@ -1,13 +1,13 @@
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useCart } from '../Context/cartContext';
 

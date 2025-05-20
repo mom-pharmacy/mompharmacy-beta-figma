@@ -1,8 +1,8 @@
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
 import React from 'react';
-import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const locationData = {Telangana: {Hyderabad: ['Gachibowli', 'Madhapur', 'Uppal'],Rangareddy: ['Ghatkesar', 'LB Nagar'],'Hitech City': ['Cyber Towers', 'Mindspace']},'Andhra Pradesh': {Vijayawada: ['Labbipet', 'Benz Circle'],},};
 const MyProfile = () => {
@@ -26,9 +26,10 @@ const MyProfile = () => {
       </TouchableOpacity>
     );};
   return (
+    <SafeAreaView>
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons name="chevron-back-outline" size={20} color="#00A99D" style={styles.arrowIcon} onPress={()=>router.back()}/>
+        <MaterialIcons name="arrow-back" size={20} color="#00A99D" style={styles.arrowIcon} onPress={()=>router.back()}/>
         <Text style={styles.title}>Blood Donor</Text>
         <Text style={styles.emptyText}></Text>
       </View>
@@ -77,6 +78,7 @@ const MyProfile = () => {
           style={styles.bottomImage}
           resizeMode="contain"/>
       </View></ScrollView>
+      </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -55,7 +56,7 @@ const NotificationsScreen = ({ navigation }) => {
     <View >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Icon name="chevron-left" size={40} color="#00a99d" />
+          <MaterialIcons name="arrow-back" size={40} color="#00a99d" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
         <View style={{ width: "40%" }} />

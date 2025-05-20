@@ -1,6 +1,6 @@
 import { userAuth } from '@/Context/authContext';
 import { useCart } from '@/Context/cartContext';
-import { Ionicons } from '@expo/vector-icons';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -25,11 +25,13 @@ type Product = {
 
 
 export default function SavedListScreen() {
-  const { cartItem, addToCart } = useCart()
-  const [wishlist, setWishlist] = useState<Product[]>([]);
+  const { cartItems, addToCart , decrementItem , incrementItem  , removeFromCart} = useCart()
+  const [wishlist, setWishlist] = useState([]);
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
   const { ExtractParseToken } = userAuth();
+
+  
 
   useEffect(() => {
     const fetchWishlist = async () => {
@@ -54,6 +56,7 @@ export default function SavedListScreen() {
           options
         );
         const data = await res.json();
+        console.log(data.wishlist.products.map(item=>item))
 
         if (res.ok) {
           setWishlist(data.wishlist.products);
@@ -70,34 +73,11 @@ export default function SavedListScreen() {
     fetchWishlist();
   }, [ExtractParseToken]);
 
- const handleAddToCart = (item: Product) => {
-  const updatedCart = { ...cart, [item._id]: 1 };
-  setCart(updatedCart);
-
-  // Use the global cart context to add the item
-  addToCart([{ ...item, quantity: 1 }]);
-};
 
 
-const handleIncrement = (item: Product) => {
-  const newQuantity = (cart[item._id] || 0) + 1;
-  setCart((prev) => ({ ...prev, [item._id]: newQuantity }));
-  addToCart([{ ...item, quantity: newQuantity }]);
-};
 
-const handleDecrement = (item: Product) => {
-  const currentQty = cart[item._id];
-  if (currentQty > 1) {
-    const newQty = currentQty - 1;
-    setCart((prev) => ({ ...prev, [item._id]: newQty }));
-    addToCart([{ ...item, quantity: newQty }]);
-  } else {
-    const updatedCart = { ...cart };
-    delete updatedCart[item._id];
-    setCart(updatedCart);
-    addToCart([]); 
-  }
-};
+
+
 
 
   const handleDelete = async (id: string) => {
@@ -110,7 +90,7 @@ const handleDecrement = (item: Product) => {
       const res = await fetch(
         'https://mom-beta-server1.onrender.com/api/wishlist/remove',
         {
-          method: 'POST',
+          method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
@@ -119,6 +99,7 @@ const handleDecrement = (item: Product) => {
         }
       );
       const data = await res.json();
+      console.log("this is whishilist" , data)
       if (res.ok) {
         setWishlist((prev) => prev.filter((item) => item._id !== id));
         const updatedCart = { ...cart };
@@ -132,23 +113,42 @@ const handleDecrement = (item: Product) => {
     }
   };
 
-  const renderItem = (item: Product) => {
-    const quantity = cart[item._id] || 0;
+  const quantity = (itemId) => {
+    const findItem = cartItems.find((item) => item._id === itemId);
+    return findItem ? findItem.quantity : 0;
+  };
+
+  
+
+  const renderItem = (item) => {
+    
+  console.log("this wishlistitemId" , item)
     return (
       <View key={item._id} style={styles.itemContainer}>
         <Image source={{ uri: item.imageUrl }} style={styles.image} />
         <View style={styles.itemInfo}>
-          <Text style={styles.name}>{item.name}</Text>
+          <View style={{flexDirection:"row" , justifyContent:"space-between"}}>
+            <View>
+          <Text style={styles.name}>{item.medicine_name}</Text>
           <Text style={styles.price}>
             Rs {item.price}{' '}
             <Text style={styles.strikethrough}>Rs {item.originalPrice}</Text>{' '}
             {item.discount}
           </Text>
-
-          {quantity === 0 ? (
+</View>
+          <View style={{marginTop:29 , marginRight:10}}>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDelete(item._id)}
+                >
+                <AntDesign name='delete' size={24} color={"gray"} />
+              </TouchableOpacity>
+                </View>
+</View>
+          {quantity(item._id) === 0 ? (
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => handleAddToCart(item)}
+              onPress={() => {addToCart(item)}}
             >
               <Text style={styles.addButtonText}>Add to cart</Text>
             </TouchableOpacity>
@@ -156,25 +156,22 @@ const handleDecrement = (item: Product) => {
             <View style={styles.controlsRow}>
               <TouchableOpacity
                 style={styles.controlButton}
-                onPress={() => handleDecrement(item)}
+                onPress={() => {
+                  quantity(item._id)>1?decrementItem(item._id):removeFromCart(item._id)
+                }}
               >
                 <Text style={styles.controlText}>−</Text>
               </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity}</Text>
+              <Text style={styles.quantityText}>{quantity(item._id)}</Text>
               <TouchableOpacity
                 style={styles.controlButton}
-                onPress={() => handleIncrement(item)}
+                onPress={() => incrementItem(item._id)}
               >
                 <Text style={styles.controlText}>+</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(item._id)}
-              >
-                <Text style={styles.deleteText}>Delete</Text>
-              </TouchableOpacity>
             </View>
           )}
+          
         </View>
       </View>
     );
@@ -183,8 +180,8 @@ const handleDecrement = (item: Product) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons
-          name="chevron-back-outline"
+        <MaterialIcons
+          name="arrow-back"
           size={24}
           color="#00A99D"
           onPress={() => router.back()}
@@ -205,22 +202,8 @@ const handleDecrement = (item: Product) => {
       {wishlist.length > 0 && (
         <TouchableOpacity
           style={styles.proceedButton}
-          onPress={() => {
-            const itemsToAdd = wishlist
-              .filter((item) => cart[item._id]) 
-              .map((item) => ({
-                ...item,
-                quantity: cart[item._id],
-              }));
-
-            if (itemsToAdd.length > 0) {
-              addToCart(itemsToAdd);
-              setWishlist([]);
-              setCart({});
-            } else {
-              console.warn('No items selected to add to cart.');
-            }
-          }}
+          onPress={() => router.push("/BottomNavbar/cart")}
+          
 
         >
           <Text style={styles.proceedButtonText}>
@@ -264,6 +247,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     elevation: 1,
+    justifyContent:"space-between"
   },
   image: {
     width: 80,
@@ -274,13 +258,14 @@ const styles = StyleSheet.create({
   },
   itemInfo: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   name: {
     fontSize: 16,
     fontWeight: '600',
     color: '#222',
     marginBottom: 4,
+    width:180
   },
   price: {
     color: '#444',
@@ -325,11 +310,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   deleteButton: {
-    marginLeft: 10,
-    backgroundColor: '#e53935',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 4,
+    
   },
   deleteText: {
     color: '#fff',

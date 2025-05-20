@@ -1,7 +1,7 @@
 import LoadingScreen from '@/components/LoadingScreen';
 import { userAuth } from '@/Context/authContext';
 
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -56,8 +56,8 @@ const OrderSummaryScreen = () => {
     <SafeAreaView style={styles.screen}>
     <ScrollView style={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons
-          name="chevron-back-outline"
+        <MaterialIcons
+          name="arrow-back"
           size={26}
           color="#00A99D"
           style={styles.arrowIcon}

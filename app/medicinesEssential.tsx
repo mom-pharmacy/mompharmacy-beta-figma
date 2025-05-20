@@ -45,7 +45,7 @@ export default function Medicines() {
   return (
     <SafeAreaView>
       
-       <TopNavbar />
+       <TopNavbar showBack={true}/>
     <ScrollView >
     <View style={styles.container}>
      

@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -14,7 +14,7 @@ export default function MomPharmacy() {
     <View style={styles.container}>
       
         <TouchableOpacity style={styles.backButton} onPress={() => { router.back()}}>
-          <Ionicons name="chevron-back" size={24} color="#0d7377" />
+          <MaterialIcons name="arrow-back" size={24} color="#0d7377" />
         </TouchableOpacity>
        <View >
         <Text style={styles.title}>mom pharmacy</Text>

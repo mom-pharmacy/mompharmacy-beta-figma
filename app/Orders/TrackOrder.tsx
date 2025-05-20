@@ -96,7 +96,7 @@ export default function TrackOrder() {
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
       <ScrollView>
-        <StatusHeader />
+        <StatusHeader title={"Track Order"} />
         <View style={trackPageStyles.deliveryBoyETA}>
           <Image source={require("@/assets/images/deliveryboy.png")} style={{ width: 160, height: 180 }} />
           <View style={trackPageStyles.ETAContainer}>

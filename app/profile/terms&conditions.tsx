@@ -1,10 +1,10 @@
 
+import { MaterialIcons } from '@expo/vector-icons';
 import CheckBox from 'expo-checkbox';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Suppress harmless layout animation warning
 // LogBox.ignoreLogs(['setLayoutAnimationEnabledExperimental']);
@@ -16,8 +16,8 @@ export default function Terms_n_Conditions() {
     <SafeAreaView>
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.headerRow}>
-        <Ionicons
-          name="chevron-back-outline"
+        <MaterialIcons
+          name="arrow-back"
           size={24}
           color="#00A99D"
           style={styles.arrowIcon}

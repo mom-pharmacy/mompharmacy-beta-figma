@@ -1,5 +1,5 @@
 import { useLocationContext } from "@/Context/locationContext";
-import { AntDesign } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
@@ -49,7 +49,7 @@ const AddAddress = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableHighlight onPress={() => router.back()}>
-          <AntDesign name="arrowleft" size={26} color="black" />
+          <MaterialIcons name="arrow-back" size={26} color="black" />
         </TouchableHighlight>
         <Text style={styles.title}>Select Address</Text>
       </View>

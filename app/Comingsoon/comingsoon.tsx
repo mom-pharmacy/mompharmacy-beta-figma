@@ -1,8 +1,8 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 const MomPharmacyScreen = () => {
   return (
@@ -10,7 +10,7 @@ const MomPharmacyScreen = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => { router.back()}}>
-          <Icon name="arrow-back" size={24} color="#007E71" />
+          <MaterialIcons name="arrow-back" size={24} color="#007E71" />
         </TouchableOpacity>
         <Text style={styles.title}>mom pharmacy</Text>
       </View>

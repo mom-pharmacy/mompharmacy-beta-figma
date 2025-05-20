@@ -12,7 +12,7 @@ import {
 
 
 import prescriptionImage from '@/assets/images/prescriptionimg.jpg';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -67,7 +67,7 @@ const Prescription = () => {
     <SafeAreaView style={styles.screen}>
     <View style={styles.container}>
         <View style={styles.headerRow}>
-            <Ionicons name="chevron-back-outline" size={24} color="#00A99D" style={styles.arrowIcon} onPress={()=>router.back()} />
+            <MaterialIcons name="arrow-back" size={24} color="#00A99D" style={styles.arrowIcon} onPress={()=>router.back()} />
             <Text style={styles.title}> My Prescriptions</Text>
         </View>
 

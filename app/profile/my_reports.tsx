@@ -1,5 +1,5 @@
 
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -10,8 +10,8 @@ export default function MyReports() {
     <SafeAreaView style={styles.screen}>
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons
-          name="chevron-back-outline"
+        <MaterialIcons
+          name="arrow-back"
           size={26}
           color="#00A99D"
           style={styles.arrowIcon}

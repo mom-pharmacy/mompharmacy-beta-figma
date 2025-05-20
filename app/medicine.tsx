@@ -1,5 +1,6 @@
 import { useCart } from '@/Context/cartContext';
 import { COLOR } from '@/constants/color';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -65,7 +66,13 @@ export default function Medicines({ limit }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.search}>
+      <View style={styles.searchRow}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <MaterialIcons name="arrow-back" size={28} color={COLOR.primary} />
+        </TouchableOpacity>
         <TextInput
           style={styles.searchInput}
           placeholder="Search medicines"
@@ -227,10 +234,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-search:{
-      backgroundColor: COLOR.light,
-      padding:15
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLOR.light,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLOR.primary,
+    paddingHorizontal: 10,
+    margin: 15,
+    height: 56,
   },
+  backButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: 'transparent',
+    color: '#000',
+    fontSize: 16,
+    paddingHorizontal: 10,
+  },
+  // --- END NEW SEARCH + BACK BUTTON ROW ---
   header: {
     paddingHorizontal: wp('4%'),
     paddingTop: hp('1%'),
@@ -343,16 +372,5 @@ search:{
   quantityIcon: {
     paddingHorizontal: 10,
   },
-  searchInput: {
-    width: '100%',
-    height: 56,
-    borderRadius: 10,
-    backgroundColor: '#fff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: COLOR.primary,
-    borderWidth: 1,
-    paddingHorizontal: 15,
-    marginTop: 10,
-  },
 });
+

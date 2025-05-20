@@ -1,3 +1,4 @@
+import StatusHeader from '@/components/OrdersComponents/StatusHeader'
 import ProtectedLayout from '@/components/ProtectedRoute'
 import React from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
@@ -7,12 +8,13 @@ import Cart1 from '../Orders/Cart'
 const Cart = () => {
   return (
     <ProtectedLayout>
-    <SafeAreaView style={styles.screen}>
       {/* <TopNavbar /> */}
+    <SafeAreaView style={styles.screen}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
-      >
+        >
+        <StatusHeader title={"Cart"} />
 
         {/* <View style={styles.container}>
           <View style={{ paddingHorizontal: 10 }}>

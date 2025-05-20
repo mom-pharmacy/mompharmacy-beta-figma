@@ -1,5 +1,5 @@
 import { useAddress } from '@/Context/addressContext';
-import { Entypo, Ionicons } from '@expo/vector-icons';
+import { Entypo, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -7,6 +7,7 @@ import {
   Dimensions,
   Linking,
   Modal,
+  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -46,7 +47,7 @@ export default function AddressBook() {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isPrimaryModalVisible, setIsPrimaryModalVisible] = useState(false);
 
-  const {address , deleteAddress  ,googleLoc} = useAddress()
+  const { address, deleteAddress, googleLoc } = useAddress()
   const handleEdit = (address: any) => {
     setSelectedAddress(address);
     setNewDetails(address.details);
@@ -103,105 +104,110 @@ export default function AddressBook() {
   };
 
   return (
+
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: hp('10%') }}>
-      <View style={styles.header}>
-        <Ionicons name="arrow-back" size={hp('3%')} color="#00695c" />
-        <Text style={styles.headerText}>Address Book</Text>
-      </View>
-
-      <Text style={styles.subHeader}>Your Saved Address</Text>
-
-      {address.map((item , index) => { 
-        console.log("this is particular address" , item)
-        const detailsAddress = `${item.street}, ${item.pincode}, ${item.city}, ${item.state}`
-        return (
-        <View
-          key={item._id}
-          style={[
-            styles.card,
-            item.id === primaryId && { backgroundColor: '#00a99d20', borderColor: '#00a99d', borderWidth: 1 },
-          ]}
-        >
-          <View style={styles.cardHeader}>
-            <Ionicons name="home" size={hp('3%')} color="#00695c" />
-            <Text style={styles.cardTitle}>Address {index+1}</Text>
-            <Entypo
-              name="dots-three-vertical"
-              size={hp('2.5%')}
-              color="#444"
-              style={{ marginLeft: 'auto' }}
-              onPress={() => {
-                setSelectedAddress(item);
-                setIsPrimaryModalVisible(true);
-              }}
-            />
-          </View>
-          <Text style={styles.cardText}>{detailsAddress}</Text>
-          <View style={styles.actionRow}>
-            <TouchableOpacity onPress={() => handleEdit(item)}>
-              <Text style={styles.actionText}>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDelete(item._id)}>
-              <Text style={styles.actionText}>Delete</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleShare(item.details)}>
-              <Text style={styles.actionText}>Share</Text>
-            </TouchableOpacity>
-          </View>
+      <SafeAreaView>
+        <View style={styles.header}>
+          <MaterialIcons name="arrow-back" size={hp('3%')} color="#00695c" onPress={()=> router.back()} />
+          <Text style={styles.headerText}>Address Book</Text>
         </View>
-      )})}
 
-      <TouchableOpacity style={styles.requestButton} onPress={handleRequest}>
-        <Ionicons name="logo-whatsapp" size={hp('2.5%')} color="#00695c" />
-        <Text style={styles.requestText}>Request address from someone else</Text>
-        <Ionicons name="chevron-forward" size={hp('2.5%')} color="#00695c" />
-      </TouchableOpacity>
+        <Text style={styles.subHeader}>Your Saved Address</Text>
 
-      <TouchableOpacity style={styles.addButton} onPress={()=>router.push('/Maps/addAddress')}>
-        <Text style={styles.addButtonText}>+ Add New Address</Text>
-      </TouchableOpacity>
+        {address.map((item, index) => {
+          console.log("this is particular address", item)
+          const detailsAddress = `${item.street}, ${item.pincode}, ${item.city}, ${item.state}`
+          return (
+            <View
+              key={item._id}
+              style={[
+                styles.card,
+                item.id === primaryId && { backgroundColor: '#00a99d20', borderColor: '#00a99d', borderWidth: 1 },
+              ]}
+            >
+              <View style={styles.cardHeader}>
+                <Ionicons name="home" size={hp('3%')} color="#00695c" />
+                <Text style={styles.cardTitle}>Address {index + 1}</Text>
+                <Entypo
+                  name="dots-three-vertical"
+                  size={hp('2.5%')}
+                  color="#444"
+                  style={{ marginLeft: 'auto' }}
+                  onPress={() => {
+                    setSelectedAddress(item);
+                    setIsPrimaryModalVisible(true);
+                  }}
+                />
+              </View>
+              <Text style={styles.cardText}>{detailsAddress}</Text>
+              <View style={styles.actionRow}>
+                <TouchableOpacity onPress={() => handleEdit(item)}>
+                  <Text style={styles.actionText}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDelete(item._id)}>
+                  <Text style={styles.actionText}>Delete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleShare(item.details)}>
+                  <Text style={styles.actionText}>Share</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )
+        })}
 
-      {/* Edit Modal */}
-      <Modal visible={isEditModalVisible} transparent animationType="slide" onRequestClose={() => setIsEditModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Edit Address</Text>
-            <TextInput
-              style={styles.inputField}
-              value={newDetails}
-              onChangeText={setNewDetails}
-              placeholder="Enter new address"
-            />
-            <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.modalButton, { marginRight: 10 }]} onPress={handleSaveEdit}>
-                <Text style={styles.modalButtonText}>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setIsEditModalVisible(false)}>
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
+        <TouchableOpacity style={styles.requestButton} onPress={handleRequest}>
+          <Ionicons name="logo-whatsapp" size={hp('2.5%')} color="#00695c" />
+          <Text style={styles.requestText}>Request address from someone else</Text>
+          <Ionicons name="chevron-forward" size={hp('2.5%')} color="#00695c" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.addButton} onPress={() => router.push('/Maps/addAddress')}>
+          <Text style={styles.addButtonText}>+ Add New Address</Text>
+        </TouchableOpacity>
+
+        {/* Edit Modal */}
+        <Modal visible={isEditModalVisible} transparent animationType="slide" onRequestClose={() => setIsEditModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Edit Address</Text>
+              <TextInput
+                style={styles.inputField}
+                value={newDetails}
+                onChangeText={setNewDetails}
+                placeholder="Enter new address"
+              />
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={[styles.modalButton, { marginRight: 10 }]} onPress={handleSaveEdit}>
+                  <Text style={styles.modalButtonText}>Save</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={() => setIsEditModalVisible(false)}>
+                  <Text style={styles.modalButtonText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
 
-      {/* Primary Modal */}
-      <Modal visible={isPrimaryModalVisible} transparent animationType="fade" onRequestClose={() => setIsPrimaryModalVisible(false)}>
-        <View style={styles.overlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>Set as primary address</Text>
-            <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.button} onPress={handleSetPrimary}>
-                <Text style={styles.buttonText}>Yes</Text>
-              </TouchableOpacity>
-              <View style={styles.divider} />
-              <TouchableOpacity style={styles.button} onPress={() => setIsPrimaryModalVisible(false)}>
-                <Text style={styles.buttonText}>No</Text>
-              </TouchableOpacity>
+        {/* Primary Modal */}
+        <Modal visible={isPrimaryModalVisible} transparent animationType="fade" onRequestClose={() => setIsPrimaryModalVisible(false)}>
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalText}>Set as primary address</Text>
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={styles.button} onPress={handleSetPrimary}>
+                  <Text style={styles.buttonText}>Yes</Text>
+                </TouchableOpacity>
+                <View style={styles.divider} />
+                <TouchableOpacity style={styles.button} onPress={() => setIsPrimaryModalVisible(false)}>
+                  <Text style={styles.buttonText}>No</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      </SafeAreaView>
     </ScrollView>
+
   );
 }
 

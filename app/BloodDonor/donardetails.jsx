@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -5,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { Button, FlatList, Image, Linking, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 const locationData = { Telangana: { Hyderabad: ['Gachibowli', 'Madhapur', 'Uppal'], Rangareddy: ['Ghatkesar', 'LB Nagar'], HitechCity: ['Cyber Towers', 'Mindspace'], }, 'Andhra Pradesh': { Vijayawada: ['Labbipet', 'Benz Circle'], }, };
 
 const AvailableDonorsScreen = () => {
@@ -93,7 +93,7 @@ const AvailableDonorsScreen = () => {
       return (
       <View style={styles.container}>
         <View style={styles.headerRow}>
-          <Ionicons name="chevron-back-outline" size={20} color="#00A99D" style={styles.arrowIcon} onPress={() => router.back()} />
+          <MaterialIcons name="arrow-back" size={20} color="#00A99D" style={styles.arrowIcon} onPress={() => router.back()} />
           <Text style={styles.title}>Available Donors</Text>
           <View style={styles.filter}>
             <TouchableOpacity onPress={() => setShowFilter(!showFilter)}>

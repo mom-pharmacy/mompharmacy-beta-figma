@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -9,7 +10,7 @@ const OnboardingScreen = ({ navigation }) => {
     <View style={styles.container}>
 
       <TouchableOpacity style={styles.backButton} onPress={() => router.push('/Login/labintro')}>
-        <Icon name="chevron-left" size={30} color="black" />
+        <MaterialIcons name="arrow-left" size={30} color="black" />
       </TouchableOpacity>
 
       <View style={styles.placeholderBox}>

@@ -1,15 +1,14 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
-  Platform
+  View
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
 
 export default function About() {
   const router = useRouter();
@@ -18,8 +17,8 @@ export default function About() {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.headerRow}>
-          <Ionicons
-            name="chevron-back-outline"
+          <MaterialIcons
+            name="arrow-back"
             size={26}
             color="#00A99D"
             style={styles.arrowIcon}

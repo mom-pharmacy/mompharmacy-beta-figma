@@ -1,10 +1,11 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
+import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 import { useCart } from '../../Context/cartContext';
 import OrderConfirmationModal from './OrderConfirmation';
@@ -86,8 +87,9 @@ const OrderReviewScreen = () => {
   }
 
   return (
+    <SafeAreaView>
+      <StatusHeader title={"Order Review"} />
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Order Review</Text>
 
       <CartList/>
 
@@ -120,6 +122,7 @@ const OrderReviewScreen = () => {
 
       <OrderConfirmationModal visible={modalVisible} orderId={orderId} />
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

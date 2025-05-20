@@ -64,7 +64,7 @@ const SearchComponent = () => {
             <View style={styles.wrapper}>
                 <View style={styles.row}>
                     <TouchableOpacity onPress={()=>{router.back()}} >
-                    <MaterialIcons name="keyboard-arrow-left" size={40} color="#00a99d" />
+                    <MaterialIcons name="arrow-back" size={40} color="#00a99d" />
                     </TouchableOpacity>
 
                     <View style={styles.searchContainer}>

@@ -241,6 +241,12 @@ const SignUpScreen = () => {
                 </Text>
               </Text>
             </View>
+            <View>
+              <Text style={styles.logintext}>Already have an account? {''}
+                <Text style={styles.loginbutton} onPress={() => router.replace('/Login/Login')}>Login Now!</Text>
+              </Text>
+            </View>
+
 
           </ScrollView>
         </TouchableWithoutFeedback>
@@ -375,6 +381,22 @@ const styles = StyleSheet.create({
     color: '#007E71',
     fontWeight: '600',
   },
+  logintext: {
+    fontSize: hp('2.3%'),
+    color: 'black',
+    ...Platform.select({
+      ios: {
+        top: 15
+      },
+      android: {
+        top: 10
+      }
+    })
+  },
+  loginbutton: {
+    color: '#007E71',
+    textDecorationLine: 'underline'
+  }
 });
 
 const genderStyles = StyleSheet.create({

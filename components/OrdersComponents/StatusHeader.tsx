@@ -1,17 +1,19 @@
 import { COLOR } from '@/constants/color';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 
-export default function StatusHeader() {
+export default function StatusHeader({title}) {
   return (
+    <SafeAreaView>
     <View style={styles.statusContainer}>
       <Pressable style={styles.Container} onPress={()=>router.back()}>
-      <AntDesign name="left" size={24} color={COLOR.secondary} />
-      <Text style={styles.Text}>Cart</Text>
+      <MaterialIcons name="arrow-back" size={24} color={COLOR.secondary} />
+      <Text style={styles.Text}>{title}</Text>
       </Pressable>
     </View>
+    </SafeAreaView>
   )
 }
 

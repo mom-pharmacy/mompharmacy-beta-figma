@@ -1,6 +1,7 @@
+import ProtectedLayout from '@/components/ProtectedRoute';
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
-import { Ionicons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useMemo } from 'react';
 import {
@@ -85,12 +86,13 @@ export default function ProfileScreen() {
   const percentage = profileCompletion ? parseInt(profileCompletion as string, 10) : computedCompletion;
 
   return (
+    <ProtectedLayout>
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.screen} contentContainerStyle={{ paddingBottom: 20 }}>
         <View style={styles.header}>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="chevron-back-outline" size={32} color="#1A7563" />
+              <MaterialIcons name="arrow-back" size={32} color="#1A7563" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Account & Settings</Text>
           </View>
@@ -103,13 +105,13 @@ export default function ProfileScreen() {
             </Pressable>
           </View>
 
-          <View style={styles.profileContainer}>
+          {userDetails && <View style={styles.profileContainer}>
             <Image style={styles.avatar} source={require('../../assets/images/profileimg.png')} />
             <View style={styles.profileDetails}>
               <Text style={styles.name}>{userDetails.name || 'Loading...'}</Text>
               <Text style={styles.email}>{userDetails.mobileNo || ''}</Text>
             </View>
-          </View>
+          </View>}
 
           <ProfileCompletionCard percentage={percentage} />
         </View>
@@ -146,6 +148,7 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
+    </ProtectedLayout>
   );
 }
 

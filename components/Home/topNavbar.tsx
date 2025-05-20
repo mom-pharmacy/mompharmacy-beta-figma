@@ -6,56 +6,75 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { useLocationContext } from '../../Context/locationContext';
 
 const { width, height } = Dimensions.get('window');
-const TopNavbar = () => {
+
+const TopNavbar = ({ showBack = false, onBack }) => {
   const { shortAddress } = useLocationContext();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>medicine on minutes</Text>
+      <View style={styles.headerRow}>
+        {showBack ? (
+          <TouchableOpacity
+            onPress={onBack ? onBack : () => router.back()}
+            style={styles.backButton}
+          >
+            <MaterialIcons name="arrow-back" size={32} color="#1A7563" />
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.backButton} />
+        )}
+        <Text style={styles.title}>medicine on minutes</Text>
+        <View style={{ width: 32 }} /> 
+      </View>
       <View style={styles.addressContainer}>
-     <TouchableOpacity onPress={()=>{router.push('/Maps/myAddress')}}>
-      <View style={{flexDirection:'row'}}>
-        <MaterialIcons name="location-on" size={24} color={COLOR.primary} />
-        <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-          {shortAddress || "Fetching location..."}
-        </Text>
-        <MaterialIcons name="keyboard-arrow-down" size={30} color={COLOR.primary} />
-        </View>
-         </TouchableOpacity>
+        <TouchableOpacity onPress={() => { router.push('/Maps/myAddress') }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <MaterialIcons name="location-on" size={24} color={COLOR.primary} />
+            <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
+              {shortAddress || "Fetching location..."}
+            </Text>
+            <MaterialIcons name="keyboard-arrow-down" size={30} color={COLOR.primary} />
+          </View>
+        </TouchableOpacity>
         <View style={{ flex: 1 }} />
-        <TouchableOpacity onPress={()=>{router.push('/Notification')}} >
-        <MaterialIcons name="notifications" size={30} color={COLOR.primary} />
+        <TouchableOpacity onPress={() => { router.push('/Notification') }} >
+          <MaterialIcons name="notifications" size={30} color={COLOR.primary} />
         </TouchableOpacity>
       </View>
-     
-
-  
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: height * 0.11,
+    height: height * 0.13,
     width: width,
     backgroundColor: COLOR.light,
     paddingHorizontal: 20,
-    marginTop:-10
-  
+    paddingTop: 5,
+    marginTop:-10,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  backButton: {
+    width: 32,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
   },
   title: {
     color: COLOR.primary,
     fontSize: 24,
-    fontWeight: 700,
+    fontWeight: '700',
     textAlign: 'center',
-
-    paddingTop: 15,
-    paddingBottom: 10,
+    flex: 1,
   },
   addressContainer: {
-
     width: '100%',
-    height: 40,
+    height: 70,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 3,
@@ -66,7 +85,6 @@ const styles = StyleSheet.create({
     color: COLOR.text,
     paddingLeft: 5,
   },
-
   locationText: {
     color: '#000',
     fontSize: 16,

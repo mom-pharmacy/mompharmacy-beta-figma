@@ -1,5 +1,5 @@
 import { userAuth } from '@/Context/authContext';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -107,8 +107,8 @@ const SuggestProductsScreen: React.FC = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.sugimg}>
         <View style={styles.headerRow}>
-          <Ionicons
-            name="chevron-back-outline"
+          <MaterialIcons
+            name="arrow-back"
             size={24}
             color="#00A99D"
             style={styles.arrowIcon}

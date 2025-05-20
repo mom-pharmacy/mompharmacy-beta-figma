@@ -1,13 +1,16 @@
+import Cart from '@/components/Cart/cart';
 import Footer from '@/components/Home/footer';
+import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { userAuth } from '@/Context/authContext';
 import { useCart } from '@/Context/cartContext';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,12 +18,17 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 
 const { width } = Dimensions.get('window');
 
 export default function Details() {
   const [showDescription, setShowDescription] = useState(false);
    const [isSaved, setIsSaved] = useState(false)
+   const [wishlist, setWishlist] = useState([]);
+     const [cart, setCart] = useState<{ [key: string]: number }>({});
+     const [loading, setLoading] = useState(true);
+    
 
   const {
     itemId, itemName, itemImage, itemPrice, description, use,
@@ -70,7 +78,51 @@ export default function Details() {
     const findItem = cartItems.find((item) => item._id === itemId);
     return findItem ? findItem.quantity : 0;
   };
+
 const {ExtractParseToken} = userAuth()
+
+
+useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const token = await ExtractParseToken();
+        if (!token) {
+          console.warn('No token found');
+          setLoading(false);
+          return;
+        }
+
+        const options = {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const res = await fetch(
+          `https://mom-beta-server1.onrender.com/api/wishlist/getwishlist`,
+          options
+        );
+        setLoading(false);
+        const data = await res.json();
+        console.log(data.wishlist.products.map(item=>item))
+
+        console.log(data)
+        if (res.ok) {
+          setWishlist(data.wishlist.products);
+        } else {
+          console.warn(data.message || 'Failed to fetch wishlist');
+        }
+      } catch (error) {
+        console.error('Failed to fetch wishlist:', error);
+      } finally {
+      }
+    };
+
+    fetchWishlist();
+  }, [ExtractParseToken]);
+
 
    const handleWishlistToggle = async () => {
     const newState = !isSaved
@@ -106,9 +158,13 @@ const {ExtractParseToken} = userAuth()
     }
   }
 
+  
+
 
 
   return (
+    <SafeAreaView>
+      <StatusHeader title={itemName.slice(0 , 10)} />
     <ScrollView style={styles.container}>
       <View style={styles.contentWrapper}>
         <View style={styles.imageContainer}>
@@ -117,8 +173,10 @@ const {ExtractParseToken} = userAuth()
             style={styles.productImage}
             resizeMode="contain"
           />
-        </View>
+          <Cart></Cart>
 
+        </View>
+        
         <View style={styles.deliveryRow}>
           <View style={styles.tag}>
             <Image source={require('../../assets/images/Categories/bike.png')} style={styles.icon} />
@@ -136,11 +194,13 @@ const {ExtractParseToken} = userAuth()
               alignItems: 'center'
             }}
           >
-            {isSaved ? (
+           {loading?<ActivityIndicator/>: <>
+            {isSaved || wishlist.find(items=>items._id===item._id)? (
               <FontAwesome name="heart" size={20} color="red" />
             ) : (
               <Feather name="heart" size={20} color="gray" />
             )}
+            </>}
           </TouchableOpacity>
        
           </View>
@@ -241,12 +301,14 @@ const {ExtractParseToken} = userAuth()
         <Footer />
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
+    bottom: 10
 
   },
   contentWrapper: {
@@ -255,6 +317,9 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: 'center',
     marginVertical: width * 0.03,
+    flexDirection:'row',
+    marginHorizontal:100,
+    marginBlockStart:70
   },
   productImage: {
     height: width * 0.5,
@@ -410,7 +475,7 @@ const styles = StyleSheet.create({
   quantityIcon: {
     paddingHorizontal: 10,
 
-  }
+  },
 });
 
 
