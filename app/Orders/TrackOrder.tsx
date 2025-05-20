@@ -1,5 +1,4 @@
 import OrderStatus from '@/components/OrdersComponents/OrderStatus';
-import OrderSummary from '@/components/OrdersComponents/OrderSummary';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { COLOR, screen } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
@@ -73,6 +72,8 @@ export default function TrackOrder() {
       return <Text>No medicines found</Text>;
     }
 
+   
+
     console.log("this is order" , order)
 
     return (
@@ -92,6 +93,12 @@ export default function TrackOrder() {
       </View>
     );
   };
+
+   const formatedDate = ()=>{
+      const orderDate = new Date(order.updatedAt)
+      const dateFormate = `${orderDate.getDate()}/${orderDate.getMonth()}/${orderDate.getFullYear()}`
+      return dateFormate
+    }
 
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
@@ -138,7 +145,7 @@ export default function TrackOrder() {
           </View>
           <View>
             <Text style={trackPageStyles.orderStatusTitle}>Order Date & Time</Text>
-            <Text style={{color:"gray"}}>21 DEC 2024 1:00PM</Text>
+            <Text style={{color:"gray"}}>{order?.updatedAt || Date.now()}</Text>
           </View>
         </View>
 
@@ -160,7 +167,34 @@ export default function TrackOrder() {
 
         {openOrderSummary && (
           <View style={trackPageStyles.OrderSummaryDropdownContainer}>
-            <OrderSummary />
+            <View style={styles.summaryBox}>
+                      <Text style={styles.OrderSummary}>Order Summary</Text>
+                        <View style={styles.summaryRow}>
+                         
+                          <Text style={styles.summaryLabel}>Subtotal</Text>
+                          <Text style={styles.summaryValue}>₹{order.subtotal.toFixed(2)}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                          <Text style={styles.summaryLabel}>Shipping</Text>
+                          <Text style={styles.summaryValue}>₹5.00</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                          <Text style={styles.summaryLabel}>Tax</Text>
+                          <Text style={styles.summaryValue}>₹2.50</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                          <Text style={styles.summaryLabel}>Discount</Text>
+                          <Text style={styles.discountValue}>– ₹3.00</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                          <Text style={styles.totalLabel}>Total</Text>
+                          <Text style={styles.totalValue}>₹{(order.subtotal + 5 + 2.5 - 3).toFixed(0)}</Text>
+                        </View>
+                        <View style={styles.summaryRow}>
+                          <Text style={styles.payByLabel}>Pay By</Text>
+                          <Text style={styles.cod}>COD/TNPL</Text>
+                        </View>
+                      </View>
           </View>
         )}
       </ScrollView>
@@ -305,5 +339,57 @@ const styles = StyleSheet.create({
     padding: 2,
     borderRadius: 12,
     alignItems: "center"
-  }
+  },
+   OrderSummary: {
+        fontWeight: 'bold',
+        fontSize:15,
+     },
+     
+     addressTitle: {
+        fontWeight: 'bold' 
+       },
+     address: {
+        marginTop: 4
+        },
+        inTime: {
+         color: '#444',
+       
+       },
+     summaryBox: {
+       marginVertical: 20,
+       paddingHorizontal: 20,
+     },
+     summaryRow: {
+       flexDirection: 'row',
+       justifyContent: 'space-between',
+       marginVertical: 4,
+     },
+     summaryLabel: {
+       fontSize: 16,
+       color: '#333',
+     },
+     summaryValue: {
+       fontWeight: '500',
+     },
+     discountValue: {
+        fontWeight: '500',
+        color: 'green',
+      },
+      totalLabel: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#000',
+      },
+      totalValue: {
+        fontWeight: 'bold',
+      },
+      payByLabel: {
+        fontSize: 15,
+        color: '#555',
+      },
+      cod: {
+        fontSize: 16,
+        color: '#0BA29D',
+        fontWeight: '600',
+      },
 });

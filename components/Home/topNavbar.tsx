@@ -4,11 +4,14 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useLocationContext } from '../../Context/locationContext';
+import { useNotificationContext } from '../../Context/notifficationContext';
+
 
 const { width, height } = Dimensions.get('window');
 
 const TopNavbar = ({ showBack = false, onBack }) => {
   const { shortAddress } = useLocationContext();
+  const {unreadCount}=useNotificationContext();
 
   return (
     <View style={styles.container}>
@@ -36,9 +39,15 @@ const TopNavbar = ({ showBack = false, onBack }) => {
             <MaterialIcons name="keyboard-arrow-down" size={30} color={COLOR.primary} />
           </View>
         </TouchableOpacity>
+
         <View style={{ flex: 1 }} />
-        <TouchableOpacity onPress={() => { router.push('/Notification') }} >
+
+        <TouchableOpacity onPress={() => router.push('/Notification')} style={styles.notificationIconWrapper}>
           <MaterialIcons name="notifications" size={30} color={COLOR.primary} />
+          
+          <View style={styles.badgeContainer}>
+            <Text style={styles.badgeText}>{unreadCount}</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -90,6 +99,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 3,
     flexShrink: 1,
+  },
+  notificationIconWrapper: {
+    position: 'relative',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    right: -6,
+    top: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
 

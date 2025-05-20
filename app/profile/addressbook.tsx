@@ -141,9 +141,7 @@ export default function AddressBook() {
               </View>
               <Text style={styles.cardText}>{detailsAddress}</Text>
               <View style={styles.actionRow}>
-                <TouchableOpacity onPress={() => handleEdit(item)}>
-                  <Text style={styles.actionText}>Edit</Text>
-                </TouchableOpacity>
+                
                 <TouchableOpacity onPress={() => handleDelete(item._id)}>
                   <Text style={styles.actionText}>Delete</Text>
                 </TouchableOpacity>

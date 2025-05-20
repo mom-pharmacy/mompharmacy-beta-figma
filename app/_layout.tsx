@@ -7,11 +7,13 @@ import { Stack } from "expo-router";
 import React from "react";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import PushNotificationProvider from '../components/pushNotificationProvider';
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <GlobalStatusBar barStyle="dark-content" backgroundColor="#42beb5" />
+      <PushNotificationProvider>
       <LocationProvider>
         <PaperProvider>
           <AuthProvider>
@@ -32,6 +34,7 @@ export default function RootLayout() {
           </AuthProvider>
         </PaperProvider>
       </LocationProvider>
+      </PushNotificationProvider>
     </SafeAreaProvider>
   );
 }

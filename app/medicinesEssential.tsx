@@ -39,76 +39,73 @@ export default function Medicines() {
       });
   }, []);
 
- 
-  const limitedMedicines = medicine.slice(-3,-1);
+  const limitedMedicines = medicine.slice(-3, -1);
 
   return (
     <SafeAreaView>
-      
-       <TopNavbar showBack={true}/>
-    <ScrollView >
-    <View style={styles.container}>
-     
-      <Search />
-      <View style={{padding:15}}>
-      <UploadPrescription />
-      </View>
-      <Ordering />
+      <TopNavbar showBack={true} onBack={undefined} />
+      <ScrollView>
+        <View style={styles.container}>
+          <Search />
+          <View style={{ padding: 15 }}>
+            <UploadPrescription />
+          </View>
+          <Ordering />
 
-      <View style={styles.header}>
-        <Text style={styles.title}>Popular Medicines</Text>
-      </View>
-      
-      <FlatList
-        data={limitedMedicines}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() =>{
-              router.push({
-                pathname: '/Details/details',
-                params: {
-                  itemId: item._id,
-                  itemName: item.medicine_name,
-                  itemImage: item.imageUrl,
-                  itemPrice: item.price,
-                  description: item.description,
-                  use: item.use,
-                  ingredients: item.ingredients,
-                  dose: item.dose,
-                  manufacturer: item.manufacturer,
-                  notFor: item.notFor,
-                  sideEffects: item.sideEffects,
-                  store: item.store,
-                  expiryDate: item.expiryDate,
-                  manufactureDate: item.manufactureDate,
-                  subcategories: JSON.stringify(item.subcategories || [])
-                },
-                
-              })
-              console.log("essienstail",item.subcategories)
-            }}
-          >
-            <Womencare
-              item={item}
-              cartItems={cartItems}
-              addToCart={addToCart}
-              incrementItem={incrementItem}
-              decrementItem={decrementItem}
-              removeFromCart={removeFromCart}
-              quantity={quantity}
-            />
-          </TouchableOpacity>
-        )}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.grid}
-        scrollEnabled={true}
-      />
-      <Categories1 />
-      <Footer />
-    </View>
-    </ScrollView>
+          <View style={styles.header}>
+            <Text style={styles.title}>Popular Medicines</Text>
+          </View>
+
+          <FlatList
+            data={limitedMedicines}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => {
+                  router.push({
+                    pathname: '/Details/details',
+                    params: {
+                      itemId: item._id,
+                      itemName: item.medicine_name,
+                      itemImage: item.imageUrl,
+                      itemPrice: item.price,
+                      description: item.description,
+                      use: item.use,
+                      ingredients: item.ingredients,
+                      dose: item.dose,
+                      manufacturer: item.manufacturer,
+                      notFor: item.notFor,
+                      sideEffects: item.sideEffects,
+                      store: item.store,
+                      expiryDate: item.expiryDate,
+                      manufactureDate: item.manufactureDate,
+                      subcategories: JSON.stringify(item.subcategories || [])
+                    },
+                  });
+                  console.log("essential", item.subcategories);
+                }}
+              >
+                <Womencare
+                  item={item}
+                  cartItems={cartItems}
+                  addToCart={addToCart}
+                  incrementItem={incrementItem}
+                  decrementItem={decrementItem}
+                  removeFromCart={removeFromCart}
+                  quantity={quantity}
+                />
+              </TouchableOpacity>
+            )}
+            numColumns={2}
+            columnWrapperStyle={styles.columnWrapper}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={true}
+          />
+
+          <Categories1 />
+          <Footer />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -212,7 +209,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     alignItems: 'center',
-
   },
   btnText: {
     color: '#fff',

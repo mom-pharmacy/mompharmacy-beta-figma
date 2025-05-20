@@ -1,11 +1,10 @@
-import { FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Checkbox from 'expo-checkbox';
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, UIManager, View, } from 'react-native';
+import { Alert, Image, Keyboard, KeyboardAvoidingView, LayoutAnimation, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, UIManager, View, } from 'react-native';
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);}
 const BASE_URL = 'https://mom-beta-server1.onrender.com/api/donar';
@@ -66,15 +65,16 @@ const RegisterScreen = () => {
     }};
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <SafeAreaView style={{flex:1}}>
       <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container}>
-          <StatusBar style="dark" />
+         
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}><Ionicons name="chevron-back-outline" size={24} color="#00A99D" /></TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.goBack()}><MaterialIcons name="arrow-back" size={24} color="#00A99D" /></TouchableOpacity>
             <Text style={styles.headerTitle}>Register as Donor</Text></View>
-          <TextInput style={styles.input} placeholder="Enter Your Name" value={name} onChangeText={setName}/>
-          <TextInput style={styles.input} placeholder="+91 Enter Mobile Number" keyboardType="phone-pad" value={mobileNumber} onChangeText={setMobileNumber}/>
-          <TextInput style={styles.input} placeholder="Enter Email" value={email} onChangeText={setEmail}/>
+          <TextInput style={styles.input} placeholder="Enter Your Name" placeholderTextColor="#000" value={name} onChangeText={setName}/>
+          <TextInput style={styles.input} placeholder="+91 Enter Mobile Number" placeholderTextColor="#000" keyboardType="phone-pad" value={mobileNumber} onChangeText={setMobileNumber}/>
+          <TextInput style={styles.input} placeholder="Enter Email" placeholderTextColor="#000"value={email} onChangeText={setEmail}/>
           <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dropdown}>
             <Text>Date of Birth {dob.toDateString()}</Text>
           </TouchableOpacity>
@@ -83,10 +83,10 @@ const RegisterScreen = () => {
                 setShowDatePicker(false);
                 if (selectedDate) setDob(selectedDate);
               }}/>)}
-          <TextInput style={styles.input} placeholder="Select State" value={state} onChangeText={setState}/>
-          <TextInput style={styles.input} placeholder="Select District" value={district} onChangeText={setDistrict}/>
-          <TextInput style={styles.input} placeholder="Select City" value={city} onChangeText={setCity}/>
-          <TextInput style={styles.input} placeholder="Enter Pincode" keyboardType="phone-pad" value={Pincode}
+          <TextInput style={styles.input} placeholder="Select State" placeholderTextColor="#000" value={state} onChangeText={setState}/>
+          <TextInput style={styles.input} placeholder="Select District" placeholderTextColor="#000" value={district} onChangeText={setDistrict}/>
+          <TextInput style={styles.input} placeholder="Select City" placeholderTextColor="#000" value={city} onChangeText={setCity}/>
+          <TextInput style={styles.input} placeholder="Enter Pincode" placeholderTextColor="#000" keyboardType="phone-pad" value={Pincode}
             onChangeText={setPincode}/>
           <Text style={styles.label}>Select your blood group</Text>
           <View style={styles.bloodGroupContainer}>
@@ -134,11 +134,11 @@ Protein: Eggs, cashews, almonds.`}/>
             <View style={styles.logoBlock}>
               <Image source={require('../../assets/images/momlab.png')} style={styles.logoImage} resizeMode="contain"/>
               <Text style={styles.logoText}>mom labs</Text>
-            </View></View></ScrollView></Pressable></KeyboardAvoidingView>);};
+            </View></View></ScrollView></Pressable></SafeAreaView></KeyboardAvoidingView>);};
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: 'white' },
   header: { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 20 },
-  headerTitle: { fontSize: 18, color: 'black', fontWeight: 'bold', textAlign: 'left' },
+  headerTitle: { fontSize: 18, color: 'black', fontWeight: 'bold', textAlign: 'left', left:10 },
   input: { borderColor: '#ccc', borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
   dropdown: { padding: 10, borderWidth: 1, borderColor: '#ddd', borderRadius: 5, marginBottom: 15, color: "#ccc" },
   label: { fontSize: 16, fontWeight: '600', marginVertical: 10 },

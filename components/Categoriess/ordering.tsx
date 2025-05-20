@@ -23,7 +23,7 @@ const images = [
 const actionHandlers = {
   whatsapp: () => Linking.openURL('https://wa.me/917702068334'),
   call: () => Linking.openURL('tel:7702068334'),
-  voice: () => router.push('./Comingsoon/voice'),
+  voice: () => router.push('./Voice'),
   emergency: () => router.push('./Comingsoon/comingsoon'),
 };
 
