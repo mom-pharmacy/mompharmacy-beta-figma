@@ -1,5 +1,5 @@
 import { userAuth } from '@/Context/authContext';
-import { Ionicons } from '@expo/vector-icons';
+import {  MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
@@ -77,8 +77,8 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.screen}>
       <View style={[styles.container, { backgroundColor: darkTheme ? '#1e1e1e' : '#fff' }]}>
         <View style={styles.headerRow}>
-          <Ionicons
-            name="chevron-back-outline"
+          <MaterialIcons
+            name="arrow-back"
             size={24}
             color="#00A99D"
             style={styles.arrowIcon}
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
+
     justifyContent: 'flex-start',
     marginBottom: 10,
   },
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00A99D',
-    marginLeft: 3,
+    marginLeft: 60,
   },
   arrowIcon: {
     marginLeft: -10,
@@ -150,7 +151,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logoutButton: {
-    backgroundColor: '#fbd9d3',
+
+    backgroundColor:'#FC7072',
+    // backgroundColor: '#fbd9d3',
     marginHorizontal: 20,
     marginTop: 20,
     borderRadius: 30,
