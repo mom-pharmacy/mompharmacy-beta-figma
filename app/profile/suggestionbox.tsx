@@ -13,8 +13,11 @@ import {
   TouchableOpacity,
   UIManager,
   View,
+  Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import SuggestAndEarn from '../profile/sug_box'
+import SuggestTop from '../profile/SugboxTop'
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -28,7 +31,7 @@ const SuggestProductsScreen: React.FC = () => {
   const [showTechnical, setShowTechnical] = useState(false);
   const [showNonTechnical, setShowNonTechnical] = useState(false);
 
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ Modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false); 
 
   const {userDetails, ExtractParseToken} = userAuth()
 
@@ -84,11 +87,11 @@ const SuggestProductsScreen: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setShowSuccessModal(true); // ✅ Show modal
+        setShowSuccessModal(true); 
 
         setTimeout(() => {
           setShowSuccessModal(false);
-        }, 2000); // ✅ Hide modal after 2 seconds
+        }, 2000); 
 
         if (type === 'product') setProductSuggestion('');
         else if (type === 'technical') setTechnicalSuggestion('');
@@ -104,8 +107,40 @@ const SuggestProductsScreen: React.FC = () => {
 
   return (
     <SafeAreaView>
+       <View style={styles.container2}>
+        <View>
+          
+          <View style={styles.card}>
+             <MaterialIcons
+            name="arrow-back"
+            size={24}
+            color="#00A99D"
+            style={styles.arrowIcon}
+            onPress={() => router.back()}
+          />
+              
+              {/* Dummy Image */}
+              <Image
+                source={require('../../assets/images/sug2.png')}
+                style={styles.image}
+              />
+              {/* Texts */}
+              <View style={styles.textContainer}>
+                <Text style={styles.title2}>Earn ₹1000</Text>
+                <Text style={styles.subtitle2}>Suggest & Earn</Text>
+                <Text style={styles.caption}>Spot it. Suggest it. Earn for it</Text>
+              </View>
+            </View>
+
+        </View>
+            
+        </View>
+      
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.sugimg}>
+      <View>
+
+     
+      {/* <View style={styles.sugimg}>
         <View style={styles.headerRow}>
           <MaterialIcons
             name="arrow-back"
@@ -116,7 +151,10 @@ const SuggestProductsScreen: React.FC = () => {
           />
           <Text style={styles.header}>Suggestion</Text>
         </View>
-      </View>
+      </View> */}
+      
+      {/* <SuggestTop></SuggestTop> */}
+      
 
       <Text style={styles.subtitle}>
         Didn't find what you are looking for? Please suggest the product
@@ -159,7 +197,7 @@ const SuggestProductsScreen: React.FC = () => {
         <Ionicons name={showNonTechnical ? 'chevron-up' : 'chevron-down'} size={20} />
       </TouchableOpacity>
       {showNonTechnical && (
-        <>
+        <>  
           <TextInput
             style={styles.textArea}
             placeholder="Enter your non-technical suggestion"
@@ -182,17 +220,63 @@ const SuggestProductsScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+       </View>
+             <SuggestAndEarn></SuggestAndEarn>
+
     </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container2: 
+  {
+    
+    
+    width:'auto',
+  },
+   card: {
+    
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2A9D8F", // greenish color like in the image
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius:16,
+    padding: 30,
+    marginBottom:1,
+  },
+  image: {
+    width: 80,
+    //height: 80,
+    maxHeight:90,
+    resizeMode: "contain",
+    marginRight: 16,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  title2: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  subtitle2: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "500",
+    marginTop: 4,
+  },
+  caption: {
+    color: "#e0f7f4",
+    fontSize: 12,
+    marginTop: 4,
+  },
   container: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 180,
     backgroundColor: '#fff',
   },
+  
   sugimg: {
     flexDirection: 'row',
   },
@@ -218,10 +302,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00A99D',
-    marginLeft: 10,
+    marginLeft: 80  ,
   },
   arrowIcon: {
     marginLeft: -10,
+    color:'white',
+    marginBottom:60
   },
   subtitle: {
     fontSize: 14,

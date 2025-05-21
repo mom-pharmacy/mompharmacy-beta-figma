@@ -1,3 +1,5 @@
+import { COLOR } from '@/constants/color';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -25,7 +27,7 @@ const banners = [
     link: '/BottomNavbar/categories'
   },
   {
-    image: require('../../assets/images/below.png'),
+    image: require('../../assets/images/bloodpacket.png'),
     title: 'Blood Donor Finder',
     description: 'Find nearby blood donors quickly 24/7',
     buttonText: 'Find Now',
@@ -83,16 +85,20 @@ const BannerCarousel = () => {
         <View style={styles.textContainer}>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.description}>{item.description}</Text>
-          <TouchableOpacity style={styles.button}>
-            <Text
-              style={styles.buttonText}
-              onPress={() => {
-                router.push(item.link || '/');
-              }}
-            >
-              {item.buttonText} →
-            </Text>
-          </TouchableOpacity>
+         <TouchableOpacity
+  style={styles.button}
+  onPress={() => {
+    router.push(item.link || '/');
+  }}
+>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text style={styles.buttonText}>
+      {item.buttonText}
+    </Text>
+    <MaterialIcons name="arrow-forward" size={24} color={COLOR.primary} />
+  </View>
+</TouchableOpacity>
+
         </View>
         <Image source={item.image} style={styles.image} />
       </View>
@@ -185,7 +191,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#00a99d',
-    fontWeight: '800',
+    fontWeight: '900',
   },
   pagination: {
     flexDirection: 'row',

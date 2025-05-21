@@ -76,14 +76,16 @@ const ProfileCompletionCard: React.FC<Props> = ({ percentage }) =>
 const styles = StyleSheet.create({
   container: {
     borderWidth: 2,
-    borderColor: '#E0E0E0',
-    borderRadius: 10,
-    padding: 12,
+    borderColor: '#007E71',
+    borderRadius: 20,
+    padding: 8,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#E7F5F3',
     marginBottom: 16,
+    marginLeft: 15,
+    marginRight: 15,
   },
   progressSection: {
     flexDirection: 'row',
