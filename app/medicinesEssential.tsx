@@ -42,9 +42,11 @@ export default function Medicines() {
   const limitedMedicines = medicine.slice(-3, -1);
 
   return (
+    <ScrollView>
     <SafeAreaView>
+      
       <TopNavbar showBack={true} onBack={undefined} />
-      <ScrollView>
+      
         <View style={styles.container}>
           <Search />
           <View style={{ padding: 15 }}>
@@ -105,8 +107,9 @@ export default function Medicines() {
           <Categories1 />
           <Footer />
         </View>
-      </ScrollView>
+      
     </SafeAreaView>
+    </ScrollView>
   );
 }
 
