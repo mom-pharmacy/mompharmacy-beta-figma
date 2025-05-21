@@ -1,12 +1,11 @@
 import { useCart } from '@/Context/cartContext';
-import Entypo from '@expo/vector-icons/Entypo';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-
-
+import Cartt from '../../assets/images/carttab';
+import Category from '../../assets/images/categorytab';
+import Home from '../../assets/images/hometab';
+import Profile from '../../assets/images/profiletab';
 export default function BottomNavbar() {
   const {cartItems} = useCart()
   return (
@@ -22,7 +21,7 @@ export default function BottomNavbar() {
         options={{
           tabBarLabel: 'Home',
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="home" size={24} color={color} />
+            <Home width={25} height={25}/>
           ),
         }}
       />
@@ -31,7 +30,7 @@ export default function BottomNavbar() {
         options={{
           tabBarLabel: 'Categories',
           tabBarIcon: ({ color }) => (
-            <Entypo name="menu" size={24} color={color} />
+            <Category width={60} height={60}/>
           ),
         }}
       />
@@ -41,7 +40,7 @@ export default function BottomNavbar() {
           tabBarLabel: 'Cart',
           tabBarIcon: ({ color }) => (
             <View>
-              <FontAwesome name="cart-plus" size={24} color={color} />
+              <Cartt width={65} height={65} />
               {cartItems.length > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{cartItems.length}</Text>
@@ -56,7 +55,7 @@ export default function BottomNavbar() {
         options={{
           tabBarLabel: 'Account',
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="user-large" size={24} color={color} />
+            <Profile width={70} height={70}/>
           ),
         }}
       />
