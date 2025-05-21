@@ -406,6 +406,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  
   boldText: {
     fontWeight: 'bold',
     marginRight: 5,
