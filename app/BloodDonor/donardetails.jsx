@@ -7,7 +7,6 @@ import { Button, FlatList, Image, Linking, Modal, StyleSheet, Text, TextInput, T
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 const locationData = { Telangana: { Hyderabad: ['Gachibowli', 'Madhapur', 'Uppal'], Rangareddy: ['Ghatkesar', 'LB Nagar'], HitechCity: ['Cyber Towers', 'Mindspace'], }, 'Andhra Pradesh': { Vijayawada: ['Labbipet', 'Benz Circle'], }, };
-
 const AvailableDonorsScreen = () => {
   const params = useLocalSearchParams();
   const [donors, setDonors] = useState([]);
