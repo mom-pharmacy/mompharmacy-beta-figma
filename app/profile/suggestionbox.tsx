@@ -92,6 +92,7 @@ const SuggestProductsScreen: React.FC = () => {
         setTimeout(() => {
           setShowSuccessModal(false);
         }, 2000); 
+
         if (type === 'product') setProductSuggestion('');
         else if (type === 'technical') setTechnicalSuggestion('');
         else if (type === 'non-technical') setNonTechnicalSuggestion('');

@@ -182,7 +182,7 @@ useEffect(() => {
             <Image source={require('../../assets/images/Categories/bike.png')} style={styles.icon} />
             <Text>30 min</Text>
           </View>
-          <View style={styles.tag}>
+          <View>
              <TouchableOpacity
             onPress={handleWishlistToggle}
             style={{
@@ -195,12 +195,20 @@ useEffect(() => {
             }}
           >
            {loading?<ActivityIndicator/>: <>
+           <View style ={{flexDirection:'row', alignItems:'center'}}>
+           
             {isSaved || wishlist.find(items=>items._id===item._id)? (
-              <FontAwesome name="heart" size={20} color="red" />
+
+              <FontAwesome name="bookmark" size={20} color="#00A99D" />
             ) : (
-              <Feather name="heart" size={20} color="gray" />
+              <Feather name="bookmark" size={20} color="gray" />
             )}
+
+            {/* </>} */}
+            <Text style={{ right: 55, fontWeight:'bold', fontSize: 16, color:'#007E71' }}>Save</Text>
+            </View>
             </>}
+
           </TouchableOpacity>
        
           </View>
@@ -270,12 +278,12 @@ useEffect(() => {
 
         <View style={styles.infoCard}>
           <Text style={styles.sectionTitle}>Key Information</Text>
-          <Text><Text style={styles.boldText}>Use: </Text>{use}</Text>
-          <Text><Text style={styles.boldText}>Ingredients: </Text>{ingredients}</Text>
-          <Text><Text style={styles.boldText}>Dose: </Text>{dose}</Text>
-          <Text><Text style={styles.boldText}>Not for: </Text><Text style={styles.notFor}>{notFor}</Text></Text>
-          <Text><Text style={styles.boldText}>Side effects: </Text>{sideEffects}</Text>
-          <Text><Text style={styles.boldText}>Store: </Text>{store}</Text>
+          <Text style={styles.boldText1 }><Text style={styles.boldText }>Use: </Text>{use}</Text>
+          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Ingredients: </Text>{ingredients}</Text>
+          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Dose: </Text>{dose}</Text>
+          <Text  style={styles.boldText1 }><Text style={styles.boldText2}>Not for: </Text><Text style={styles.notFor}>{notFor}</Text></Text>
+          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Side effects: </Text>{sideEffects}</Text>
+          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Store: </Text>{store}</Text>
           <Text>
             <Text style={styles.boldText}>Expires on or after: </Text>
             {new Date(expiryDate).toISOString().split('T')[0]}
@@ -289,7 +297,7 @@ useEffect(() => {
 
         <TouchableOpacity onPress={() => setShowDescription(!showDescription)} style={styles.dropdownHeader}>
           <Text style={styles.sectionTitle}>Product Description</Text>
-          <Text>{showDescription}</Text>
+          <Text style={styles.boldText3 }>{showDescription}</Text>
         </TouchableOpacity>
 
         {showDescription && (
@@ -329,11 +337,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginVertical: width * 0.03,
+    // backgroundColor: '#acd9d4'
   },
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
-   
+    backgroundColor:'#ACD9D4',
     borderRadius: 20,
     paddingHorizontal: 10,
     height: 30,
@@ -397,9 +406,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  
   boldText: {
     fontWeight: 'bold',
     marginRight: 5,
+    color: 'black',
+  },
+  boldText1:{
+    color:'#666666',
+    marginRight: 5,
+  },
+  boldText2:{
+    color: '#c03a3a',
+    fontWeight:'bold',
+  },
+  boldText3:{
+    color: '#666666',
   },
   smallText: {
     fontSize: 12,
@@ -432,9 +454,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
     marginBottom: 10,
+    color: "#007E71",
   },
   notFor: {
-    color: 'red',
+    color: '#666666',
   },
   dropdownHeader: {
     flexDirection: 'row',

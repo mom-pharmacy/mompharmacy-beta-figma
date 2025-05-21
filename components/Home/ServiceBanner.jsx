@@ -1,6 +1,6 @@
-import React from 'react';
+import { COLOR } from '@/constants/color';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
 const ServiceBanner = ({ image, title, description, buttonText, onPress }) => {
   return (
     <View style={styles.card}>
@@ -9,7 +9,8 @@ const ServiceBanner = ({ image, title, description, buttonText, onPress }) => {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
         <TouchableOpacity onPress={onPress} style={styles.button}>
-          <Text style={styles.buttonText}>{buttonText} →</Text>
+          <Text style={styles.buttonText}>{buttonText}</Text>
+          <MaterialIcons name="arrow-forward" size={28} color={COLOR.primary} />
         </TouchableOpacity>
       </View>
     </View>
