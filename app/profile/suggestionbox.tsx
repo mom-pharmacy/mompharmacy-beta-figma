@@ -28,7 +28,7 @@ const SuggestProductsScreen: React.FC = () => {
   const [showTechnical, setShowTechnical] = useState(false);
   const [showNonTechnical, setShowNonTechnical] = useState(false);
 
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // ✅ Modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false); 
 
   const {userDetails, ExtractParseToken} = userAuth()
 
@@ -84,11 +84,11 @@ const SuggestProductsScreen: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setShowSuccessModal(true); // ✅ Show modal
+        setShowSuccessModal(true); 
 
         setTimeout(() => {
           setShowSuccessModal(false);
-        }, 2000); // ✅ Hide modal after 2 seconds
+        }, 2000); 
 
         if (type === 'product') setProductSuggestion('');
         else if (type === 'technical') setTechnicalSuggestion('');

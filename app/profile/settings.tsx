@@ -77,13 +77,8 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.screen}>
       <View style={[styles.container, { backgroundColor: darkTheme ? '#1e1e1e' : '#fff' }]}>
         <View style={styles.headerRow}>
-          <MaterialIcons
-            name="arrow-back"
-            size={24}
-            color="#00A99D"
-            style={styles.arrowIcon}
-            onPress={handleBack}
-          />
+        <MaterialIcons name="arrow-back" size={24} color="#00A99D" style={styles.MaterialIcons} onPress={()=>router.back()} />
+
           <Text style={styles.header}>Settings</Text>
         </View>
 
@@ -132,12 +127,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   header: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
     color: '#00A99D',
-    marginLeft: 60,
+    marginLeft: 100,
   },
-  arrowIcon: {
+  MaterialIcons: {
     marginLeft: -10,
   },
   settingItem: {
@@ -151,9 +146,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logoutButton: {
-
-    backgroundColor:'#FC7072',
-    // backgroundColor: '#fbd9d3',
+    backgroundColor: '#B5000A0D',
     marginHorizontal: 20,
     marginTop: 20,
     borderRadius: 30,
@@ -161,9 +154,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutText: {
-    color: '#fff',
+    color: '#B5000A',
     fontSize: 16,
     fontWeight: '800',
+    marginRight: -10
   },
   screen: {
     flex: 1,
