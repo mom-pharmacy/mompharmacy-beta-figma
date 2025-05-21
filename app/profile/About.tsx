@@ -34,7 +34,6 @@ export default function About() {
               We are a healthcare delivery platform committed to bringing medical supplies and essential medications to your doorstep quickly, safely, and reliably.
               Mom Pharmacy is one of Bangalore's fastest-growing digital healthcare delivery startups. Our mission is simple: medicines delivered to your doorstep in just 10 minutes. From essential tablets to over-the-counter wellness products, we are transforming how people access pharmaceutical care with speed, precision, and compassion.
             </Text>
-
             <Text style={styles.title}>Our Mission</Text>
             <Text style={styles.text}>
               We aim to simplify access to critical healthcare by ensuring medications are delivered within minutes. Fast service. Full trust. Always.
