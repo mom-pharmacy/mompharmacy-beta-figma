@@ -6,7 +6,7 @@ export default function footer() {
   return (
     
     <View>
-        <Text style={{ textAlign: 'center', color: 'gray', marginBottom: 40, marginTop:30 }}>PROD - v 1.0.1(2)</Text>
+        {/* <Text style={{ textAlign: 'center', color: 'gray', marginBottom: 40, marginTop:30 }}>PROD - v 1.0.1(2)</Text> */}
 
         <Text style={{ fontSize: 29, fontWeight: 'bold', textAlign: 'center', marginBottom: 15, color: 'gray' }}>Care Like Your <AntDesign name="heart" size={24} color="red" /> mom </Text>
         <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center', marginBottom: 30, color: 'gray' }}>Made Love With mom Fam</Text>

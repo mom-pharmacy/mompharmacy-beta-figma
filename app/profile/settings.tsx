@@ -1,5 +1,5 @@
 import { userAuth } from '@/Context/authContext';
-import { MaterialIcons } from '@expo/vector-icons';
+import {  MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
@@ -78,6 +78,7 @@ export default function SettingsScreen() {
       <View style={[styles.container, { backgroundColor: darkTheme ? '#1e1e1e' : '#fff' }]}>
         <View style={styles.headerRow}>
         <MaterialIcons name="arrow-back" size={24} color="#00A99D" style={styles.MaterialIcons} onPress={()=>router.back()} />
+
           <Text style={styles.header}>Settings</Text>
         </View>
 
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
+
     justifyContent: 'flex-start',
     marginBottom: 10,
   },
