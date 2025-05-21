@@ -117,7 +117,7 @@ const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, r
     <View style={styles.cardContainer}>
       <View style={styles.card}>
         <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
-        <Text style={styles.cardTitle}>{item.medicine_name}</Text>
+        <Text style={styles.cardTitle} numberOfLines={1}>{item.medicine_name}</Text>
         <View style={styles.nameContainer}>
           <Text style={styles.cardPrice}>Rs {item.price}</Text>
         </View>
