@@ -73,13 +73,6 @@ export default function SavedListScreen() {
     fetchWishlist();
   }, [ExtractParseToken]);
 
-
-
-
-
-
-
-
   const handleDelete = async (id: string) => {
     try {
       const token = await ExtractParseToken();
@@ -281,7 +274,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00A99D',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 6,
+    borderRadius: 15,
     alignSelf: 'flex-start',
   },
   addButtonText: {
@@ -320,7 +313,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     backgroundColor: '#00A99D',
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 25,
     alignItems: 'center',
   },
   proceedButtonText: {
