@@ -70,11 +70,15 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     paddingRight: 8,
+    marginTop: -50,
+    color: "#00A99D",
   },
   header: {
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: '#00A99D',
+    color: '#007E71',
+    marginLeft: 100,
+    marginTop: -50
   },
   cardContainer: {
     width: '100%',
@@ -98,5 +102,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: '#333',
     marginBottom: 18,
+    textAlign: "justify"
+    
   },
 });
