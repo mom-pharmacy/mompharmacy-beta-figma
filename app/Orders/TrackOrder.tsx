@@ -2,10 +2,10 @@ import OrderStatus from '@/components/OrdersComponents/OrderStatus';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { COLOR, screen } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
+import { useOrderActive } from '@/Context/orderContext';
 import { Ionicons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -13,11 +13,13 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 
 export default function TrackOrder() {
   const [openOrderSummary, setOpenOrderSummary] = useState(false);
-  const { orderId } = useLocalSearchParams();
+  // const { orderId } = useLocalSearchParams();
   const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
 
   const { ExtractParseToken } = userAuth();
+  const {ActiveOrderId} = useOrderActive()
+  console.log("this is active",ActiveOrderId)
 
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -32,7 +34,7 @@ export default function TrackOrder() {
             "Authorization":`Bearer ${tokenAuth}`
           }
         }
-        const response = await fetch(`https://mom-beta-server1.onrender.com/api/orderbyid/${orderId}` , options);
+        const response = await fetch(`https://mom-beta-server1.onrender.com/api/orderbyid/${ActiveOrderId}` , options);
         console.log("this is from order " ,response)
         if (!response.ok) {
           throw new Error('Failed to fetch order data');
@@ -45,7 +47,7 @@ export default function TrackOrder() {
     };
 
     fetchOrderData();
-  }, [orderId]);
+  }, [ActiveOrderId]);
 
   const StatusRender = ({ title, icons }) => (
     <View style={trackPageStyles.orderStatusItems}>
@@ -55,7 +57,7 @@ export default function TrackOrder() {
   );
 
   const generateOrderId = ()=>{
-    const standaredId = orderId.slice(0 , 10).toString().toUpperCase() 
+    const standaredId = ActiveOrderId.slice(0 , 10).toString().toUpperCase() 
     return standaredId
   }
 
@@ -81,7 +83,7 @@ export default function TrackOrder() {
         {order.medicines.map((medicine, index) => (
           <View key={index} style={styles.orderItemContainer}>
             <Image
-              source={medicine.image ?{ uri: medicine.image } : require("@/assets/images/Categories/babyoil.png")}
+              source={medicine.imageUrl ?{ uri: medicine.imageUrl } : require("@/assets/images/Categories/babyoil.png")}
               style={{ width: 40, height: 40 }}
             />
             <View style={styles.orderItemQuantityContainer}>
