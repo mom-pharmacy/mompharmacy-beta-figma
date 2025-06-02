@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SuggestAndEarn from '../profile/sug_box'
-import SuggestTop from '../profile/SugboxTop'
+import SuggestTop from '../profile/sug_box';
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);

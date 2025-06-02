@@ -1,12 +1,12 @@
+
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect } from 'react';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -64,7 +64,7 @@ const Dropdown = ({ label, value, setValue, options }) => {
 };
 
 const EditUserScreen = () => {
-  const { userDetails, getUserDetails } = userAuth();
+  const { userDetails, getUserDetails, setUserDetails } = userAuth();
   const [user, setUser] = useState(userDetails);
   const [updating, setUpdating] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -75,24 +75,57 @@ const EditUserScreen = () => {
   
 
   const handleUpdate = async () => {
-    if (!user || !user._id) return;
+    if (!user || !user._id) {
+      Alert.alert('Error', 'User information is missing');
+      return;
+    }
+    
     setUpdating(true);
     try {
+      const tokenStr = await AsyncStorage.getItem('jwt_token');
+      if (!tokenStr) {
+        Alert.alert('Error', 'Authentication token is missing. Please login again.');
+        return;
+      }
+
+      const token = JSON.parse(tokenStr);
+      console.log('Starting update request for user:', user._id);
+      
       const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/user/update/${user._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: user.name,
+          gender: user.gender,
+          dateOfBirth: user.dateOfBirth,
+          bloodgroup: user.bloodgroup,
+          mobileNo: user.mobileNo
+        }),
       });
+
+      console.log('Response status:', res.status);
       const data = await res.json();
+      console.log('Response data:', data);
+
       if (res.ok) {
-        Alert.alert('Success', 'User updated');
-        const token = JSON.parse(await AsyncStorage.getItem('jwt_token'));
+        Alert.alert('Success', 'Profile updated successfully');
         await getUserDetails(token);
-        router.push({ pathname: '/BottomNavbar/profile', params: { profileCompletion: profileCompletion.toString() } });
-        
-      } else Alert.alert('Error', data.message || 'Update failed');
+        router.push({ 
+          pathname: '/BottomNavbar/profile', 
+          params: { profileCompletion: profileCompletion.toString() } 
+        });
+      } else {
+        throw new Error(data.message || 'Failed to update profile');
+      }
     } catch (e) {
-      Alert.alert('Error', 'Update error');
+      console.error('Update error:', e);
+      Alert.alert(
+        'Error',
+        e.message || 'Failed to update profile. Please check your connection and try again.'
+      );
     } finally {
       setUpdating(false);
     }
@@ -196,7 +229,7 @@ const pickImage = async () => {
         <Dropdown
           label="Blood Group"
           value={user.bloodgroup}
-          setValue={(v) => setUser({ ...user, bloodgroup: v })}
+          setValue={(v) => `setUser({ ...user, bloodgroup: v })`}
           options={BLOODGROUP_OPTIONS}
         />
         

@@ -9,6 +9,7 @@ import {
   Text,
   View
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function About() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function About() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+      <SafeAreaView>
         <View style={styles.headerRow}>
           <MaterialIcons
             name="arrow-back"
@@ -47,6 +49,7 @@ export default function About() {
             </Text>
           </BlurView>
         </View>
+        </SafeAreaView>
       </ScrollView>
     </View>
   );
@@ -69,15 +72,15 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     paddingRight: 8,
-    marginTop: -50,
+    marginTop: -30,
     color: "#00A99D",
   },
   header: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#007E71',
-    marginLeft: 100,
-    marginTop: -50
+    marginLeft: 10,
+    marginTop: -30
   },
   cardContainer: {
     width: '100%',
