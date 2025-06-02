@@ -9,14 +9,13 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View,
+  View
 } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
@@ -81,7 +80,7 @@ export default function LoginScreen() {
       keyboardVerticalOffset={Platform.select({ ios: 0, android: 25 })}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView>
+       
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
@@ -171,7 +170,7 @@ export default function LoginScreen() {
             </View>
           </View>
         </ScrollView>
-        </SafeAreaView>
+        
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
