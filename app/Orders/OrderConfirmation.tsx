@@ -1,10 +1,20 @@
+import { useOrderActive } from '@/Context/orderContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const OrderConfirmationModal = ({ visible, orderId}) => {
-  console.log("hhgh",orderId)
+const OrderConfirmationModal = ({ visible, orderId }) => {
+  console.log("hhgh", orderId)
+  const {updateActiveOrder} = useOrderActive()
+
+  function handleTrackOrder(){
+     updateActiveOrder(orderId)
+     router.replace({
+                pathname: './TrackOrder',
+                params: { orderId }
+              })
+  }
 
   return (
     <Modal transparent visible={visible} animationType="fade">
@@ -16,8 +26,7 @@ const OrderConfirmationModal = ({ visible, orderId}) => {
           <Text style={styles.title}>Order confirmed</Text>
           <Text style={styles.subtitle}>Your order is on its way</Text>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.replace({  pathname: './TrackOrder',
-      params: {orderId} })}>
+          <TouchableOpacity style={styles.button} onPress={handleTrackOrder}>
             <Text style={styles.buttonText}>Track Your Order</Text>
           </TouchableOpacity>
         </View>

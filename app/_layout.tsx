@@ -3,6 +3,7 @@ import { AddressProvider } from "@/Context/addressContext";
 import { AuthProvider } from "@/Context/authContext";
 import { CartProvider } from "@/Context/cartContext";
 import { LocationProvider } from "@/Context/locationContext";
+import { OrderProvider } from "@/Context/orderContext";
 import { Stack } from "expo-router";
 import React from "react";
 import { PaperProvider } from "react-native-paper";
@@ -13,6 +14,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <GlobalStatusBar barStyle="dark-content" backgroundColor="#42beb5" />
+      <OrderProvider>
       <PushNotificationProvider>
       <LocationProvider>
         <PaperProvider>
@@ -35,6 +37,7 @@ export default function RootLayout() {
         </PaperProvider>
       </LocationProvider>
       </PushNotificationProvider>
+      </OrderProvider>
     </SafeAreaProvider>
   );
 }
