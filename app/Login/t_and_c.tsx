@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import CheckBox from 'expo-checkbox';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -7,6 +6,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 export default function Terms_n_Conditions() {
   const [isSelected, setSelection] = useState(false);
 
+  
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.headerRow}>

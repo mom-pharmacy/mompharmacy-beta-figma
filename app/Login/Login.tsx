@@ -19,12 +19,12 @@ import {
 } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
-
 const slides = [
   require('../../assets/images/1image.png'),
   require('../../assets/images/2image.png'),
   require('../../assets/images/3image.png'),
 ];
+
 
 export default function LoginScreen() {
   const [input, setInput] = useState('');

@@ -2,6 +2,7 @@ import UnifiedOnboardingScreen from '@/components/onBoardingScreen'; // Adjust p
 import { router } from 'expo-router';
 import React from 'react';
 
+
 export default function Screen3() {
   return (
     <UnifiedOnboardingScreen

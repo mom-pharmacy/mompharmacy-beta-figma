@@ -11,6 +11,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -29,7 +30,7 @@ export default function OtpScreen() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
-  const inputRefs = useRef<Array<TextInput | null>>([]);
+  const inputRefs = useRef<(TextInput | null)[]>([]);
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const { verifyOtp } = userAuth();

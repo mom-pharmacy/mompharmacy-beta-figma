@@ -18,5 +18,6 @@ export default function Screen2() {
         circleBackground: 'rgba(255,255,255,0.25)',
       }}
     />
+    
   );
 }
