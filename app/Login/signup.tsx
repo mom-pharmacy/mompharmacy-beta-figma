@@ -21,6 +21,7 @@ import { Button, Checkbox } from 'react-native-paper';
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import WelcomeCard from './success';
 
+
 const GENDER_OPTIONS = [
   'Male',
   'Female',

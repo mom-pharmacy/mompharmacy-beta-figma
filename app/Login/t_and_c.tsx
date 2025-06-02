@@ -1,5 +1,4 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import CheckBox from 'expo-checkbox';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -7,6 +6,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 export default function Terms_n_Conditions() {
   const [isSelected, setSelection] = useState(false);
 
+  
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
       <View style={styles.headerRow}>
@@ -79,12 +79,12 @@ export default function Terms_n_Conditions() {
         • We may update these terms from time to time. Continued use of the app indicates acceptance.
       </Text>
 
-      <View style={styles.checkboxContainer}>
+      {/* <View style={styles.checkboxContainer}>
         <CheckBox value={isSelected} onValueChange={setSelection} style={styles.checkbox} />
         <Text style={styles.label}>
           By continuing to use the app, you agree to these Terms & Conditions.
         </Text>
-      </View>
+      </View> */}
     </ScrollView>
   );
 }
@@ -101,11 +101,13 @@ const styles = StyleSheet.create({
   },
   arrowIcon: {
     marginRight: 10,
+    paddingTop:20
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00A99D',
+    paddingTop:20
   },
   date: {
     fontSize: 14,

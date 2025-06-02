@@ -7,6 +7,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -51,7 +52,6 @@ const generateBackgroundLayout = (cols = 5, rows = 9, spacing = 16) => {
         rotate,
         opacity,
       });
-
       index++;
     }
   }
