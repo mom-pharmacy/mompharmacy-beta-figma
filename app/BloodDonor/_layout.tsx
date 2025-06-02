@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-
+//to make code runnable
 export default function BloodDonorLayout() {
   return (
     <Stack
