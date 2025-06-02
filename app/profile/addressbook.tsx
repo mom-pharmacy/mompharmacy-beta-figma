@@ -7,7 +7,6 @@ import {
   Dimensions,
   Linking,
   Modal,
-  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -16,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const wp = (percentage: string) => (width * parseFloat(percentage)) / 100;
