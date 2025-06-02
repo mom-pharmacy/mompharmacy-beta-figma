@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Micro from '../assets/images/microphone';
 
-export default function VoiceInput({ onTranscript }) {
+export default function VoiceInput({ onTranscript, style }) {
 const recordingRef = useRef(null);
 
   const [isRecording, setIsRecording] = useState(false);
@@ -113,9 +113,12 @@ const stopRecording = async () => {
   };
 
   return (
-    <View>
-      <TouchableOpacity onPress={isRecording ? null : startRecording}>
-        <Micro width={100} height={100}/>
+    <View style={styles.container}>
+      <TouchableOpacity 
+        onPress={isRecording ? null : startRecording} 
+        style={[styles.microphoneContainer, style]}
+      >
+        <Micro width={100} height={100} style={styles.voice}/>
       </TouchableOpacity>
 
       <Modal transparent visible={isLoading} animationType="fade">
@@ -134,6 +137,13 @@ const stopRecording = async () => {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  voice:{
+    marginRight:-40,
+  },
   modalBackground: {
     flex: 1,
     justifyContent: 'center',
@@ -152,5 +162,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
   },
+  microphoneContainer: {
+    marginLeft: 'auto',
+    padding: 5
+  }
 });
 

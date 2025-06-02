@@ -31,9 +31,11 @@ export default function Categories() {
               <Text style={{ flex: 1, fontWeight: '500', fontSize: 20 }}>
                 {item.category_name}
               </Text>
+              <TouchableOpacity onPress={()=>router.push({pathname:'/CategoriesWiseMedicines', params:{CategoryId:item._id}})}>
               <Text style={{ fontWeight: '500', fontSize: 16, color: '#00a99d' }}>
                 See All <AntDesign name="arrowright" size={20} color="#00a99d" />
               </Text>
+              </TouchableOpacity>
             </View>
             <FlatList
               data={item.subcategories.slice(0,4)}

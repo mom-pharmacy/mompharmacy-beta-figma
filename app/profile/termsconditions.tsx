@@ -25,8 +25,6 @@ export default function Terms_n_Conditions() {
         <Text style={styles.title}>Terms & Conditions</Text>
       </View>
 
-      {/* <Text style={styles.date}>Effective Date: 01/05/2025</Text> */}
-
       <Text style={styles.heading}>1. User Responsibilities</Text>
       <Text style={styles.paragraph}>
         • Provide accurate and complete prescription and delivery details.{'\n'}
@@ -84,12 +82,6 @@ export default function Terms_n_Conditions() {
         • We may update these terms from time to time. Continued use of the app indicates acceptance.
       </Text>
 
-      {/* <View style={styles.checkboxContainer}>
-        <CheckBox value={isSelected} onValueChange={setSelection} style={styles.checkbox} />
-        <Text style={styles.label}>
-          By continuing to use the app, you agree to these Terms & Conditions.
-        </Text>
-      </View> */}
     </ScrollView>
     </SafeAreaView>
   );
@@ -112,13 +104,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00A99D',
-    marginLeft: 60,
   },
-  // date: {
-  //   fontSize: 14,
-  //   color: '#777',
-  //   marginBottom: 20,
-  // },
+  date: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 20,
+  },
   heading: {
     fontSize: 15,
     fontWeight: '700',
@@ -130,7 +121,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#444',
     lineHeight: 22,
-   textAlign: "justify"
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -147,4 +137,3 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
-

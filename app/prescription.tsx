@@ -92,7 +92,7 @@ const PrescriptionUploadScreen = () => {
   };
 
   const handleSendToWhatsApp = () => {
-    const phoneNumber = '7780530888';
+    const phoneNumber = '7702068334';
     const fileName = selectedFile?.name || selectedFile?.uri || 'No file';
     const message = `*Prescription Upload*\n\n👤 Name: ${name}\n🎂 Age: ${age}\n📝 Notes: ${notes || 'None'}\n📎 File: ${fileName}`;
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
