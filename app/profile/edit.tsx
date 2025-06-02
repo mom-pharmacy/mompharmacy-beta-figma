@@ -1,10 +1,12 @@
+
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Button,
@@ -24,6 +26,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const GENDER_OPTIONS = ['male', 'female', 'others'];
 const BLOODGROUP_OPTIONS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
+
 
 const Dropdown = ({ label, value, setValue, options }) => {
   const [visible, setVisible] = useState(false);
@@ -61,7 +64,7 @@ const Dropdown = ({ label, value, setValue, options }) => {
 };
 
 const EditUserScreen = () => {
-  const { userDetails, getUserDetails } = userAuth();
+  const { userDetails, getUserDetails, setUserDetails } = userAuth();
   const [user, setUser] = useState(userDetails);
   const [updating, setUpdating] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -69,29 +72,87 @@ const EditUserScreen = () => {
   const filledFields = [user?.name, user?.mobileNo, user?.gender, user?.dateOfBirth, user?.bloodgroup]
     .filter((f) => f && f.toString().trim() !== '').length;
   const profileCompletion = Math.round((filledFields / 5) * 100);
+  
 
   const handleUpdate = async () => {
-    if (!user || !user._id) return;
+    if (!user || !user._id) {
+      Alert.alert('Error', 'User information is missing');
+      return;
+    }
+    
     setUpdating(true);
     try {
+      const tokenStr = await AsyncStorage.getItem('jwt_token');
+      if (!tokenStr) {
+        Alert.alert('Error', 'Authentication token is missing. Please login again.');
+        return;
+      }
+
+      const token = JSON.parse(tokenStr);
+      console.log('Starting update request for user:', user._id);
+      
       const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/user/update/${user._id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(user),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: user.name,
+          gender: user.gender,
+          dateOfBirth: user.dateOfBirth,
+          bloodgroup: user.bloodgroup,
+          mobileNo: user.mobileNo
+        }),
       });
+
+      console.log('Response status:', res.status);
       const data = await res.json();
+      console.log('Response data:', data);
+
       if (res.ok) {
-        Alert.alert('Success', 'User updated');
-        const token = JSON.parse(await AsyncStorage.getItem('jwt_token'));
+        Alert.alert('Success', 'Profile updated successfully');
         await getUserDetails(token);
-        router.push({ pathname: '/BottomNavbar/profile', params: { profileCompletion: profileCompletion.toString() } });
-      } else Alert.alert('Error', data.message || 'Update failed');
+        router.push({ 
+          pathname: '/BottomNavbar/profile', 
+          params: { profileCompletion: profileCompletion.toString() } 
+        });
+      } else {
+        throw new Error(data.message || 'Failed to update profile');
+      }
     } catch (e) {
-      Alert.alert('Error', 'Update error');
+      console.error('Update error:', e);
+      Alert.alert(
+        'Error',
+        e.message || 'Failed to update profile. Please check your connection and try again.'
+      );
     } finally {
       setUpdating(false);
     }
   };
+  const [imageUri, setImageUri] = useState(null);
+
+useEffect(() => {
+  (async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission denied', 'Camera roll permissions are required to change profile picture.');
+    }
+  })();
+}, []);
+
+const pickImage = async () => {
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    setImageUri(result.assets[0].uri);
+  }
+};
 
   const onDateChange = (_, selectedDate) => {
     if (selectedDate) setUser({ ...user, dateOfBirth: selectedDate.toISOString().split('T')[0] });
@@ -114,9 +175,19 @@ const EditUserScreen = () => {
 
         <View style={styles.avatarContainer}>
           <Image source={require('../../assets/images/profileimg.png')} style={styles.avatar} />
-          <Text style={styles.changePhotoText}>Change Profile Picture</Text>
+          {/* <Text style={styles.changePhotoText}>Change Profile Picture</Text> */}
         </View>
+                         
+            {/* <TouchableOpacity onPress={pickImage} style={{ alignItems: 'center' }}>
+                    <Image
+                      source={imageUri ? { uri: imageUri } : require('../../assets/images/profileimg.png')}
+                      style={styles.avatar}
+                      resizeMode="cover"
+                    />
+                  <Text style={styles.changePhotoText}>Change Profile Picture</Text>
+               </TouchableOpacity> */}
 
+           
         <Text style={styles.label}>Name:</Text>
         <TextInput
           style={styles.input}
@@ -158,24 +229,26 @@ const EditUserScreen = () => {
         <Dropdown
           label="Blood Group"
           value={user.bloodgroup}
-          setValue={(v) => setUser({ ...user, bloodgroup: v })}
+          setValue={(v) => `setUser({ ...user, bloodgroup: v })`}
           options={BLOODGROUP_OPTIONS}
         />
-
-        <Button title={updating ? 'Updating...' : 'Submit'} onPress={handleUpdate} disabled={updating} color="#008080" />
+        
+        <Button   title={updating ? 'Updating...' : 'Submit'}  onPress={handleUpdate} disabled={updating} color="#008080"  />
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 10, paddingBottom: 100, backgroundColor: '#fff', flexGrow: 1 },
+  container: { padding: 20, paddingBottom: 120, backgroundColor: '#fff', flexGrow: 1 },
   changePhotoText: { color: '#008080', marginTop: 8, fontSize: 14, fontWeight: '500' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   label: { marginTop: 10, fontWeight: '600', color: '#333' },
-  avatar: { width: 100, height: 89, borderRadius: 50, backgroundColor: '#ddd' },
+  avatar: { width: 90, height: 90, borderRadius: 50, backgroundColor: '#ddd' },
   input: { backgroundColor: '#e9f0eb', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 6 },
-  avatarContainer: { alignItems: 'center', marginBottom: 10, },
+  avatarContainer: 
+  { alignItems: 'center', 
+    marginBottom: 10, },
   statusContainer: { padding: 12, backgroundColor: 'white', paddingLeft: 20 },
   Container1: { flexDirection: 'row', gap: 30 },
   header: { fontWeight: '700', fontSize: 22, color: '#00a99d', paddingBottom:30},

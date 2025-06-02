@@ -22,7 +22,8 @@ const styles = StyleSheet.create({
         margin: 8,
         alignItems: 'center',
         justifyContent: 'center',
-        marginHorizontal:6,
+        marginHorizontal:5,
+        
     },
     items: {
         height: 111,
@@ -39,6 +40,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 5, 
         fontSize: 11,
+        width:76,
+        height:18,
+        fontWeight:500,
     },
 });
 

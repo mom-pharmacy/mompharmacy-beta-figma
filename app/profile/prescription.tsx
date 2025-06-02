@@ -86,11 +86,11 @@ const Prescription = () => {
           contentContainerStyle={prescriptions.length === 0 && styles.emptyContainer}
         />
         
-        <View style={styles.buttonContainer}>
+        {/* <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.uploadButton} onPress={handleUpload}>
             <Text style={styles.buttonText}>Upload</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
     </View>
     </SafeAreaView>
   );
