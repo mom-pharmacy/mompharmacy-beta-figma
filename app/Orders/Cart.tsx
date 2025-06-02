@@ -71,17 +71,17 @@ const OrderReviewScreen = () => {
        
         <CartList/>
         <View style={styles.recommendedContainer}>
-          <Text style={styles.recommended}>Recommended</Text>
+          {/* <Text style={styles.recommended}>Recommended</Text> */}
         </View>
 
-        <ScrollView horizontal={true}>
+        {/* <ScrollView horizontal={true}> */}
           <Recommended />
           {/* <View style={styles.recommendedCardContainer}>
             {items.map(item => (
               <MedicineCard key={item._id} item={item} />
             ))}
           </View> */}
-        </ScrollView>
+        {/* </ScrollView> */}
       </ScrollView>
 
       {/* Fixed at bottom */}
@@ -213,8 +213,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#00bfa5',
     borderRadius: 24,
     alignItems: 'center',
-    paddingVertical: 12,
-    marginTop: 10,
+    paddingVertical: 7,
+    marginTop: 0,
   },
   proceedText: {
     color: '#fff',
@@ -244,8 +244,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fff",
-    padding: 12,
+    paddingHorizontal: 12,
+    paddingVertical: -20, 
+    height: 60, 
   },
+  
   mainContainer: {
     flex: 1,
     height: screen.width
@@ -263,7 +266,9 @@ const styles = StyleSheet.create({
 
   },
   proccedBtnText:{
-    color:"white"
+    color:"white",
+    fontSize:17,
+    fontWeight:"bold",
   },
   discountPrice:{
     color:COLOR.primary ,

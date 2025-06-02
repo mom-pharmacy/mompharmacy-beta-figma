@@ -141,6 +141,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginTop: -20,
   },
+  heading: {
+    fontSize: 17,
+    fontWeight: "bold",
+  },
   header: {
     padding: 10,
     backgroundColor: '#fff',
@@ -161,10 +165,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   columnWrapper: {
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
+    gap: 12,
   },
   cardContainer: {
-    width: 180,
+    width: 160,
+    flex: 1,
   },
   card: {
     backgroundColor: '#fff',
@@ -172,7 +178,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: '#b2d8d833',
-    margin: 10,
+    margin: 8,
   },
   cardImage: {
     width: '100%',
