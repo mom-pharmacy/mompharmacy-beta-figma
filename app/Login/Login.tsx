@@ -170,7 +170,6 @@ export default function LoginScreen() {
               </Text>
             </View>
           </View>
-
         </ScrollView>
         </SafeAreaView>
       </TouchableWithoutFeedback>
@@ -186,12 +185,14 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     paddingBottom: hp('2%'),
+    
   },
   topSection: {
     alignItems: 'center',
     paddingTop: Platform.select({
       ios: hp('6%'),
       android: hp('4%')
+      
     }),
     paddingBottom: hp('2%'),
   },
@@ -201,9 +202,10 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: { 
         height: hp('30%'),
-        top: 20, },
+        top: 30, },
       android: {
-        height: hp('28%')
+        height: hp('30%'),
+        top:30
       }
     }),
   },
@@ -231,11 +233,10 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     position: 'absolute',
-    top: Platform.select({
-      ios: hp('7%'),
-      android: hp('3%')
-    }),
-    right: wp('5%'),
+    top: Platform.OS === 'ios'?60:50,
+    right: 20,
+    paddingVertical:5,
+    paddingHorizontal:20,
     zIndex: 1,
   },
   skipText: {
@@ -266,7 +267,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: wp('8%'),
     marginTop: hp('4%'),
     padding: wp('5%'),
-    height: -200,
+    height: '65%',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -368,35 +369,35 @@ const styles = StyleSheet.create({
     color: '#007E71',
     textDecorationLine: 'underline',
   },
-  signupContainer: {
-    backgroundColor: '#E5F2F1',
-    paddingVertical: hp('2%'),
-    alignItems: 'center',
-    height:"100%",
+  // signupContainer: {
+  //   backgroundColor: '#E5F2F1',
+  //   paddingVertical: hp('2%'),
+  //   alignItems: 'center',
+  //   height:"100%",
 
-    ...Platform.select({
-      ios: {
-        marginTop: 50
-      },
-      android: {
-        marginTop: 50
-      }
-    })
-  },
-  signupText: {
-    fontSize: hp('1.8%'),
-    color: '#333',
-    ...Platform.select({
-      android: {
-         marginTop: 40
-      }
+  //   ...Platform.select({
+  //     ios: {
+  //       marginTop: 50
+  //     },
+  //     android: {
+  //       marginTop: 50
+  //     }
+  //   })
+  // },
+  // signupText: {
+  //   fontSize: hp('1.8%'),
+  //   color: '#333',
+  //   ...Platform.select({
+  //     android: {
+  //        marginTop: 40
+  //     }
       
-    })
+  //   })
    
-  },
-  signupLink: {
-    color: '#007E71',
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
+  // },
+//   signupLink: {
+//     color: '#007E71',
+//     fontWeight: '600',
+//     textDecorationLine: 'underline',
+//   },
 });

@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   Image,
@@ -31,13 +32,14 @@ export default function OtpScreen() {
   const inputRefs = useRef<Array<TextInput | null>>([]);
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { verifyOtp, postData } = userAuth();
+  const { verifyOtp } = userAuth();
   const params = useLocalSearchParams();
-  const user = params.user ;
+  const user = params.user;
   const isRegistration = params.isRegistration === "true";
+  const [loader, setShowLoader] = useState(false);
 
   useEffect(() => {
-    let intervalId: number;
+    let intervalId: NodeJS.Timeout;
     if (timer > 0) {
       intervalId = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -45,11 +47,7 @@ export default function OtpScreen() {
     } else {
       setCanResend(true);
     }
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
+    return () => clearInterval(intervalId);
   }, [timer]);
 
   useEffect(() => {
@@ -84,17 +82,23 @@ export default function OtpScreen() {
 
   const handleVerifyOtp = async () => {
     const fullOtp = otp.join("");
-    console.log("Submitting OTP:", fullOtp);
-    const data = await verifyOtp(fullOtp, user);
-    console.log("this is veeffnakf" , data)
-    if(data){
-      if(data.isExist){
-        router.replace("/Login/medintro")
-      }else{
-        router.replace("/Login/signup")
+    setShowLoader(true);
+    try {
+      const data = await verifyOtp(fullOtp, user);
+      if (data) {
+        if (data.isExist) {
+          router.replace("/Login/medintro");
+        } else {
+          router.replace("/Login/signup");
+        }
+      } else {
+        Alert.alert("Invalid OTP", "Please try again.");
+        router.back();
       }
-    }else{
-      router.back()
+    } catch (error) {
+      Alert.alert("Error", "Failed to verify OTP.");
+    } finally {
+      setShowLoader(false);
     }
   };
 
@@ -105,10 +109,8 @@ export default function OtpScreen() {
       setCanResend(false);
       try {
         await sendSmsOtp(typeof user === "string" ? user : user[0]);
-        console.log("OTP resent successfully");
         Alert.alert("OTP Resent", "A new OTP has been sent to your phone");
       } catch (error) {
-        console.error("Error resending OTP:", error);
         Alert.alert("Error", "Failed to resend OTP. Please try again.");
         setCanResend(true);
       }
@@ -120,7 +122,6 @@ export default function OtpScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.container}>
@@ -179,12 +180,9 @@ export default function OtpScreen() {
 
               <View style={styles.resendRow}>
                 <Text style={styles.resendText}>
-                  {canResend ? "" : `Wait for ${timer} seconds to `}
+                  {canResend ? "" : `Wait for ${timer}s to `}
                 </Text>
-                <TouchableOpacity
-                  onPress={handleResendOtp}
-                  disabled={!canResend}
-                >
+                <TouchableOpacity onPress={handleResendOtp} disabled={!canResend}>
                   <Text
                     style={[styles.resendText, !canResend && { opacity: 0.5 }]}
                   >
@@ -197,7 +195,11 @@ export default function OtpScreen() {
                 onPress={handleVerifyOtp}
                 style={styles.verifyButton}
               >
-                <Text style={styles.verifyButtonText}>Submit</Text>
+                {loader ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.verifyButtonText}>Submit</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -240,6 +242,11 @@ const styles = StyleSheet.create({
   },
   activeDot: {
     backgroundColor: "#007E71",
+  },
+  bottomCard: {
+    marginTop: 20,
+    width: "100%",
+    alignItems: "center",
   },
   heading: {
     fontSize: 22,
@@ -307,19 +314,5 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    textAlign: "center",
-  },
-  bottomCard: {
-    backgroundColor: "#E5F2F1",
-    borderTopLeftRadius: 140,
-    borderTopRightRadius: 140,
-    paddingTop: 40,
-    paddingHorizontal: 70,
-    paddingBottom: 20,
-    flex: 1,
-    justifyContent: "flex-start",
-    bottom: -25,
   },
 });
