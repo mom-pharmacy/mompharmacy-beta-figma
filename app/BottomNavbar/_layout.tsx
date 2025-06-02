@@ -65,8 +65,8 @@ export default function BottomNavbar() {
 const styles = StyleSheet.create({
   badge: {
     position: 'absolute',
-    right: -6,
-    top: -3,
+    right: 15,
+    top: 19,
     backgroundColor: '#00a99d',
     borderRadius: 8,
     minWidth: 16,
