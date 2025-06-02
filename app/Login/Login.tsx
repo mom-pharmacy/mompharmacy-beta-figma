@@ -9,6 +9,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -73,17 +74,20 @@ export default function LoginScreen() {
   }, [currentIndex]);
 
   return (
+
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.select({ ios: 0, android: 25 })}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView>
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+
           <View style={styles.topSection}>
             <FlatList
               ref={flatListRef}
@@ -167,15 +171,8 @@ export default function LoginScreen() {
             </View>
           </View>
 
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>
-              Don't have an account?{' '}
-              <Text style={styles.signupLink} onPress={() => router.push('/Login/signup')}>
-                Sign Up Now!
-              </Text>
-            </Text>
-          </View>
         </ScrollView>
+        </SafeAreaView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
