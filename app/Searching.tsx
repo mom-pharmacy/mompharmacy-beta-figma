@@ -117,7 +117,7 @@ const handleVoice = (text) => {
                             onChangeText={onChangeHandler}
                             placeholderTextColor="#888"
                         />
-                        <VoiceInput onTranscript={handleVoice} />
+                        <VoiceInput onTranscript={handleVoice} style={styles.voiceInput} />
                     </View>
                     <TouchableOpacity onPress={() => { router.push('/BottomNavbar/cart') }} >
                         <FontAwesome6 name="cart-plus" size={28} color="#00a99d" />
@@ -259,6 +259,7 @@ const styles = StyleSheet.create({
         height: 50,
         borderColor: COLOR.primary,
         borderWidth: 1,
+        position: 'relative'
     },
     searchInput: {
         flex: 1,
@@ -359,6 +360,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 10,
         fontWeight: 'bold',
+    },
+    voiceInput: {
+        marginLeft: 'auto'
     },
 });
 
