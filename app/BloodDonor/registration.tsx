@@ -4,11 +4,30 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import Checkbox from 'expo-checkbox';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Keyboard, KeyboardAvoidingView, LayoutAnimation, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, UIManager, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  LayoutAnimation,
+  Platform,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  UIManager,
+  View,
+} from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);}
-const BASE_URL = 'https://mom-beta-server1.onrender.com/api/donar';
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const BASE_URL = 'http://localhost:3000/api/donar';
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
 const locationData = {
@@ -21,6 +40,7 @@ const locationData = {
     Vijayawada: ['Labbipet', 'Benz Circle'],
   },
 };
+
 const FAQItem = ({ question, answer }) => {
   const [expanded, setExpanded] = useState(false);
   const toggleExpand = () => {
@@ -31,57 +51,52 @@ const FAQItem = ({ question, answer }) => {
     <View style={styles.faqItem}>
       <TouchableOpacity style={styles.faqHeader} onPress={toggleExpand}>
         <Text style={styles.faqQuestion}>{question}</Text>
-        <MaterialIcons 
-          name={expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-down'} 
-          size={24} 
+        <MaterialIcons
+          name={expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
+          size={24}
           color="#00A99D"
         />
       </TouchableOpacity>
       {expanded && <Text style={styles.faqAnswer}>{answer}</Text>}
     </View>
-  );};
+  );
+};
+
 const RegisterScreen = () => {
   const navigation = useNavigation();
   const [name, setName] = useState('');
-  // Blood group dropdown state
   const [bloodOpen, setBloodOpen] = useState(false);
   const [selectedBloodGroup, setSelectedBloodGroup] = useState('');
   const [bloodItems, setBloodItems] = useState(
     bloodGroups.map((bg) => ({ label: bg, value: bg }))
   );
-  
-  // Keep this for backward compatibility with the form
   const [bloodGroup, setBloodGroup] = useState('');
-  
-  // Sync selectedBloodGroup with bloodGroup
-  useEffect(() => {
-    if (selectedBloodGroup) {
-      setBloodGroup(selectedBloodGroup);
-    }
-  }, [selectedBloodGroup]);
   const [dob, setDob] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [mobileNumber, setMobileNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [email, setEmail] = useState('');
-  // Location dropdown states
   const [stateOpen, setStateOpen] = useState(false);
   const [selectedState, setSelectedState] = useState('');
   const [stateItems, setStateItems] = useState(
     Object.keys(locationData).map((key) => ({ label: key, value: key }))
   );
-
   const [districtOpen, setDistrictOpen] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [districtItems, setDistrictItems] = useState([]);
-
   const [cityOpen, setCityOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [cityItems, setCityItems] = useState([]);
-
   const [Pincode, setPincode] = useState('');
-  const [availability, setAvailability] = useState(null);
   const [authorized, setAuthorized] = useState(false);
-  // Update district items when state changes
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (selectedBloodGroup) {
+      setBloodGroup(selectedBloodGroup);
+    }
+  }, [selectedBloodGroup]);
+
   useEffect(() => {
     if (selectedState) {
       const districts = Object.keys(locationData[selectedState] || {}).map((d) => ({
@@ -95,7 +110,6 @@ const RegisterScreen = () => {
     }
   }, [selectedState]);
 
-  // Update city items when district changes
   useEffect(() => {
     if (selectedState && selectedDistrict) {
       const cities = (locationData[selectedState]?.[selectedDistrict] || []).map((c) => ({
@@ -108,12 +122,14 @@ const RegisterScreen = () => {
   }, [selectedDistrict]);
 
   const handleSubmit = async () => {
+    setPhoneError('');
     if (!name || !mobileNumber || !email || !selectedBloodGroup || !selectedState || !selectedDistrict || !selectedCity || !Pincode) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
     }
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(mobileNumber)) {
+      setPhoneError('Mobile number must be exactly 10 digits.');
       Alert.alert('Invalid Mobile Number', 'Mobile number must be exactly 10 digits.');
       return;
     }
@@ -131,8 +147,9 @@ const RegisterScreen = () => {
       state: selectedState,
       city: selectedCity,
       district: selectedDistrict,
-      availability,
+      pincode: Pincode,
     };
+    setIsLoading(true);
     try {
       console.log('Sending data to server:', dataToSend);
       const response = await axios.post(`${BASE_URL}/register`, dataToSend);
@@ -140,152 +157,215 @@ const RegisterScreen = () => {
       if (response.status === 201) {
         Alert.alert('Success', 'Registration successful!');
         navigation.goBack();
-      } else { Alert.alert('Error', response.data.message || 'Registration failed.');}
+      } else {
+        Alert.alert('Error', response.data.message || 'Registration failed.');
+      }
     } catch (error) {
-      console.error('Error during registration:', error);
-      Alert.alert('Error', 'Server error or request failed.');
-    }};
+      console.log('Full error object:', JSON.stringify(error, null, 2));
+      console.log('Error response:', JSON.stringify(error.response, null, 2));
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.message || error.response.data.error || error.response.data.msg || 'Server error or request failed';
+        console.log('Extracted error message:', errorMessage);
+        if (
+          errorMessage.toLowerCase().includes('phone') &&
+          (errorMessage.toLowerCase().includes('exist') ||
+           errorMessage.toLowerCase().includes('registered') ||
+           errorMessage.toLowerCase().includes('duplicate') ||
+           errorMessage.toLowerCase().includes('already'))
+        ) {
+          setPhoneError('This phone number is already registered.');
+          Alert.alert('Error', 'This phone number is already registered. Please use a different number.');
+        } else {
+          Alert.alert('Error', errorMessage);
+        }
+      } else {
+        Alert.alert('Error', 'Network error or server is unreachable. Please check your connection or try again later.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <SafeAreaView style={{flex:1}}>
-      <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.container}>
-         
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}><MaterialIcons name="arrow-back" size={24} color="#00A99D" /></TouchableOpacity>
-            <Text style={styles.headerTitle}>Register as Donor</Text></View>
-          <TextInput 
-            style={styles.input} 
-            placeholder="Enter Your Name" 
-            placeholderTextColor="#9E9E9E" 
-            value={name} 
-            onChangeText={setName}
-          />
-          <TextInput 
-            style={styles.input} 
-            placeholder="+91 Enter Mobile Number" 
-            placeholderTextColor="#9E9E9E" 
-            keyboardType="phone-pad" 
-            value={mobileNumber} 
-            onChangeText={setMobileNumber}
-          />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Enter Email" 
-            placeholderTextColor="#9E9E9E"
-            value={email} 
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TouchableOpacity 
-            onPress={() => {
-              Keyboard.dismiss();
-              setShowDatePicker(true);
-            }} 
-            style={[styles.input, {justifyContent: 'center', backgroundColor: '#E8F5F3'}]}
-          >
-            <Text style={{color: dob ? '#212121' : '#9E9E9E', fontSize: 18}}>
-              {dob ? dob.toDateString() : 'Select your date of birth'}
-            </Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker 
-              value={dob || new Date()}
-              mode="date"
-              display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              onChange={(event, selectedDate) => {
-                if (Platform.OS === 'android') {
-                  setShowDatePicker(false);
-                }
-                if (selectedDate) {
-                  setDob(selectedDate);
-                }
-              }}
-              maximumDate={new Date()}
-              style={styles.datePicker}
+      <SafeAreaView style={{ flex: 1 }}>
+        <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+          <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <MaterialIcons name="arrow-back" size={24} color="#00A99D" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Register as Donor</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Your Name"
+              placeholderTextColor="#9E9E9E"
+              value={name}
+              onChangeText={setName}
             />
-          )}
-          {Platform.OS === 'ios' && showDatePicker && (
-            <View style={styles.iosButtons}>
-              <TouchableOpacity 
-                style={styles.iosButton}
-                onPress={() => setShowDatePicker(false)}
-              >
-                <Text style={styles.iosButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.iosButton, {backgroundColor: '#00A99D'}]}
-                onPress={() => setShowDatePicker(false)}
-              >
-                <Text style={[styles.iosButtonText, {color: 'white'}]}>Done</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          <View style={styles.locationRow}>
-            <View style={[styles.dropdownContainer, {flex: 1}]}>
-              <DropDownPicker
-                open={stateOpen}
-                value={selectedState}
-                items={stateItems}
-                setOpen={setStateOpen}
-                setValue={setSelectedState}
-                setItems={setStateItems}
-                placeholder="Select State"
-                placeholderStyle={styles.placeholderStyle}
-                style={[styles.dropdown, {flex: 1}]}
-                textStyle={styles.dropdownText}
-                listMode="MODAL"
-                modalProps={{
-                  animationType: 'slide',
+            <TextInput
+              style={[styles.input, phoneError ? styles.inputError : null]}
+              placeholder="+91 Enter Mobile Number"
+              placeholderTextColor="#9E9E9E"
+              keyboardType="phone-pad"
+              value={mobileNumber}
+              onChangeText={(text) => {
+                setMobileNumber(text);
+                setPhoneError('');
+              }}
+            />
+            {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
+            <TextInput
+              style={styles.input}
+              placeholder="Enter Email"
+              placeholderTextColor="#9E9E9E"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              onPress={() => {
+                Keyboard.dismiss();
+                setShowDatePicker(true);
+              }}
+              style={[styles.input, { justifyContent: 'center', backgroundColor: '#E8F5F3' }]}
+            >
+              <Text style={{ color: dob ? '#212121' : '#9E9E9E', fontSize: 18 }}>
+                {dob ? dob.toDateString() : 'Select your date of birth'}
+              </Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={dob || new Date()}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={(event, selectedDate) => {
+                  if (Platform.OS === 'android') {
+                    setShowDatePicker(false);
+                  }
+                  if (selectedDate) {
+                    setDob(selectedDate);
+                  }
                 }}
-                onOpen={() => {
-                  if (districtOpen) setDistrictOpen(false);
-                  if (cityOpen) setCityOpen(false);
-                  if (bloodOpen) setBloodOpen(false);
-                }}
+                maximumDate={new Date()}
+                style={styles.datePicker}
               />
+            )}
+            {Platform.OS === 'ios' && showDatePicker && (
+              <View style={styles.iosButtons}>
+                <TouchableOpacity
+                  style={styles.iosButton}
+                  onPress={() => setShowDatePicker(false)}
+                >
+                  <Text style={styles.iosButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.iosButton, { backgroundColor: '#00A99D' }]}
+                  onPress={() => setShowDatePicker(false)}
+                >
+                  <Text style={[styles.iosButtonText, { color: 'white' }]}>Done</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <View style={styles.locationRow}>
+              <View style={[styles.dropdownContainer, { flex: 1 }]}>
+                <DropDownPicker
+                  open={stateOpen}
+                  value={selectedState}
+                  items={stateItems}
+                  setOpen={setStateOpen}
+                  setValue={setSelectedState}
+                  setItems={setStateItems}
+                  placeholder="Select State"
+                  placeholderStyle={styles.placeholderStyle}
+                  style={[styles.dropdown, { flex: 1 }]}
+                  textStyle={styles.dropdownText}
+                  listMode="MODAL"
+                  modalProps={{
+                    animationType: 'slide',
+                  }}
+                  onOpen={() => {
+                    if (districtOpen) setDistrictOpen(false);
+                    if (cityOpen) setCityOpen(false);
+                    if (bloodOpen) setBloodOpen(false);
+                  }}
+                />
+              </View>
+              <View style={[styles.dropdownContainer, { flex: 1 }]}>
+                <DropDownPicker
+                  open={districtOpen}
+                  value={selectedDistrict}
+                  items={districtItems}
+                  setOpen={setDistrictOpen}
+                  setValue={setSelectedDistrict}
+                  setItems={setDistrictItems}
+                  placeholder="Select District"
+                  placeholderStyle={styles.placeholderStyle}
+                  style={[styles.dropdown, { flex: 1 }]}
+                  textStyle={styles.dropdownText}
+                  disabled={!selectedState}
+                  listMode="MODAL"
+                  modalProps={{
+                    animationType: 'slide',
+                  }}
+                  onOpen={() => {
+                    if (stateOpen) setStateOpen(false);
+                    if (cityOpen) setCityOpen(false);
+                    if (bloodOpen) setBloodOpen(false);
+                  }}
+                />
+              </View>
             </View>
-            <View style={[styles.dropdownContainer, {flex: 1}]}>
-              <DropDownPicker
-                open={districtOpen}
-                value={selectedDistrict}
-                items={districtItems}
-                setOpen={setDistrictOpen}
-                setValue={setSelectedDistrict}
-                setItems={setDistrictItems}
-                placeholder="Select District"
-                placeholderStyle={styles.placeholderStyle}
-                style={[styles.dropdown, {flex: 1}]}
-                textStyle={styles.dropdownText}
-                disabled={!selectedState}
-                listMode="MODAL"
-                modalProps={{
-                  animationType: 'slide',
-                }}
-                onOpen={() => {
-                  if (stateOpen) setStateOpen(false);
-                  if (cityOpen) setCityOpen(false);
-                  if (bloodOpen) setBloodOpen(false);
-                }}
-              />
+            <View style={styles.locationRow}>
+              <View style={[styles.dropdownContainer, { flex: 2 }]}>
+                <DropDownPicker
+                  open={cityOpen}
+                  value={selectedCity}
+                  items={cityItems}
+                  setOpen={setCityOpen}
+                  setValue={setSelectedCity}
+                  setItems={setCityItems}
+                  placeholder="Select City"
+                  placeholderStyle={styles.placeholderStyle}
+                  style={styles.dropdown}
+                  textStyle={styles.dropdownText}
+                  disabled={!selectedDistrict}
+                  listMode="MODAL"
+                  modalProps={{
+                    animationType: 'slide',
+                  }}
+                  onOpen={() => {
+                    if (stateOpen) setStateOpen(false);
+                    if (districtOpen) setDistrictOpen(false);
+                    if (bloodOpen) setBloodOpen(false);
+                  }}
+                />
+              </View>
+              <View style={[styles.dropdownContainer, { flex: 1, marginLeft: 10 }]}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Pincode"
+                  placeholderTextColor="grey"
+                  keyboardType="phone-pad"
+                  value={Pincode}
+                  onChangeText={setPincode}
+                />
+              </View>
             </View>
-          </View>
-
-          <View style={styles.locationRow}>
-            <View style={[styles.dropdownContainer, {flex: 2}]}>
+            <View style={styles.dropdownContainer}>
               <DropDownPicker
-                open={cityOpen}
-                value={selectedCity}
-                items={cityItems}
-                setOpen={setCityOpen}
-                setValue={setSelectedCity}
-                setItems={setCityItems}
-                placeholder="Select City"
+                open={bloodOpen}
+                value={selectedBloodGroup}
+                items={bloodItems}
+                setOpen={setBloodOpen}
+                setValue={setSelectedBloodGroup}
+                setItems={setBloodItems}
+                placeholder="Select Blood Group"
                 placeholderStyle={styles.placeholderStyle}
                 style={styles.dropdown}
                 textStyle={styles.dropdownText}
-                disabled={!selectedDistrict}
                 listMode="MODAL"
                 modalProps={{
                   animationType: 'slide',
@@ -293,117 +373,97 @@ const RegisterScreen = () => {
                 onOpen={() => {
                   if (stateOpen) setStateOpen(false);
                   if (districtOpen) setDistrictOpen(false);
-                  if (bloodOpen) setBloodOpen(false);
+                  if (cityOpen) setCityOpen(false);
                 }}
               />
             </View>
-            <View style={[styles.dropdownContainer, {flex: 1, marginLeft: 10}]}>
-              <TextInput 
-                style={styles.input} 
-                placeholder="Pincode" 
-                placeholderTextColor="grey" 
-                keyboardType="phone-pad" 
-                value={Pincode}
-                onChangeText={setPincode}
-              />
+            <View style={styles.checkboxRow}>
+              <Checkbox value={authorized} onValueChange={setAuthorized} color="#00A99D" />
+              <Text style={styles.checkboxLabel}> Agree for Terms & Condition</Text>
             </View>
-          </View>
-
-          <View style={styles.dropdownContainer}>
-            <DropDownPicker
-              open={bloodOpen}
-              value={selectedBloodGroup}
-              items={bloodItems}
-              setOpen={setBloodOpen}
-              setValue={setSelectedBloodGroup}
-              setItems={setBloodItems}
-              placeholder="Select Blood Group"
-              placeholderStyle={styles.placeholderStyle}
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              listMode="MODAL"
-              modalProps={{
-                animationType: 'slide',
-              }}
-              onOpen={() => {
-                if (stateOpen) setStateOpen(false);
-                if (districtOpen) setDistrictOpen(false);
-                if (cityOpen) setCityOpen(false);
-              }}
-            />
-          </View>
-          <Text style={[styles.label, {fontFamily: 'PlusJakartaSans-Medium'}]}>I am available to donate my blood?</Text>
-          <View style={styles.availabilityContainer}>
-            <TouchableOpacity onPress={() => setAvailability(true)} style={styles.checkboxRow}>
-              <Checkbox value={availability === true} color="#00A99D" />
-              <Text style={styles.checkboxLabel}>Yes</Text>
+            <TouchableOpacity
+              style={[styles.button, isLoading && { opacity: 0.6 }]}
+              onPress={handleSubmit}
+              disabled={isLoading}
+            >
+              <Text style={styles.buttonText}>{isLoading ? 'Registering...' : 'Register'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setAvailability(false)} style={styles.checkboxRow}>
-              <Checkbox value={availability === false} color="#00A99D" />
-              <Text style={styles.checkboxLabel}>No</Text>
-            </TouchableOpacity></View>
-          <View style={styles.checkboxRow}>
-            <Checkbox value={authorized} onValueChange={setAuthorized} color="#00A99D" />
-            <Text style={styles.checkboxLabel}>Agree for Terms & Condition</Text></View>
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Register</Text></TouchableOpacity>
-          <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
-          <FAQItem
-            question="Who can donate?"
-            answer="Healthy individuals between 18-65 years and above 50kg, and with a hemoglobin level of at least 12.5 g/dL."/>
-          <FAQItem question="When to donate?" answer="Once every 6 months if healthy." />
-          <FAQItem
-            question="Which food should eat after donating blood?"
-            answer={`Iron-rich: Lean meat, poultry, fish (like tuna and salmon), beans, spinach, fortified cereals, raisins, and legumes.
+            <Text style={styles.sectionTitle}>Frequently Asked Questions</Text>
+            <FAQItem
+              question="Who can donate?"
+              answer="Healthy individuals between 18-65 years and above 50kg, and with a hemoglobin level of at least 12.5 g/dL."
+            />
+            <FAQItem question="When to donate?" answer="Once every 6 months if healthy." />
+            <FAQItem
+              question="Which food should eat after donating blood?"
+              answer={`Iron-rich: Lean meat, poultry, fish (like tuna and salmon), beans, spinach, fortified cereals, raisins, and legumes.
 Vitamin C-rich: Citrus fruits, berries, bell peppers, tomatoes.
 Hydrating: Water, juice, broth, and herbal tea.
 Whole grains: Brown rice, quinoa, oats, and whole wheat bread.
-Protein: Eggs, cashews, almonds.`}/>
-          <Text style={styles.sectionMain}>Help a heart beat and become the hero someone needs.</Text>
-          <View style={styles.bottomLogosContainer}>
-            <View style={styles.logoBlock}>
-              <Image source={require('../../assets/images/mom.png')} style={styles.logoImage} resizeMode="contain" />
-              <Text style={styles.logoText}>mom pharmacy</Text></View>
-            <View style={styles.logoBlock}>
-              <Image source={require('../../assets/images/momlab.png')} style={styles.logoImage} resizeMode="contain"/>
-              <Text style={styles.logoText}>mom labs</Text>
-            </View></View></ScrollView></Pressable></SafeAreaView></KeyboardAvoidingView>);};
+Protein: Eggs, cashews, almonds.`}
+            />
+            <Text style={styles.sectionMain}>Help a heart beat and become the hero someone needs.</Text>
+            <View style={styles.bottomLogosContainer}>
+              <View style={styles.logoBlock}>
+                <Image
+                  source={require('../../assets/images/mom.png')}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.logoText}>mom pharmacy</Text>
+              </View>
+              <View style={styles.logoBlock}>
+                <Image
+                  source={require('../../assets/images/momlab.png')}
+                  style={styles.logoImage}
+                  resizeMode="contain"
+                />
+                <Text style={styles.logoText}>mom labs</Text>
+              </View>
+            </View>
+          </ScrollView>
+        </Pressable>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
+  );
+};
+
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: 'white' },
-  locationRow: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
+  locationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 12,
     gap: 10,
   },
   dropdownContainer: { flex: 1 },
-  dropdown: { 
-    borderColor: 'transparent', 
-    borderWidth: 0, 
-    borderRadius: 8, 
+  dropdown: {
+    borderColor: 'transparent',
+    borderWidth: 0,
+    borderRadius: 8,
     paddingHorizontal: 12,
     minHeight: 48,
     justifyContent: 'center',
     backgroundColor: '#E8F5F3',
   },
-  placeholderStyle: { 
+  placeholderStyle: {
     color: '#9E9E9E',
     fontSize: 18,
     fontWeight: '400',
   },
-  dropdownText: { 
-    fontSize: 18, 
+  dropdownText: {
+    fontSize: 18,
     color: '#212121',
     fontWeight: '400',
   },
   header: { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginBottom: 20 },
-  headerTitle: { fontSize: 18, color: 'black', fontWeight: 'bold', textAlign: 'left', left:10 },
-  input: { 
-    borderColor: 'transparent', 
-    borderWidth: 0, 
-    borderRadius: 8, 
+  headerTitle: { fontSize: 18, color: 'black', fontWeight: 'bold', textAlign: 'left', left: 10 },
+  input: {
+    borderColor: 'transparent',
+    borderWidth: 0,
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12, 
+    paddingVertical: 12,
     marginBottom: 12,
     color: '#212121',
     fontSize: 18,
@@ -411,21 +471,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5F3',
     fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto',
   },
-  label: { fontSize: 18, fontWeight: '500', marginVertical: 10, color: 'grey' },
-  bloodGroupContainer: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', marginBottom: 15 },
-  bloodDropWrapper: { margin: 8, borderRadius: 40, padding: 5 },
-  bloodDropWrapperSelected: { borderWidth: 2, borderColor: '#00A99D' },
-  bloodIconWrapper: {width: 60,height: 60,borderRadius: 30,backgroundColor: 'white',alignItems: 'center',justifyContent: 'center',position: 'relative'},
-  bloodOverlayText: { position: 'absolute', color: 'white', fontSize: 10, textAlign: 'center', zIndex: 1 },
-  availabilityContainer: { flexDirection: 'row', marginBottom: 15, justifyContent: 'flex-start' },
-  checkboxRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 12,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginRight: 15,
     marginBottom: 8,
   },
-  checkboxLabel: { 
-    fontSize: 14, 
+  checkboxLabel: {
+    fontSize: 14,
     marginLeft: 8,
     color: '#212121',
   },
@@ -469,8 +531,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 },
-  sectionMain: { fontSize: 24, marginTop: 20, paddingTop: 20, color: 'grey'},
-  faqItem: { 
+  sectionMain: { fontSize: 24, marginTop: 20, paddingTop: 20, color: 'grey' },
+  faqItem: {
     marginBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#EEEEEE',
@@ -481,21 +543,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  faqQuestion: { 
-    fontSize: 15, 
+  faqQuestion: {
+    fontSize: 15,
     color: '#212121',
     fontWeight: '500',
     flex: 1,
   },
-  faqAnswer: { 
-    fontSize: 13, 
-    color: '#616161', 
+  faqAnswer: {
+    fontSize: 13,
+    color: '#616161',
     marginTop: 8,
     lineHeight: 20,
   },
-  bottomLogosContainer: {flexDirection: 'row',justifyContent: 'space-around',alignItems: 'center',marginTop: 20,marginBottom: 30},
+  bottomLogosContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 30,
+  },
   logoBlock: { alignItems: 'center', width: 150 },
   logoImage: { width: 120, height: 80, marginBottom: 5 },
   logoText: { fontSize: 14, color: '#333', textAlign: 'center' },
 });
+
 export default RegisterScreen;
