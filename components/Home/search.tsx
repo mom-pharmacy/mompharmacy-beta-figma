@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 15,
     marginTop: 10,
+    
 
   },
   fakeInput: {

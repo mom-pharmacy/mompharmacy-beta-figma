@@ -1,15 +1,16 @@
-import Cart from '@/components/Cart/cart';
+
 import Footer from '@/components/Home/footer';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { userAuth } from '@/Context/authContext';
 import { useCart } from '@/Context/cartContext';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState, } from 'react';
 import {
   Dimensions,
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -24,24 +25,24 @@ const { width } = Dimensions.get('window');
 
 export default function Details() {
   const [showDescription, setShowDescription] = useState(false);
-   const [isSaved, setIsSaved] = useState(false)
-   const [wishlist, setWishlist] = useState([]);
-     const [cart, setCart] = useState<{ [key: string]: number }>({});
-     const [loading, setLoading] = useState(true);
-    
+  const [isSaved, setIsSaved] = useState(false)
+  const [wishlist, setWishlist] = useState([]);
+  const [cart, setCart] = useState<{ [key: string]: number }>({});
+  const [loading, setLoading] = useState(true);
+
 
   const {
     itemId, itemName, itemImage, itemPrice, description, use,
     ingredients, dose, manufacturer,
     notFor, sideEffects, store,
-    expiryDate, manufactureDate,subcategories
+    expiryDate, manufactureDate, subcategories
   } = useLocalSearchParams();
   const imageUrl = Array.isArray(itemImage) ? itemImage[0] : itemImage;
   const parsedSubcategories = subcategories
-  ? Array.isArray(subcategories)
-    ? subcategories
-    : JSON.parse(subcategories)
-  : [];
+    ? Array.isArray(subcategories)
+      ? subcategories
+      : JSON.parse(subcategories)
+    : [];
 
 
   const item = {
@@ -59,7 +60,7 @@ export default function Details() {
     store,
     expiryDate,
     manufactureDate,
-   subcategories:parsedSubcategories
+    subcategories: parsedSubcategories
 
   };
   console.log('Sending subcategories:', item.subcategories);
@@ -79,10 +80,10 @@ export default function Details() {
     return findItem ? findItem.quantity : 0;
   };
 
-const {ExtractParseToken} = userAuth()
+  const { ExtractParseToken } = userAuth()
 
 
-useEffect(() => {
+  useEffect(() => {
     const fetchWishlist = async () => {
       try {
         const token = await ExtractParseToken();
@@ -106,7 +107,7 @@ useEffect(() => {
         );
         setLoading(false);
         const data = await res.json();
-        console.log(data.wishlist.products.map(item=>item))
+        console.log(data.wishlist.products.map(item => item))
 
         console.log(data)
         if (res.ok) {
@@ -124,11 +125,11 @@ useEffect(() => {
   }, [ExtractParseToken]);
 
 
-   const handleWishlistToggle = async () => {
+  const handleWishlistToggle = async () => {
     const newState = !isSaved
     setIsSaved(newState)
     const tokenAuth = await ExtractParseToken()
-    
+
 
     if (newState) {
       try {
@@ -136,12 +137,12 @@ useEffect(() => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization':`Bearer ${tokenAuth}`,
+            'Authorization': `Bearer ${tokenAuth}`,
           },
           body: JSON.stringify({
-            userId: '682354e783196e87d42a7cbc', 
+            userId: '682354e783196e87d42a7cbc',
             productId: itemId,
-          
+
           }),
         })
 
@@ -158,157 +159,166 @@ useEffect(() => {
     }
   }
 
-  
+
 
 
 
   return (
     <SafeAreaView>
-      <StatusHeader title={itemName.slice(0 , 10)} />
-    <ScrollView style={styles.container}>
-      <View style={styles.contentWrapper}>
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: imageUrl }}
-            style={styles.productImage}
-            resizeMode="contain"
-          />
-          <Cart></Cart>
-
-        </View>
-        
-        <View style={styles.deliveryRow}>
-          <View style={styles.tag}>
-            <Image source={require('../../assets/images/Categories/bike.png')} style={styles.icon} />
-            <Text>30 min</Text>
-          </View>
-          <View>
-             <TouchableOpacity
-            onPress={handleWishlistToggle}
-            style={{
-              height: 25,
-              width: 40,
-              borderRadius: 5,
-              marginBottom: 5,
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}
-          >
-           {loading?<ActivityIndicator/>: <>
-           <View style ={{flexDirection:'row', alignItems:'center'}}>
-           
-            {isSaved || wishlist.find(items=>items._id===item._id)? (
-
-              <FontAwesome name="bookmark" size={20} color="#00A99D" />
-            ) : (
-              <Feather name="bookmark" size={20} color="gray" />
+      <StatusHeader title={itemName.slice(0, 10)} />
+      <ScrollView style={styles.container}>
+        <View style={styles.contentWrapper}>
+          <TouchableOpacity onPress={() => router.push('/BottomNavbar/cart')} style={styles.cartContainer}>
+            <Image source={require('../../assets/images/cart.jpeg')} style={styles.carttxt} />
+            {cartItems.length > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{cartItems.length}</Text>
+              </View>
             )}
-
-            {/* </>} */}
-            <Text style={{ right: 55, fontWeight:'bold', fontSize: 16, color:'#007E71' }}>Save</Text>
-            </View>
-            </>}
-
           </TouchableOpacity>
-       
-          </View>
-        </View>
 
-        <View style={styles.card}>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>{itemName}</Text>
-            <Text style={styles.subtitle}>Prescription Drug</Text>
-          </View>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: imageUrl }}
+              style={styles.productImage}
+              resizeMode="contain"
+            />
 
-          <View style={styles.priceRow}>
-            <Text style={styles.mainPrice}>Rs {itemPrice}</Text>
-            <Text style={styles.strikePrice}>Rs149</Text>
-            <Text style={styles.discount}>21% off</Text>
+
           </View>
 
-          <View style={styles.offerBox}>
-            <View style={styles.offerLeft}>
-              <Text style={styles.boldText}>Rs 79</Text>
-              <Text style={styles.strikePrice}>Rs149</Text>
-              <Text style={styles.discount}>30% off</Text>
+          <View style={styles.deliveryRow}>
+            <View style={styles.tag}>
+              <Image source={require('../../assets/images/Categories/bike.png')} style={styles.icon} />
+              <Text>30 min</Text>
             </View>
             <View>
-              <Text style={styles.smallText}>To avail this offer</Text>
-              <Text style={styles.premiumText}>Get Premium</Text>
+              <TouchableOpacity
+                onPress={handleWishlistToggle}
+                style={{
+                  height: 25,
+                  width: 40,
+                  borderRadius: 5,
+                  marginBottom: 5,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                {loading ? <ActivityIndicator /> : <>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+
+                    {isSaved || wishlist.find(items => items._id === item._id) ? (
+
+                      <FontAwesome name="bookmark" size={20} color="#00A99D" />
+                    ) : (
+                      <Feather name="bookmark" size={20} color="gray" />
+                    )}
+
+                    {/* </>} */}
+                    <Text style={{ right: 55, fontWeight: 'bold', fontSize: 16, color: '#007E71' }}>Save</Text>
+                  </View>
+                </>}
+
+              </TouchableOpacity>
+
             </View>
           </View>
-        </View>
 
-        <TouchableHighlight
-          underlayColor="#006b64"
-          style={styles.buyNowButton}
-        >
-          {!isInCart ? (
-            <TouchableOpacity
-              style={styles.medicineBtn}
-              onPress={() => addToCart(item)}
-            >
-              <Text style={styles.btnText} allowFontScaling={false}>Add To Cart</Text>
-            </TouchableOpacity>
-          ) : (
-            <View style={styles.medicineBtn}>
+          <View style={styles.card}>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>{itemName}</Text>
+              <Text style={styles.subtitle}>Prescription Drug</Text>
+            </View>
+
+            <View style={styles.priceRow}>
+              <Text style={styles.mainPrice}>Rs {itemPrice}</Text>
+              <Text style={styles.strikePrice}>Rs149</Text>
+              <Text style={styles.discount}>21% off</Text>
+            </View>
+
+            <View style={styles.offerBox}>
+              <View style={styles.offerLeft}>
+                <Text style={styles.boldText}>Rs 79</Text>
+                <Text style={styles.strikePrice}>Rs149</Text>
+                <Text style={styles.discount}>30% off</Text>
+              </View>
+              <View>
+                <Text style={styles.smallText}>To avail this offer</Text>
+                <Text style={styles.premiumText}>Get Premium</Text>
+              </View>
+            </View>
+          </View>
+
+          <TouchableHighlight
+            underlayColor="#006b64"
+            style={styles.buyNowButton}
+          >
+            {!isInCart ? (
               <TouchableOpacity
-                style={styles.quantityIcon}
-                onPress={() =>
-                  quantity(itemId) > 1
-                    ? decrementItem(itemId)
-                    : removeFromCart(itemId)
-                }
+                style={styles.medicineBtn}
+                onPress={() => addToCart(item)}
               >
-                <Text style={styles.btnText}>-</Text>
+                <Text style={styles.btnText} allowFontScaling={false}>Add To Cart</Text>
               </TouchableOpacity>
-              <Text style={styles.quantity} allowFontScaling={false}>
-                {quantity(itemId)}
-              </Text>
-              <TouchableOpacity
-                style={styles.quantityIcon}
-                onPress={() => incrementItem(itemId)}
-              >
-                <Text style={styles.btnText}>+</Text>
-              </TouchableOpacity>
+            ) : (
+              <View style={styles.medicineBtn}>
+                <TouchableOpacity
+                  style={styles.quantityIcon}
+                  onPress={() =>
+                    quantity(itemId) > 1
+                      ? decrementItem(itemId)
+                      : removeFromCart(itemId)
+                  }
+                >
+                  <Text style={styles.btnText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.quantity} allowFontScaling={false}>
+                  {quantity(itemId)}
+                </Text>
+                <TouchableOpacity
+                  style={styles.quantityIcon}
+                  onPress={() => incrementItem(itemId)}
+                >
+                  <Text style={styles.btnText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+          </TouchableHighlight>
+
+          <View style={styles.infoCard}>
+            <Text style={styles.sectionTitle}>Key Information</Text>
+            <Text style={styles.boldText1}><Text style={styles.boldText}>Use: </Text>{use}</Text>
+            <Text style={styles.boldText1}><Text style={styles.boldText}>Ingredients: </Text>{ingredients}</Text>
+            <Text style={styles.boldText1}><Text style={styles.boldText}>Dose: </Text>{dose}</Text>
+            <Text style={styles.boldText1}><Text style={styles.boldText2}>Not for: </Text><Text style={styles.notFor}>{notFor}</Text></Text>
+            <Text style={styles.boldText1}><Text style={styles.boldText}>Side effects: </Text>{sideEffects}</Text>
+            <Text style={styles.boldText1}><Text style={styles.boldText}>Store: </Text>{store}</Text>
+            <Text>
+              <Text style={styles.boldText}>Expires on or after: </Text>
+              {new Date(expiryDate).toISOString().split('T')[0]}
+            </Text>
+            <Text>
+              <Text style={styles.boldText}>Manufactured on: </Text>
+              {new Date(manufactureDate).toISOString().split('T')[0]}
+            </Text>
+
+          </View>
+
+          <TouchableOpacity onPress={() => setShowDescription(!showDescription)} style={styles.dropdownHeader}>
+            <Text style={styles.sectionTitle}>Product Description</Text>
+            <Text style={styles.boldText3}>{showDescription}</Text>
+          </TouchableOpacity>
+
+          {showDescription && (
+            <View style={styles.descriptionBox}>
+              <Text>{description}</Text>
             </View>
           )}
 
-        </TouchableHighlight>
-
-        <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>Key Information</Text>
-          <Text style={styles.boldText1 }><Text style={styles.boldText }>Use: </Text>{use}</Text>
-          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Ingredients: </Text>{ingredients}</Text>
-          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Dose: </Text>{dose}</Text>
-          <Text  style={styles.boldText1 }><Text style={styles.boldText2}>Not for: </Text><Text style={styles.notFor}>{notFor}</Text></Text>
-          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Side effects: </Text>{sideEffects}</Text>
-          <Text  style={styles.boldText1 }><Text style={styles.boldText}>Store: </Text>{store}</Text>
-          <Text>
-            <Text style={styles.boldText}>Expires on or after: </Text>
-            {new Date(expiryDate).toISOString().split('T')[0]}
-          </Text>
-          <Text>
-            <Text style={styles.boldText}>Manufactured on: </Text>
-            {new Date(manufactureDate).toISOString().split('T')[0]}
-          </Text>
-
+          <Footer />
         </View>
-
-        <TouchableOpacity onPress={() => setShowDescription(!showDescription)} style={styles.dropdownHeader}>
-          <Text style={styles.sectionTitle}>Product Description</Text>
-          <Text style={styles.boldText3 }>{showDescription}</Text>
-        </TouchableOpacity>
-
-        {showDescription && (
-          <View style={styles.descriptionBox}>
-            <Text>{description}</Text>
-          </View>
-        )}
-
-        <Footer />
-      </View>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -325,9 +335,9 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: 'center',
     marginVertical: width * 0.03,
-    flexDirection:'row',
-    marginHorizontal:100,
-    marginBlockStart:70
+    flexDirection: 'row',
+    marginHorizontal: 100,
+    marginBlockStart: 70
   },
   productImage: {
     height: width * 0.5,
@@ -342,7 +352,7 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor:'#ACD9D4',
+    backgroundColor: '#ACD9D4',
     borderRadius: 20,
     paddingHorizontal: 10,
     height: 30,
@@ -406,21 +416,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  
+
   boldText: {
     fontWeight: 'bold',
     marginRight: 5,
     color: 'black',
   },
-  boldText1:{
-    color:'#666666',
+  boldText1: {
+    color: '#666666',
     marginRight: 5,
   },
-  boldText2:{
+  boldText2: {
     color: '#c03a3a',
-    fontWeight:'bold',
+    fontWeight: 'bold',
   },
-  boldText3:{
+  boldText3: {
     color: '#666666',
   },
   smallText: {
@@ -499,7 +509,37 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
 
   },
+
+  cartContainer: {
+    position: 'relative',
+    padding: 10,
+    
+  },
+  carttxt: {
+    width: 30,
+    height: 30,
+    marginLeft:310
+   
+  },
+  badge: {
+    position: 'absolute',
+    right: 2,
+    top: 2,
+    backgroundColor: '#00a99d',
+    borderRadius: 10,
+    minWidth: 16,
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
 });
+
 
 
 
