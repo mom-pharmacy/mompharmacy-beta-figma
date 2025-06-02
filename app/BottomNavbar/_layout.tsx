@@ -39,11 +39,11 @@ export default function BottomNavbar() {
         options={{
           tabBarLabel: 'Cart',
           tabBarIcon: ({ color }) => (
-            <View>
+            <View style={styles.cardContainer}>
               <Cartt width={65} height={65} />
               {cartItems.length > 0 && (
                 <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{cartItems.length}</Text>
+                  <Text style={styles.badgeText}>{cartItems.length > 9 ? '9+' : cartItems.length}</Text>
                 </View>
               )}
             </View>
@@ -63,10 +63,16 @@ export default function BottomNavbar() {
   );
 }
 const styles = StyleSheet.create({
+  cardContainer: {
+    width: 65,
+    height: 65,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   badge: {
     position: 'absolute',
-    right: -6,
-    top: -3,
+    right: 10,
+    top: 15,
     backgroundColor: '#00a99d',
     borderRadius: 8,
     minWidth: 16,

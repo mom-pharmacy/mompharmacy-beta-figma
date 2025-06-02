@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ProfileCompletionCard from '../profile/Percentage';
 
 const profileSections = [
+
   {
     title: 'My Orders',
     icon: <Image source={require('@/assets/images/order.png')} style={{ height: 30, width: 23 }} />,
