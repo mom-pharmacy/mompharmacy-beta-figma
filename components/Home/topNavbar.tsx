@@ -1,17 +1,19 @@
-import { COLOR } from '@/constants/color';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { COLOR } from '@/constants/color';
 import { useLocationContext } from '../../Context/locationContext';
 import { useNotificationContext } from '../../Context/notifficationContext';
-
+import Group2 from '../../assets/images/location';
+import Notify from '../../assets/images/notification';
 
 const { width, height } = Dimensions.get('window');
 
 const TopNavbar = ({ showBack = false, onBack }) => {
   const { shortAddress } = useLocationContext();
-  const {unreadCount}=useNotificationContext();
+  const { unreadCount } = useNotificationContext();
 
   return (
     <View style={styles.container}>
@@ -27,14 +29,15 @@ const TopNavbar = ({ showBack = false, onBack }) => {
           <View style={styles.backButton} />
         )}
         <Text style={styles.title}>medicine on minutes</Text>
-        <View style={{ width: 32 }} /> 
+        <View style={{ width: 32 }} />
       </View>
+
       <View style={styles.addressContainer}>
-        <TouchableOpacity onPress={() => { router.push('/Maps/myAddress') }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <MaterialIcons name="location-on" size={24} color={COLOR.primary} />
+        <TouchableOpacity onPress={() => router.push('/Maps/myAddress')}>
+          <View style={styles.locationWrapper}>
+            <Group2 width={25} height={25} />
             <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-              {shortAddress || "Fetching location..."}
+              {shortAddress || 'Fetching location...'}
             </Text>
             <MaterialIcons name="keyboard-arrow-down" size={30} color={COLOR.primary} />
           </View>
@@ -42,12 +45,18 @@ const TopNavbar = ({ showBack = false, onBack }) => {
 
         <View style={{ flex: 1 }} />
 
-        <TouchableOpacity onPress={() => router.push('/Notification')} style={styles.notificationIconWrapper}>
-          <MaterialIcons name="notifications" size={30} color={COLOR.primary} />
-          
-          <View style={styles.badgeContainer}>
-            <Text style={styles.badgeText}>{unreadCount}</Text>
-          </View>
+        <TouchableOpacity
+          onPress={() => router.push('/Notification')}
+          style={styles.notificationIconWrapper}
+        >
+          <Notify width={75} height={75} />
+          {unreadCount > 0 && (
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -61,7 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLOR.light,
     paddingHorizontal: 20,
     paddingTop: 5,
-    marginTop:-10,
+    marginTop: -10,
   },
   headerRow: {
     flexDirection: 'row',
@@ -88,11 +97,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 3,
   },
-  address: {
-    fontFamily: 'Plus Jakarta Sans',
-    fontSize: 20,
-    color: COLOR.text,
-    paddingLeft: 5,
+  locationWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   locationText: {
     color: '#000',
@@ -102,15 +109,19 @@ const styles = StyleSheet.create({
   },
   notificationIconWrapper: {
     position: 'relative',
+    width: 75,
+    height: 75,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   badgeContainer: {
     position: 'absolute',
-    right: -6,
-    top: -6,
+    top: 4,
+    right: 4,
+    backgroundColor: '#FF3B30',
+    borderRadius: 9,
     minWidth: 18,
     height: 18,
-    borderRadius: 9,
-    backgroundColor: '#00A99D',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 4,

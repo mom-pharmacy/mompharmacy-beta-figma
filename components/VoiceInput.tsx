@@ -1,4 +1,3 @@
-import { MaterialIcons } from '@expo/vector-icons';
 import axios from 'axios';
 import { Audio } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Micro from '../assets/images/microphone';
 
 export default function VoiceInput({ onTranscript }) {
 const recordingRef = useRef(null);
@@ -115,7 +115,7 @@ const stopRecording = async () => {
   return (
     <View>
       <TouchableOpacity onPress={isRecording ? null : startRecording}>
-        <MaterialIcons name="mic" size={30} color={isRecording ? 'red' : '#00a99d'} />
+        <Micro width={100} height={100}/>
       </TouchableOpacity>
 
       <Modal transparent visible={isLoading} animationType="fade">
