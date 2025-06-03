@@ -8,8 +8,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 
 const AddAddress = () => {
-  const { location, address, setLocation, updateAddress , shortAddress , googleLoc} = useLocationContext();
-  
+  const { location, address, setLocation, updateAddress, shortAddress, googleLoc } = useLocationContext();
+
 
   const [region, setRegion] = useState<Region>({
     latitude: location?.latitude || 17.385044,
@@ -45,39 +45,39 @@ const AddAddress = () => {
 
   return (
     <SafeAreaView style={styles.screen}>
-     
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableHighlight onPress={() => router.back()}>
-          <MaterialIcons name="arrow-back" size={26} color="black" />
-        </TouchableHighlight>
-        <Text style={styles.title}>Select Address</Text>
-      </View>
 
-      <MapView
-        style={styles.map}
-        region={region}
-        onPress={handleMapPress}
-        onPoiClick={handlePoiClick}
-        showsUserLocation
-      >
-        {location && <Marker coordinate={location} />}
-      </MapView>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableHighlight onPress={() => router.back()}>
+            <MaterialIcons name="arrow-back" size={26} color="black" />
+          </TouchableHighlight>
+          <Text style={styles.title}>Select Address</Text>
+        </View>
 
-      <View style={styles.addressContainer}>
-        <Text style={styles.label}>Selected Location</Text>
-        <Text style={styles.address}>{address || "Fetching address..."}</Text>
-      </View>
-
-      <View style={styles.saveButtonWrapper}>
-        <TouchableHighlight
-          style={styles.saveButton}
-          onPress={() => router.push({ pathname: './confirmAddress', params: { address: address || '' , region} })}
+        <MapView
+          style={styles.map}
+          region={region}
+          onPress={handleMapPress}
+          onPoiClick={handlePoiClick}
+          showsUserLocation
         >
-          <Text style={styles.saveButtonText}>Save Address</Text>
-        </TouchableHighlight>
+          {location && <Marker coordinate={location} />}
+        </MapView>
+
+        <View style={styles.addressContainer}>
+          <Text style={styles.label}>Selected Location</Text>
+          <Text style={styles.address}>{address || "Fetching address..."}</Text>
+        </View>
+
+        <View style={styles.saveButtonWrapper}>
+          <TouchableHighlight
+            style={styles.saveButton}
+            onPress={() => router.push({ pathname: './confirmAddress', params: { address: address || '', region } })}
+          >
+            <Text style={styles.saveButtonText}>Save Address</Text>
+          </TouchableHighlight>
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 };
@@ -95,9 +95,9 @@ const styles = StyleSheet.create({
   saveButtonWrapper: { alignItems: 'center' },
   saveButton: { height: 50, width: 350, backgroundColor: "#00a99d", borderRadius: 10, margin: 10, alignItems: 'center', justifyContent: 'center' },
   saveButtonText: { color: "white", fontSize: 18 },
-   screen: {
+  screen: {
     flex: 1,
     backgroundColor: '#fff',
-  
+
   },
 });

@@ -5,7 +5,9 @@ import Footer from '@/components/Home/footer';
 import Search from '@/components/Home/search';
 import TopNavbar from '@/components/Home/topNavbar';
 import UploadPrescription from '@/components/Home/uploadPrescription';
+import FloatOrders from '@/components/TrackOrder/FloatOrders';
 import { userAuth } from '@/Context/authContext';
+import { useOrderActive } from '@/Context/orderContext';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,11 +15,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const Home = () => {
   const { userDetails } = userAuth();
   console.log(userDetails);
+
+  const {ActiveOrderId} = useOrderActive()
   
   return (
     <SafeAreaView style={styles.screen}>
      
       <View style={styles.screen}>
+        {ActiveOrderId && <FloatOrders/>}
         <TopNavbar />
         <Search />
         <ScrollView contentContainerStyle={styles.scrollContainer}>

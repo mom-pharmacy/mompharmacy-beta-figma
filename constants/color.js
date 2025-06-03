@@ -10,4 +10,6 @@ export const COLOR = {
 
 }
 
+export const screenWidth = Dimensions.get("screen").width
+
 export const screen = Dimensions.get("screen")

@@ -1,6 +1,7 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
+import { useAddress } from '@/Context/addressContext';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -19,6 +20,9 @@ const OrderReviewScreen = () => {
 
   const {ExtractParseToken} = userAuth()
   const {clearCart} = useCart()
+  const {getPrimaryAddress , primaryAddress} = useAddress()
+
+  console.log("this is primary Address" ,primaryAddress)
 
   const handleQuantityChange = (id, type) => {
     const item = cartItems.find((item) => item.id === id);
@@ -28,11 +32,13 @@ const OrderReviewScreen = () => {
 
   };
 
+  // const {primaryAddress} = useAddress()
+
   async function postOrders(medicines) {
 
     const tokenAuth = await ExtractParseToken()
     
-    const addressId = "6815a9c9f92b58dc500aa3da";
+   
 
     const orderMedicines = medicines.map((item) => {
       console.log(item)
@@ -45,7 +51,7 @@ const OrderReviewScreen = () => {
    })});
 
     const orderData = {
-      address_id: addressId,
+      address_id: primaryAddress,
       medicines: orderMedicines,
       ETA: 10,
       subtotal: subtotal,
@@ -86,31 +92,30 @@ const OrderReviewScreen = () => {
     }
   }
 
+  
+
   return (
     <SafeAreaView>
       <StatusHeader title={"Order Review"} />
     <ScrollView style={styles.container}>
-
       <CartList/>
-
       <View style={styles.addressBox}>
         <Ionicons name="location-outline" size={24} color="#007F5F" style={styles.icon} />
         <View>
           <Text style={styles.addressTitle}>Deliver to</Text>
           <Text style={styles.address}>
-            100ft Rd Madhapur <Text style={styles.inTime}>in 10mins</Text>
+            {getPrimaryAddress().slice(0 , 30)}
+            {/* 100ft Rd Madhapur <Text style={styles.inTime}>in 10mins</Text> */}
           </Text>
-
         </View>
+  
         <TouchableOpacity onPress={()=>{
           router.push("/Maps/myAddress")
         }}>
           <Text>Change</Text>
         </TouchableOpacity>
       </View>
-
       <OrderSummary />
-
       <TouchableOpacity
         style={styles.proceedButton}
         onPress={() => postOrders(cartItems)}
@@ -145,16 +150,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 14,
     borderRadius: 20,
-    marginHorizontal: 16,
+    marginHorizontal: 12,
     marginVertical: 10,
-    marginLeft:-1,
-    marginRight:-1
   },
   addressTitle: {
     fontWeight: 'bold',
   },
   address: {
     marginTop: 4,
+    
   },
   inTime: {
     color: '#444',

@@ -23,7 +23,7 @@ export default function MomPharmacy() {
         </View>
         <Text style={styles.subtitle}>Your Emergency, Our Priority</Text>
         <Image
-          source={require('../../assets/images/hospital.gif')}
+          source={require('../../assets/images/hospital2.gif')}
           style={styles.ctaIcon}
         />
 

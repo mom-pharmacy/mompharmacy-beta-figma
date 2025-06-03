@@ -1,4 +1,5 @@
 import { COLOR } from '@/constants/color';
+import { useAddress } from '@/Context/addressContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -91,6 +92,8 @@ const MyAddressesScreen = () => {
       console.log(err);
     }
   };
+
+  const {address , setAddressAsPrimary , primaryAddress} = useAddress()
   return (
     <SafeAreaView style={styles.screen}>
       <ScrollView style={styles.container}>
@@ -119,15 +122,23 @@ const MyAddressesScreen = () => {
         <Text style={styles.sectionTitle}>Your saved addresses</Text>
 
         {/* Address Card */}
-        {data.map((item, index) => (
+        {address.map((item, index) => (
 
-          <View key={index} style={styles.addressCard}>
+          <TouchableOpacity key={index} style={styles.addressCard} onPress={()=>{
+            setAddressAsPrimary(item._id)
+            router.back()
+            }}>
             <View style={styles.addressHeader}>
+              <View style={{flexDirection:"row" , flex:1 , justifyContent:"space-between"}}>
               <View style={styles.homeIconBackground}>
                 <Icon name="home" size={20} color="#f0ad4e" />
+                <Text style={{fontWeight:"bold" , fontSize:18}}>Saved</Text>
               </View>
 
-              <Text style={styles.addressTitle}>{item.name || "Saved Address"}</Text>
+             {primaryAddress===item._id? <View style={{padding:2 , borderColor:COLOR.primary , borderWidth:2, paddingHorizontal:6 ,alignItems:"center", backgroundColor:COLOR.light , borderRadius:12}}>
+                <Text>Primary</Text>
+              </View>:""}
+              </View>
             </View>
             <Text style={styles.addressDetails}>
               {item.name}, {item.houseNo}, {item.buildingName}, {item.street}, {item.city}, {item.state}, {item.pincode}
@@ -146,7 +157,7 @@ const MyAddressesScreen = () => {
                 <Icon name="upload" size={20} color="gray" />
               </TouchableOpacity>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
 
 
@@ -220,6 +231,9 @@ const styles = StyleSheet.create({
   },
   homeIconBackground: {
     marginRight: 10,
+    flexDirection:"row",
+    gap:4 ,
+    alignItems:"center"
   },
   addressTitle: {
     fontSize: 16,
