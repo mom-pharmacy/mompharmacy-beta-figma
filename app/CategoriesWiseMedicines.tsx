@@ -185,7 +185,7 @@ export default function CategoriesWiseMedicines() {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <StatusHeader title={'Hello'} />
+            <StatusHeader title={'Categories'} />
             <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
