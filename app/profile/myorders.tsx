@@ -1,7 +1,7 @@
 
 import LoadingScreen from '@/components/LoadingScreen';
 import { userAuth } from '@/Context/authContext';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -83,7 +83,7 @@ const OrderSummaryScreen = () => {
                       {medicine?.medicine_id?.medicine_name ?? 'N/A'}
                     </Text>
                     <Text style={styles.productQty}>{medicine.quantity}</Text>
-                    <Text style={styles.saveText}>Save for later</Text>
+                    
                   </View>
                 </View>
               ))
