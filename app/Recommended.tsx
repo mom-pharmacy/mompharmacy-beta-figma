@@ -2,6 +2,7 @@ import { useCart } from '@/Context/cartContext';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaFrameContext, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Recommended() {
   const { item, cartItems, addToCart, incrementItem, decrementItem, removeFromCart} = useCart();
@@ -41,7 +42,9 @@ export default function Recommended() {
   }, [cartItems]);
 
   return (
+    <SafeAreaView>
     <View style={styles.container}>
+   
       <Text style={styles.heading}>Recommended Medicines</Text>
 
 
@@ -69,7 +72,7 @@ export default function Recommended() {
                   store: item.store,
                   expiryDate: item.expiryDate,
                   manufactureDate: item.manufactureDate,
-                  subcategories:item.subcategories
+                  subcategories: JSON.stringify(item.subcategories || []),
                 },
               })
             }
@@ -90,7 +93,9 @@ export default function Recommended() {
         contentContainerStyle={styles.grid}
         scrollEnabled={true}
       />
+   
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -98,7 +103,9 @@ const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, r
   const isInCart = cartItems.some(cartItem => cartItem._id === item._id);
 
   return (
+
     <View style={styles.cardContainer}>
+          <SafeAreaView>
       <ScrollView>
         <View style={styles.card}>
           <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
@@ -132,7 +139,9 @@ const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, r
           )}
         </View>
       </ScrollView>
+      </SafeAreaView>
     </View>
+  
   );
 };
 

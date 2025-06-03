@@ -159,13 +159,9 @@ export default function Details() {
     }
   }
 
-
-
-
-
   return (
     <SafeAreaView>
-      <StatusHeader title={itemName.slice(0, 10)} />
+      <StatusHeader title={itemName} />
       <ScrollView style={styles.container}>
         <View style={styles.contentWrapper}>
           <TouchableOpacity onPress={() => router.push('/BottomNavbar/cart')} style={styles.cartContainer}>
@@ -487,16 +483,18 @@ const styles = StyleSheet.create({
   },
   medicineBtn: {
     backgroundColor: '#00a99d',
-    height: 36,
+    height: 25,
     borderRadius: 16,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     paddingHorizontal: 10,
+    
   },
   btnText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
 
   },
   quantity: {

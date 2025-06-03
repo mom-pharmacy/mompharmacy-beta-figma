@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Medicines({ limit }) {
   const [sortType, setSortType] = useState('low');
@@ -46,7 +47,9 @@ const [showDropdown, setShowDropdown] = useState(false);
   });
 
   return (
+    <SafeAreaView>
     <View style={styles.container}>
+  
       <TopNavbar />
 
       <View style={styles.header}>
@@ -148,6 +151,7 @@ const [showDropdown, setShowDropdown] = useState(false);
         scrollEnabled={true}
       />
     </View>
+    </SafeAreaView>
   );
 }
 

@@ -152,7 +152,7 @@ const RegisterScreen = () => {
     setIsLoading(true);
     try {
       console.log('Sending data to server:', dataToSend);
-      const response = await axios.post(${BASE_URL}/register, dataToSend);
+      const response = await axios.post(`${BASE_URL}/register, dataToSend`);
       console.log('Response from server:', response);
       if (response.status === 201) {
         Alert.alert('Success', 'Registration successful!');
