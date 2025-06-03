@@ -1,7 +1,7 @@
 import { useCart } from '@/Context/cartContext';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { COLOR } from '@/constants/color';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
     Dimensions,
@@ -13,6 +13,7 @@ import {
     View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator } from 'react-native-paper';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -39,7 +40,8 @@ export default function CategoriesWiseMedicines() {
         if (!CategoryId) return;
 
         fetch(`https://mom-beta-server1.onrender.com/api/medicines/categories/${CategoryId}`)
-            .then((res) => res.json())
+            .then((res) => res.json())   
+
             .then((data) => {
                 setSubcategories(data.subcategories || []);
             })
@@ -114,6 +116,31 @@ export default function CategoriesWiseMedicines() {
 
     const renderMedicineItem = ({ item }) => (
         <View style={styles.cardContainer}>
+            <TouchableOpacity
+                        onPress={() =>
+                          router.push({
+                            pathname: '/Details/details',
+                            params: {
+                              itemId: item._id,
+                              itemName: item.medicine_name,
+                              itemImage: item.imageUrl,
+                              itemPrice: item.price,
+                              description: item.description,
+                              use: item.use,
+                              ingredients: item.ingredients,
+                              dose: item.dose,
+                              manufacturer: item.manufacturer,
+                              notFor: item.notFor,
+                              sideEffects: item.sideEffects,
+                              store: item.store,
+                              expiryDate: item.expiryDate,
+                              manufactureDate: item.manufactureDate,
+                              subcategories: JSON.stringify(item.subcategories || []),
+                            },
+                          })
+                        }
+                    >
+                        
             <View style={styles.card}>
                 <View style={{ alignItems: 'center' }}>
                     <Image source={{ uri: item.imageUrl }} style={styles.cardImage} />
@@ -152,6 +179,7 @@ export default function CategoriesWiseMedicines() {
                     </View>
                 )}
             </View>
+            </TouchableOpacity>
         </View>
     );
 
@@ -167,8 +195,8 @@ export default function CategoriesWiseMedicines() {
                 contentContainerStyle={{ paddingHorizontal: 10 }}
             />
 
-            {selectedSubcategory !== 'all' && (
-                <>
+            {/* {selectedSubcategory !== 'all' && (
+                <> */}
 
                     <FlatList
                         data={medicines}
@@ -179,8 +207,8 @@ export default function CategoriesWiseMedicines() {
                         contentContainerStyle={styles.grid}
                         scrollEnabled={true}
                     />
-                </>
-            )}
+                {/* </> */}
+            {/* )} */}
         </SafeAreaView>
     );
 }
@@ -224,7 +252,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginTop: 8,
-        padding: 7,
+        padding: 10,
         backgroundColor: COLOR.primary,
         borderRadius: 20,
         alignContent: 'center'

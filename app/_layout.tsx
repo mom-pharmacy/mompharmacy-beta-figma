@@ -5,15 +5,18 @@ import { CartProvider } from "@/Context/cartContext";
 import { LocationProvider } from "@/Context/locationContext";
 import { OrderProvider } from "@/Context/orderContext";
 import { Stack } from "expo-router";
-import React from "react";
+import React, { useContext } from "react";
 import { PaperProvider } from "react-native-paper";
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import PushNotificationProvider from '../components/pushNotificationProvider';
+import { MedicineProvider, MediniceContext } from "@/Context/medicineContext";
 
 export default function RootLayout() {
+  
   return (
     <SafeAreaProvider>
       <GlobalStatusBar barStyle="dark-content" backgroundColor="#42beb5" />
+      <MedicineProvider>
       <OrderProvider>
       <PushNotificationProvider>
       <LocationProvider>
@@ -38,6 +41,7 @@ export default function RootLayout() {
       </LocationProvider>
       </PushNotificationProvider>
       </OrderProvider>
+      </MedicineProvider>
     </SafeAreaProvider>
   );
 }
