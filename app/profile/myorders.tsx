@@ -1,7 +1,7 @@
 
 import LoadingScreen from '@/components/LoadingScreen';
 import { userAuth } from '@/Context/authContext';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -47,6 +47,10 @@ const OrderSummaryScreen = () => {
     return <LoadingScreen />;
   }
 
+  if(orders.length===0) return <View>
+    <Text>You Haven't ordered yet</Text>
+  </View>
+
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView>
@@ -66,8 +70,10 @@ const OrderSummaryScreen = () => {
 
         return (
           <View key={order._id} style={styles.deliveryBox}>
+            {/* <Text>Your order is confirmed</Text> */}
             <Text style={styles.deliveredText}>
-              Delivered on <Text style={styles.bold}>9 minutes 3 sec</Text>
+              Your order is {order.status}
+              {/* <Text style={styles.bold}>9 minutes 3 sec</Text> */}
             </Text>
             <Text style={styles.shipmentText}>Shipment of {order.medicines.length} items</Text>
 
@@ -83,7 +89,7 @@ const OrderSummaryScreen = () => {
                       {medicine?.medicine_id?.medicine_name ?? 'N/A'}
                     </Text>
                     <Text style={styles.productQty}>{medicine.quantity}</Text>
-                    <Text style={styles.saveText}>Save for later</Text>
+                    {/* <Text style={styles.saveText}>Save for later</Text> */}
                   </View>
                 </View>
               ))

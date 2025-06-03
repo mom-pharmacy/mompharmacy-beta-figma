@@ -1,6 +1,6 @@
 import OrderStatus from '@/components/OrdersComponents/OrderStatus';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
-import { COLOR, screen } from '@/constants/color';
+import { COLOR, screen, screenWidth } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import { useOrderActive } from '@/Context/orderContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -40,6 +40,7 @@ export default function TrackOrder() {
           throw new Error('Failed to fetch order data');
         }
         const data = await response.json();
+        console.log("this is order" , data)
         setOrder(data.order);
       } catch (error) {
         setError(error.message);
@@ -102,6 +103,12 @@ export default function TrackOrder() {
       return dateFormate
     }
 
+    function formateOrderAddress(){
+      const {street , pincode, city , state} = order.address_id
+      const fullAddress = `${street},${pincode}, ${city}, ${state}`
+      return fullAddress
+    }
+
   return (
     <View style={{ backgroundColor: "white", flex: 1 }}>
       <ScrollView>
@@ -113,6 +120,11 @@ export default function TrackOrder() {
             <Text style={trackPageStyles.ETA}>10 MINS</Text>
             <Text style={trackPageStyles.way}>On the way</Text>
           </View>
+        </View>
+
+        <View style={{paddingHorizontal:20 , flexDirection:"row", gap:4 , alignItems:"center"  , width:screenWidth/1.02 }}>
+          <Ionicons name='location-outline' size={24} color={COLOR.primary}/>
+          <Text>{order && formateOrderAddress().slice(0 , 40)}.....</Text>
         </View>
 
         <View style={trackPageStyles.deliveryBoyContainer}>

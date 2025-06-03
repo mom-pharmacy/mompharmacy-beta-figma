@@ -2,12 +2,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
-    Dimensions,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 const { width, height } = Dimensions.get('window'); 
@@ -16,7 +16,7 @@ const UploadPrescription = () => (
   <TouchableOpacity onPress={() => router.push('/prescription')}>
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/prescription.jpeg')}
+        source={require('../../assets/images/prescription.png')}
         style={styles.image}
       />
       <View style={styles.textContainer}>

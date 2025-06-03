@@ -96,12 +96,21 @@ export default function AddressBook() {
     Linking.openURL(whatsappURL);
   };
 
+  const {primaryAddress , setAddressAsPrimary} = useAddress()
+
   const handleSetPrimary = () => {
     if (selectedAddress) {
       setPrimaryId(selectedAddress.id);
+    
     }
     setIsPrimaryModalVisible(false);
   };
+ 
+  function handleSetPrimaryAddress(id){
+    setAddressAsPrimary(id)
+    setIsPrimaryModalVisible(false)
+  }
+
 
   return (
 
@@ -122,7 +131,7 @@ export default function AddressBook() {
               key={item._id}
               style={[
                 styles.card,
-                item.id === primaryId && { backgroundColor: '#00a99d20', borderColor: '#00a99d', borderWidth: 1 },
+                item._id === primaryAddress && { backgroundColor: '#00a99d20', borderColor: '#00a99d', borderWidth: 1 },
               ]}
             >
               <View style={styles.cardHeader}>
@@ -134,7 +143,7 @@ export default function AddressBook() {
                   color="#444"
                   style={{ marginLeft: 'auto' }}
                   onPress={() => {
-                    setSelectedAddress(item);
+                    setSelectedAddress(item._id);
                     setIsPrimaryModalVisible(true);
                   }}
                 />
@@ -192,7 +201,7 @@ export default function AddressBook() {
             <View style={styles.modalContainer}>
               <Text style={styles.modalText}>Set as primary address</Text>
               <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.button} onPress={handleSetPrimary}>
+                <TouchableOpacity style={styles.button} onPress={()=>handleSetPrimaryAddress(selectedAddress)}>
                   <Text style={styles.buttonText}>Yes</Text>
                 </TouchableOpacity>
                 <View style={styles.divider} />

@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }) => {
       if (response.ok) {
         console.log("User successfully registered");
 
-        // ✅ After successful registration, refetch latest user details
+        // After successful registration, refetch latest user details
         await getUserDetails(parsedToken);
 
         // router.replace("/Home/home");

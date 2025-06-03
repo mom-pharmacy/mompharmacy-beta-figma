@@ -1,3 +1,4 @@
+import apiClient from "@/utils/apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { userAuth } from "./authContext";
@@ -40,18 +41,15 @@ export const AddressProvider = ({ children }) => {
         getAddress()
     }, [])
 
+
     useEffect(()=>{
-        const primary = address.filter(item=>{
-            console.log(item)
-            return item._id===userDetails.primaryAddress
-    })
-        console.log("this is primary address" , primary)
-        setPrimaryAddress(primary[0])
+        setPrimaryAddress(userDetails.primaryAddress)
     } , [])
 
 
 
-    async function setAddressAsPrimary() {
+    async function setAddressAsPrimary(addressId) {
+        setPrimaryAddress(addressId)
         const authToken = await ExtractParseToken()
         try{
             const options = {
@@ -61,8 +59,8 @@ export const AddressProvider = ({ children }) => {
                     "Content-Type":"application/json"
                 }
             } 
-            const response = await fetch("https://mom-beta-server1.onrender.com/address/make-primary" , options)
-            if(response.ok){
+            const response = await apiClient(`address/make-primary/${addressId}` , options)
+            if(response){
                 return true
             }else{
                 return false
@@ -85,24 +83,37 @@ export const AddressProvider = ({ children }) => {
                 },
                 body:JSON.stringify(data)
             }
-            const response = await fetch("https://mom-beta-server1.onrender.com/address/add-address" , options)
-            const responseData = await response.json() 
-            if(response.ok){
-                console.log(responseData)
+            const response = await apiClient("address/add-address" , options)
+
+            // console.log(response)
+            setAddressAsPrimary(response.address._id)
+
+            if(response){
+                console.log(response)
                 setAddress(prev=>{
-                    const newAddress = [...prev , responseData.address]
+                    const newAddress = [...prev , response.address]
                     return newAddress
                 })
                 return true 
 
             }else{
-                console.log(responseData)
+                console.log(response)
                 return false 
             }
         }catch(e){
             console.log("Error in adding address" , e)
             return false 
         }
+    }
+
+    function getPrimaryAddress(){
+        // console.log("C",address)
+        if(!address)return 
+       const primaryAddressFull = address.find((item)=>item._id===primaryAddress)
+       if(primaryAddressFull){
+        return `${primaryAddressFull.street},${primaryAddressFull.pincode},${primaryAddressFull.city},${primaryAddressFull.state}`
+       }
+       return null
     }
 
     async function deleteAddress(id) {
@@ -133,8 +144,10 @@ export const AddressProvider = ({ children }) => {
         }
     }
 
+    
 
-    return <AddressContext.Provider value={{ primaryAddress, address , addAddress , deleteAddress , setAddressAsPrimary  }}>
+
+    return <AddressContext.Provider value={{ primaryAddress, address , addAddress , deleteAddress , setAddressAsPrimary , getPrimaryAddress  }}>
         {children}
     </AddressContext.Provider>
 }
