@@ -1,6 +1,7 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
+import { COLOR } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -91,6 +92,13 @@ const OrderReviewScreen = () => {
       console.error('Error:', error);
     }
   }
+
+  if(!primaryAddress) return <View style={{marginTop:20 , padding:12}}>
+    <Text style={{marginVertical:12 , color:COLOR.btnPrimary}}>You dont have saved address, add address first</Text>
+    <TouchableOpacity style={{width:"100%" , padding:12 , backgroundColor:COLOR.primary ,borderRadius:12 }} onPress={()=>{router.push('/Maps/addAddress')}}>
+    <Text style={{textAlign:"center" , color:"white"}}>Add Address</Text>
+  </TouchableOpacity>
+  </View>
 
   
 

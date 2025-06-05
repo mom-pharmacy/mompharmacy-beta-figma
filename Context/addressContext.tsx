@@ -42,9 +42,10 @@ export const AddressProvider = ({ children }) => {
     }, [])
 
 
-    useEffect(()=>{
-        setPrimaryAddress(userDetails.primaryAddress)
-    } , [])
+    useEffect(() => {
+        if (userDetails) setPrimaryAddress(userDetails.primaryAddress);
+      }, []);
+      
 
 
 
