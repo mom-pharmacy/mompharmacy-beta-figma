@@ -1,54 +1,63 @@
 import OrderStatus from '@/components/OrdersComponents/OrderStatus';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
-import { COLOR, screen, screenWidth } from '@/constants/color';
+import { COLOR, screen } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
-import { useOrderActive } from '@/Context/orderContext';
+// import { useOrderActive } from '@/Context/orderContext';
 import { Ionicons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import React, { useEffect, useState } from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+
 
 
 
 export default function TrackOrder() {
   const [openOrderSummary, setOpenOrderSummary] = useState(false);
-  // const { orderId } = useLocalSearchParams();
+  const { orderId } = useLocalSearchParams();
   const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
 
   const { ExtractParseToken } = userAuth();
-  const {ActiveOrderId} = useOrderActive()
-  console.log("this is active",ActiveOrderId)
 
-  useEffect(() => {
-    const fetchOrderData = async () => {
-      const tokenAuth = await ExtractParseToken();
-      if (!tokenAuth) {
-        setError('Token not found');
-        return;
-      }
-      try {
-        const options = {
-          headers:{
-            "Authorization":`Bearer ${tokenAuth}`
-          }
-        }
-        const response = await fetch(`https://mom-beta-server1.onrender.com/api/orderbyid/${ActiveOrderId}` , options);
-        console.log("this is from order " ,response)
-        if (!response.ok) {
-          throw new Error('Failed to fetch order data');
-        }
-        const data = await response.json();
-        console.log("this is order" , data)
-        setOrder(data.order);
-      } catch (error) {
-        setError(error.message);
-      }
+const fetchOrderData = useCallback(async () => {
+  const tokenAuth = await ExtractParseToken();
+  if (!tokenAuth) {
+    setError('Token not found');
+    return;
+  }
+  try {
+    const options = {
+      headers: {
+        "Authorization":` Bearer ${tokenAuth}`
+      },
     };
+    const response = await fetch(`http://192.168.1.59:3000/api/orderbyid/${orderId}`, options);
+    if (!response.ok) {
+      throw new Error('Failed to fetch order data');
+    }
+    const data = await response.json();
+    setOrder(data.order);
+  } catch (error) {
+    setError(error.message);
+  }
+}, [orderId]);
 
+useFocusEffect(
+  useCallback(() => {
     fetchOrderData();
-  }, [ActiveOrderId]);
+    const intervalId = setInterval(fetchOrderData, 5000);
+    return () => clearInterval(intervalId);
+  }, [fetchOrderData])
+);
+
+  const handleCall = (phone) =>{
+    let phoneNumber = `tel:${phone}`;
+  Linking.openURL(phoneNumber);
+  }
 
   const StatusRender = ({ title, icons }) => (
     <View style={trackPageStyles.orderStatusItems}>
@@ -58,7 +67,7 @@ export default function TrackOrder() {
   );
 
   const generateOrderId = ()=>{
-    const standaredId = ActiveOrderId.slice(0 , 10).toString().toUpperCase() 
+    const standaredId = orderId.slice(0 , 10).toString().toUpperCase() 
     return standaredId
   }
 
@@ -103,13 +112,8 @@ export default function TrackOrder() {
       return dateFormate
     }
 
-    function formateOrderAddress(){
-      const {street , pincode, city , state} = order.address_id
-      const fullAddress = `${street},${pincode}, ${city}, ${state}`
-      return fullAddress
-    }
-
   return (
+    <SafeAreaView style={{flex:1}}>
     <View style={{ backgroundColor: "white", flex: 1 }}>
       <ScrollView>
         <StatusHeader title={"Track Order"} />
@@ -122,26 +126,30 @@ export default function TrackOrder() {
           </View>
         </View>
 
-        <View style={{paddingHorizontal:20 , flexDirection:"row", gap:4 , alignItems:"center"  , width:screenWidth/1.02 }}>
-          <Ionicons name='location-outline' size={24} color={COLOR.primary}/>
-          <Text>{order && formateOrderAddress().slice(0 , 40)}.....</Text>
-        </View>
-
         <View style={trackPageStyles.deliveryBoyContainer}>
           <View style={trackPageStyles.deliveryBoyDetailsContainer}>
             <Image source={require("@/assets/images/deliveryProfile.png")} style={{ width: 40, height: 40 }} />
             <View>
-              <Text>Amith Kumar</Text>
-              <Text>Heal Porter</Text>
+              {/* <Text>Amith Kumar</Text>
+              <Text>Heal Porter</Text> */}
+              <Text>
+      {
+        order?.deliveryboy_id
+          ? order.deliveryboy_id.name ||
+            `${order.deliveryboy_id.firstName || ''} ${order.deliveryboy_id.lastName || ''}`.trim()
+          : 'Delivery Boy'
+      }
+      </Text>
+          
             </View>
           </View>
           <View style={trackPageStyles.deliveryIconsContainer}>
-            <TouchableOpacity style={trackPageStyles.iconsBtn}>
+            <TouchableOpacity style={trackPageStyles.iconsBtn } onPress={()=>{handleCall(order.deliveryboy_id.mobileNumber)}}>
               <Ionicons name='call' size={20} color={COLOR.primary} />
             </TouchableOpacity>
-            <TouchableOpacity style={trackPageStyles.iconsBtn}>
+            {/* <TouchableOpacity style={trackPageStyles.iconsBtn }>
               <MaterialCommunityIcons name="message-text" size={20} color={COLOR.primary} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
         </View>
 
@@ -213,6 +221,7 @@ export default function TrackOrder() {
         )}
       </ScrollView>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -247,6 +256,7 @@ const trackPageStyles = StyleSheet.create({
   },
   orderItemHeadingContainer: {
     padding: 12,
+
     marginHorizontal: 20,
   },
   orderItemHeading: {
