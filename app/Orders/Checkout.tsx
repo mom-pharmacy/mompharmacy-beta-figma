@@ -29,7 +29,6 @@ const OrderReviewScreen = () => {
     if (!item) return;
     const newQty = type === 'inc' ? item.quantity + 1 : item.quantity - 1;
     updateQuantity(id, newQty > 0 ? newQty : 1);
-
   };
 
   // const {primaryAddress} = useAddress()

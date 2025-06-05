@@ -12,8 +12,6 @@ export const AddressProvider = ({ children }) => {
     const [address, setAddress] = useState([])
 
     const {ExtractParseToken , userDetails} = userAuth()
-  
-    
 
     useEffect(() => {
         async function getAddress() {
