@@ -7,7 +7,7 @@ function FloatOrders(){
 
     function handleOnPress(){
         console.log("this is pressed")
-        router.push("/Orders/TrackOrder")
+        router.push("/Orders/CheckOrders")
     }
     
     return <TouchableOpacity style={styles.floatContainer} onPress={handleOnPress}>
