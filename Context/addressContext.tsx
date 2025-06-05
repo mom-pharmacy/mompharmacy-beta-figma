@@ -12,6 +12,8 @@ export const AddressProvider = ({ children }) => {
     const [address, setAddress] = useState([])
 
     const {ExtractParseToken , userDetails} = userAuth()
+  
+    
 
     useEffect(() => {
         async function getAddress() {
@@ -40,9 +42,10 @@ export const AddressProvider = ({ children }) => {
     }, [])
 
 
-    useEffect(()=>{
-        setPrimaryAddress(userDetails.primaryAddress)
-    } , [])
+    useEffect(() => {
+        if (userDetails) setPrimaryAddress(userDetails.primaryAddress);
+      }, []);
+      
 
 
 
