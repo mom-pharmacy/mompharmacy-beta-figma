@@ -11,6 +11,7 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } fr
 import { ActivityIndicator } from 'react-native-paper';
 import { useCart } from '../../Context/cartContext';
 import OrderConfirmationModal from './OrderConfirmation';
+import LoadingScreen from '../ErrorScreens/loadingscreen';
 
 const OrderReviewScreen = () => {
   const { cartItems, subtotal, updateQuantity } = useCart();
@@ -18,6 +19,7 @@ const OrderReviewScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [ medicine, setMedicine]=useState([])
   const [isLoading ,setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(true);
 
   const {ExtractParseToken} = userAuth()
   const {clearCart} = useCart()
@@ -93,6 +95,10 @@ const OrderReviewScreen = () => {
     }
   }
 
+  if (loading) {
+      return <LoadingScreen />;
+    }
+  
   if(!primaryAddress) return <View style={{marginTop:20 , padding:12}}>
     <Text style={{marginVertical:12 , color:COLOR.btnPrimary}}>You dont have saved address, add address first</Text>
     <TouchableOpacity style={{width:"100%" , padding:12 , backgroundColor:COLOR.primary ,borderRadius:12 }} onPress={()=>{router.push('/Maps/addAddress')}}>

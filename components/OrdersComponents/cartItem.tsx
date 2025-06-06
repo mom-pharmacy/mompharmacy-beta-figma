@@ -4,6 +4,7 @@ import React, { useCallback, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 import { useCart } from "../../Context/cartContext";
+import LoadingScreen from '../../app/ErrorScreens/loadingscreen';
 
 export default function CartItem({ item }) {
   const [isSaved, setIsSaved] = useState(false);
@@ -49,6 +50,7 @@ export default function CartItem({ item }) {
             const products = data.wishlist.products;
             setWishlist(products);
             setIsSaved(products.some((wishlistItem) => wishlistItem._id === item._id));
+  
           } else {
             console.warn(data.message || "Failed to fetch wishlist");
           }
@@ -61,7 +63,7 @@ export default function CartItem({ item }) {
       fetchWishlist();
     }, [item._id, ExtractParseToken])
   );
-
+ 
   const changeSaveText = async () => {
     const newState = !isSaved;
     setIsSaved(newState);
@@ -92,9 +94,14 @@ export default function CartItem({ item }) {
       }
     }
   };
+ 
 
+   
   const isInWishlist = wishlist.some((wishlistItem) => wishlistItem._id === item._id);
-
+    if (loading) {
+    return <LoadingScreen />;
+  }
+  
   return (
     <View style={styles.itemRow}>
       <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
