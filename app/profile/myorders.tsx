@@ -1,5 +1,8 @@
 
-import LoadingScreen from '@/components/LoadingScreen';
+import LoadingScreen from '../ErrorScreens/loadingscreen'
+import Page404 from '../ErrorScreens/loadingscreen'
+
+
 import { userAuth } from '@/Context/authContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -11,6 +14,7 @@ const OrderSummaryScreen = () => {
   const [orders, setOrders] = useState([]);
   const [expandedOrderId, setExpandedOrderId] = useState(null); // Updated
   const [loading, setLoading] = useState(false);
+  
 
   const { ExtractParseToken } = userAuth();
                                                                   
@@ -33,6 +37,7 @@ const OrderSummaryScreen = () => {
           console.log(data);
           setOrders(data.orders);
         } else {
+          return
           console.error('Error fetching orders:', data.message);
         }
       } catch (error) {
@@ -44,7 +49,11 @@ const OrderSummaryScreen = () => {
   }, []);
 
   if (loading) {
+    console.log("..................................")
     return <LoadingScreen />;
+  }
+  else{
+    return <Page404></Page404>
   }
 
   if(orders.length===0) return <View>

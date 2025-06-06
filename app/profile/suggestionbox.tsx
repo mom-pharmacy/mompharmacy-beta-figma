@@ -2,6 +2,8 @@ import { userAuth } from '@/Context/authContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import LoadingScreen from '../ErrorScreens/loadingscreen';
+import Page404 from '../ErrorScreens/page404';
 import {
   LayoutAnimation,
   Modal,
@@ -16,8 +18,7 @@ import {
   Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SuggestAndEarn from '../profile/sug_box'
-import SuggestTop from '../profile/sug_box';
+import SuggestAndEarn from '../profile/sug_box';
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -27,20 +28,18 @@ const SuggestProductsScreen: React.FC = () => {
   const [productSuggestion, setProductSuggestion] = useState('');
   const [technicalSuggestion, setTechnicalSuggestion] = useState('');
   const [nonTechnicalSuggestion, setNonTechnicalSuggestion] = useState('');
-
   const [showTechnical, setShowTechnical] = useState(false);
   const [showNonTechnical, setShowNonTechnical] = useState(false);
-
   const [showSuccessModal, setShowSuccessModal] = useState(false); 
+  const [loading, setLoading] = useState(false); // ✅ Added loading state
 
-  const {userDetails, ExtractParseToken} = userAuth()
+  const { userDetails, ExtractParseToken } = userAuth();
 
   const toggleSection = (type: 'tech' | 'nonTech') => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     if (type === 'tech') setShowTechnical(!showTechnical);
     else setShowNonTechnical(!showNonTechnical);
   };
-
 
   const handleSubmit = async (type: string) => {
     let suggestionText = '';
@@ -68,6 +67,7 @@ const SuggestProductsScreen: React.FC = () => {
     }
 
     try {
+      setLoading(true); // ✅ Show loading
       const response = await fetch('https://mom-beta-server1.onrender.com/api/suggestions/add/', {
         method: 'POST',
         headers: {
@@ -81,18 +81,13 @@ const SuggestProductsScreen: React.FC = () => {
           isNonTechincal,
         }),
       });
-      
-      console.log("this is from suggestions" , response)
 
       const data = await response.json();
+      setLoading(false); // ✅ Hide loading
 
       if (response.ok) {
-        setShowSuccessModal(true); 
-
-        setTimeout(() => {
-          setShowSuccessModal(false);
-        }, 2000); 
-
+        setShowSuccessModal(true);
+        setTimeout(() => setShowSuccessModal(false), 2000);
         if (type === 'product') setProductSuggestion('');
         else if (type === 'technical') setTechnicalSuggestion('');
         else if (type === 'non-technical') setNonTechnicalSuggestion('');
@@ -100,48 +95,21 @@ const SuggestProductsScreen: React.FC = () => {
         alert(data.message || 'Submission failed');
       }
     } catch (error) {
+      setLoading(false); // ✅ Hide loading on error
       console.error('Error submitting suggestion:', error);
       alert('An error occurred while submitting your suggestion.');
     }
   };
 
+  // ✅ Show loading screen if loading is true
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <SafeAreaView>
-       <View style={styles.container2}>
-        <View>
-          
-          <View style={styles.card}>
-             <MaterialIcons
-            name="arrow-back"
-            size={24}
-            color="#00A99D"
-            style={styles.arrowIcon}
-            onPress={() => router.back()}
-          />
-              
-              {/* Dummy Image */}
-              <Image
-                source={require('../../assets/images/sug2.png')}
-                style={styles.image}
-              />
-              {/* Texts */}
-              <View style={styles.textContainer}>
-                <Text style={styles.title2}>Earn ₹1000</Text>
-                <Text style={styles.subtitle2}>Suggest & Earn</Text>
-                <Text style={styles.caption}>Spot it. Suggest it. Earn for it</Text>
-              </View>
-            </View>
-
-        </View>
-            
-        </View>
-      
-    <ScrollView contentContainerStyle={styles.container}>
-      <View>
-
-     
-      {/* <View style={styles.sugimg}>
-        <View style={styles.headerRow}>
+      <View style={styles.container2}>
+        <View style={styles.card}>
           <MaterialIcons
             name="arrow-back"
             size={24}
@@ -149,106 +117,107 @@ const SuggestProductsScreen: React.FC = () => {
             style={styles.arrowIcon}
             onPress={() => router.back()}
           />
-          <Text style={styles.header}>Suggestion</Text>
-        </View>
-      </View> */}
-      
-      {/* <SuggestTop></SuggestTop> */}
-      
-
-      <Text style={styles.subtitle}>
-        Didn't find what you are looking for? Please suggest the product
-      </Text>
-
-      <TextInput
-        style={styles.textArea}
-        placeholder="Enter the name of the products you would like to see on mom pharmacy"
-        placeholderTextColor="#A0A0A0"
-        multiline
-        value={productSuggestion}
-        onChangeText={setProductSuggestion}
-      />
-      <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit('product')}>
-        <Text style={styles.submitText}>Submit</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.dropdownHeader} onPress={() => toggleSection('tech')}>
-        <Text style={styles.dropdownTitle}>Technical Suggestion</Text>
-        <Ionicons name={showTechnical ? 'chevron-up' : 'chevron-down'} size={20} />
-      </TouchableOpacity>
-      {showTechnical && (
-        <>
-          <TextInput
-            style={styles.textArea}
-            placeholder="Enter your technical suggestion"
-            placeholderTextColor="#A0A0A0"
-            multiline
-            value={technicalSuggestion}
-            onChangeText={setTechnicalSuggestion}
+          <Image
+            source={require('../../assets/images/sug2.png')}
+            style={styles.image}
           />
-          <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit('technical')}>
-            <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      <TouchableOpacity style={styles.dropdownHeader} onPress={() => toggleSection('nonTech')}>
-        <Text style={styles.dropdownTitle}>Non-Technical Suggestion</Text>
-        <Ionicons name={showNonTechnical ? 'chevron-up' : 'chevron-down'} size={20} />
-      </TouchableOpacity>
-      {showNonTechnical && (
-        <>  
-          <TextInput
-            style={styles.textArea}
-            placeholder="Enter your non-technical suggestion"
-            placeholderTextColor="#A0A0A0"
-            multiline
-            value={nonTechnicalSuggestion}
-            onChangeText={setNonTechnicalSuggestion}
-          />
-          <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit('non-technical')}>
-            <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
-        </>
-      )}
-
-      {/* ✅ Success Modal */}
-      <Modal transparent visible={showSuccessModal} animationType="fade">
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>✅ Suggestion submitted successfully!</Text>
+          <View style={styles.textContainer}>
+            <Text style={styles.title2}>Earn ₹1000</Text>
+            <Text style={styles.subtitle2}>Suggest & Earn</Text>
+            <Text style={styles.caption}>Spot it. Suggest it. Earn for it</Text>
           </View>
         </View>
-      </Modal>
-       </View>
-             <SuggestAndEarn></SuggestAndEarn>
+      </View>
 
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View>
+          <Text style={styles.subtitle}>
+            Didn't find what you are looking for? Please suggest the product
+          </Text>
+
+          <TextInput
+            style={styles.textArea}
+            placeholder="Enter the name of the products you would like to see on mom pharmacy"
+            placeholderTextColor="#A0A0A0"
+            multiline
+            value={productSuggestion}
+            onChangeText={setProductSuggestion}
+          />
+          <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit('product')}>
+            <Text style={styles.submitText}>Submit</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.dropdownHeader} onPress={() => toggleSection('tech')}>
+            <Text style={styles.dropdownTitle}>Technical Suggestion</Text>
+            <Ionicons name={showTechnical ? 'chevron-up' : 'chevron-down'} size={20} />
+          </TouchableOpacity>
+          {showTechnical && (
+            <>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Enter your technical suggestion"
+                placeholderTextColor="#A0A0A0"
+                multiline
+                value={technicalSuggestion}
+                onChangeText={setTechnicalSuggestion}
+              />
+              <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit('technical')}>
+                <Text style={styles.submitText}>Submit</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          <TouchableOpacity style={styles.dropdownHeader} onPress={() => toggleSection('nonTech')}>
+            <Text style={styles.dropdownTitle}>Non-Technical Suggestion</Text>
+            <Ionicons name={showNonTechnical ? 'chevron-up' : 'chevron-down'} size={20} />
+          </TouchableOpacity>
+          {showNonTechnical && (
+            <>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Enter your non-technical suggestion"
+                placeholderTextColor="#A0A0A0"
+                multiline
+                value={nonTechnicalSuggestion}
+                onChangeText={setNonTechnicalSuggestion}
+              />
+              <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit('non-technical')}>
+                <Text style={styles.submitText}>Submit</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          <Modal transparent visible={showSuccessModal} animationType="fade">
+            <View style={styles.modalBackground}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalText}>✅ Suggestion submitted successfully!</Text>
+              </View>
+            </View>
+          </Modal>
+        </View>
+
+        <SuggestAndEarn />
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container2: 
-  {
-    
-    
-    width:'auto',
+  container2: {
+    width: 'auto',
   },
-   card: {
-    
+  card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2A9D8F", // greenish color like in the image
+    backgroundColor: "#2A9D8F",
     borderBottomLeftRadius: 16,
-    borderBottomRightRadius:16,
+    borderBottomRightRadius: 16,
     padding: 30,
-    marginBottom:1,
+    marginBottom: 1,
   },
   image: {
     width: 80,
-    //height: 80,
-    maxHeight:90,
+    maxHeight: 90,
     resizeMode: "contain",
     marginRight: 16,
   },
@@ -275,39 +244,6 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 180,
     backgroundColor: '#fff',
-  },
-  
-  sugimg: {
-    flexDirection: 'row',
-  },
-  suggest: {
-    width: 60,
-    height: 50,
-    marginHorizontal: 40,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    alignSelf: 'center',
-    marginBottom: 10,
-    color: '#1A7563',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    marginBottom: 10,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#00A99D',
-    marginLeft: 80  ,
-  },
-  arrowIcon: {
-    marginLeft: -10,
-    color:'white',
-    marginBottom:60
   },
   subtitle: {
     fontSize: 14,
@@ -369,6 +305,11 @@ const styles = StyleSheet.create({
     color: '#007B65',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  arrowIcon: {
+    marginLeft: -10,
+    color: 'white',
+    marginBottom: 60,
   },
 });
 
