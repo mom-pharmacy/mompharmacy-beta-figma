@@ -2,6 +2,7 @@ import OrderStatus from '@/components/OrdersComponents/OrderStatus';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { COLOR, screen } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
+import { useOrderActive } from '@/Context/orderContext';
 // import { useOrderActive } from '@/Context/orderContext';
 import { Ionicons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -17,11 +18,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TrackOrder() {
   const [openOrderSummary, setOpenOrderSummary] = useState(false);
-  const { orderId } = useLocalSearchParams();
+  const { ActiveOrderId } = useOrderActive();
   const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
 
   const { ExtractParseToken } = userAuth();
+
+  console.log("this is from orders tracking page" , ActiveOrderId)
+
 
 const fetchOrderData = useCallback(async () => {
   const tokenAuth = await ExtractParseToken();
@@ -35,7 +39,7 @@ const fetchOrderData = useCallback(async () => {
         "Authorization":` Bearer ${tokenAuth}`
       },
     };
-    const response = await fetch(`http://192.168.1.59:3000/api/orderbyid/${orderId}`, options);
+    const response = await fetch(`http://192.168.1.16:3000/api/orderbyid/${ActiveOrderId}`, options);
     if (!response.ok) {
       throw new Error('Failed to fetch order data');
     }
@@ -44,7 +48,7 @@ const fetchOrderData = useCallback(async () => {
   } catch (error) {
     setError(error.message);
   }
-}, [orderId]);
+}, [ActiveOrderId]);
 
 useFocusEffect(
   useCallback(() => {
@@ -67,7 +71,7 @@ useFocusEffect(
   );
 
   const generateOrderId = ()=>{
-    const standaredId = orderId.slice(0 , 10).toString().toUpperCase() 
+    const standaredId = ActiveOrderId
     return standaredId
   }
 

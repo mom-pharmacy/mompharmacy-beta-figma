@@ -161,7 +161,7 @@ export default function Details() {
 
   return (
     <SafeAreaView>
-      <StatusHeader title={itemName} />
+      <StatusHeader title={itemName.slice(0 , 16)} />
       <ScrollView style={styles.container}>
         <View style={styles.contentWrapper}>
           <TouchableOpacity onPress={() => router.push('/BottomNavbar/cart')} style={styles.cartContainer}>
