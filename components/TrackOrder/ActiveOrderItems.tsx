@@ -10,7 +10,10 @@ export default function ActiveOrderItems({activeOrderId}) {
 
   const [order , setOrder] = useState(null)
   const [loading , setLoading] = useState(true)
-  const {setActiveOrder} = useOrderActive()
+  const {setActiveOrder , loadingOrders} = useOrderActive()
+  const [error , setError ] = useState(false)
+
+  
 
     useEffect(() =>{
         async function fetchActiveOrder(){
@@ -26,6 +29,7 @@ export default function ActiveOrderItems({activeOrderId}) {
             setOrder(response.order)
             console.log('Active Order:', response.order);
         } catch (error) {
+          setError(true)
             console.error('Error fetching active order:', error);
         }   
     }
@@ -42,6 +46,8 @@ export default function ActiveOrderItems({activeOrderId}) {
       setActiveOrder(order._id)
       router.push('/Orders/TrackOrder')
     }
+
+
   return (
     
     

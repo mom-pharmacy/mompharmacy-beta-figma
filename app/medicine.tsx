@@ -17,6 +17,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LoadingScreen from './ErrorScreens/loadingscreen';
 
 export default function Medicines({ limit }) {
   const [sortType, setSortType] = useState('low');
@@ -24,6 +25,7 @@ export default function Medicines({ limit }) {
   const [medicine, setMedicine] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const { subcategoryId } = useLocalSearchParams();
+  const [loading , setLoading]  = useState(true)
   const {
     addToCart,
     cartItems,
@@ -44,6 +46,7 @@ export default function Medicines({ limit }) {
           `https://mom-beta-server1.onrender.com/api/medicines/subcategories/${subcategoryId}/medicines`
         );
         const data = await res.json();
+        setLoading(false)
         setMedicine(data);
       } catch (err) {
         console.error('Failed to fetch medicines:', err);
@@ -60,6 +63,8 @@ export default function Medicines({ limit }) {
   const sortedMedicines = [...filteredMedicines].sort((a, b) =>
     sortType === 'low' ? a.price - b.price : b.price - a.price
   );
+
+  if(loading) return <LoadingScreen/>
 
   const getSortLabel = () =>
     sortType === 'low' ? 'Sort: Low to High' : 'Sort: High to Low';

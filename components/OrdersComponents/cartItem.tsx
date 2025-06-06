@@ -33,7 +33,7 @@ export default function CartItem({ item }) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: Bearer ${token},
+              Authorization: `Bearer ${token}`,
             },
           };
 
@@ -75,7 +75,7 @@ export default function CartItem({ item }) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: Bearer ${tokenAuth},
+              Authorization: `Bearer ${tokenAuth}`,
             },
             body: JSON.stringify({ productId: item._id }),
           }

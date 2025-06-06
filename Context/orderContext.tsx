@@ -3,13 +3,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 const OrderContext = createContext({
+    
     ActiveOrderId:null,
-    updateActiveOrder:(orderId)=>{}
+    orderIDs:[],
+    updateActiveOrder:(orderId)=>{},
+    setActiveOrder:(orderId)=>{},
+    loadingOrders:true,
+    
 })
 
 export function OrderProvider({children}){
 
     const [ActiveOrderId , setActiveOrder] = useState(null)
+    const [orderIDs , setOrderIDs] = useState(null)
+    const [loadingOrders , setLoadingOrders] = useState(true)
 
     async function getActiveOrders(){
         const token = await AsyncStorage.getItem("jwt_token")
@@ -25,7 +32,9 @@ export function OrderProvider({children}){
             }
             const activeOrders = await apiClient("api/activeOrder" , options)
             console.log("this is active order",activeOrders)
+            setLoadingOrders(false)
             setActiveOrder(activeOrders.data[0]._id)
+            setOrderIDs(activeOrders.data.map((item)=>item._id))
         }catch(error){
             console.log("Error in fetching active orders" , error)
         }
@@ -40,7 +49,7 @@ export function OrderProvider({children}){
     } , [])
 
     
-    return <OrderContext.Provider value={{ActiveOrderId , updateActiveOrder}}>
+    return <OrderContext.Provider value={{ActiveOrderId , setActiveOrder , updateActiveOrder , orderIDs , loadingOrders}}>
         {children}
     </OrderContext.Provider>
 }

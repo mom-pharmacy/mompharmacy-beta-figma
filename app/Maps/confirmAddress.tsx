@@ -11,7 +11,7 @@ import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddressForm() {
-  const { address, location } = useLocalSearchParams();
+  const { address } = useLocalSearchParams();
   const {location}=useLocationContext()
   console.log("googleLoc", location)
   const addressDetails = address.split(",")

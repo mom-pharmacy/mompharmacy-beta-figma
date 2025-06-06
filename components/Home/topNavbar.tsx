@@ -49,7 +49,7 @@ const TopNavbar = ({ showBack = false, onBack }) => {
           onPress={() => router.push('/Notification')}
           style={styles.notificationIconWrapper}
         >
-          <Notify width={75} height={75} />
+          <Notify width={70} height={70} />
           {unreadCount > 0 && (
             <View style={styles.badgeContainer}>
               <Text style={styles.badgeText}>
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     flex: 1,
+    marginTop:10
   },
   addressContainer: {
     width: '100%',
