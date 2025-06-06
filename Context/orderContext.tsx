@@ -45,9 +45,16 @@ export function OrderProvider({children}){
     }
 
     useEffect(()=>{
-        getActiveOrders()
-    } , [])
+        getActiveOrders();
+        const intervalId = setInterval(() => {
+            getActiveOrders();
+        }, 15000); 
+    
+        return () => clearInterval(intervalId);
+    } , []);
 
+    if(!orderIDs) return null;
+    
     
     return <OrderContext.Provider value={{ActiveOrderId , setActiveOrder , updateActiveOrder , orderIDs , loadingOrders}}>
         {children}
