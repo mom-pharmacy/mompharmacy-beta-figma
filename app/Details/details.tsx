@@ -7,6 +7,10 @@ import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, } from 'react';
+import LoadingScreen from '../ErrorScreens/loadingscreen';
+import Page404 from "../ErrorScreens/page404";
+
+
 import {
   Dimensions,
   Image,
@@ -21,6 +25,7 @@ import {
 } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
+
 const { width } = Dimensions.get('window');
 
 export default function Details() {
@@ -29,6 +34,7 @@ export default function Details() {
   const [wishlist, setWishlist] = useState([]);
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false); 
 
 
   const {
@@ -85,6 +91,8 @@ export default function Details() {
 
   useEffect(() => {
     const fetchWishlist = async () => {
+      setLoading(true);
+      setError(false);
       try {
         const token = await ExtractParseToken();
         if (!token) {
@@ -117,13 +125,21 @@ export default function Details() {
         }
       } catch (error) {
         console.error('Failed to fetch wishlist:', error);
+           setError(true); 
       } finally {
+        setLoading(false);
       }
     };
 
     fetchWishlist();
   }, [ExtractParseToken]);
 
+   if (loading)
+   {
+    return <LoadingScreen />;
+  }
+    if (error)
+     return <Page404 />;
 
   const handleWishlistToggle = async () => {
     const newState = !isSaved
@@ -161,7 +177,7 @@ export default function Details() {
 
   return (
     <SafeAreaView>
-      <StatusHeader title={itemName} />
+      <StatusHeader title={itemName.slice(0 , 16)} />
       <ScrollView style={styles.container}>
         <View style={styles.contentWrapper}>
           <TouchableOpacity onPress={() => router.push('/BottomNavbar/cart')} style={styles.cartContainer}>

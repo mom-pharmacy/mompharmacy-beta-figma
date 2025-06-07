@@ -2,18 +2,17 @@ import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import * as Contacts from 'expo-contacts';
 import { useState } from 'react';
 import { Pressable, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native';
-
-
 import { router, useLocalSearchParams } from 'expo-router';
-
 import { COLOR } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
 import { userAuth } from '@/Context/authContext';
+import { useLocationContext } from '@/Context/locationContext';
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AddressForm() {
-  const { address, location } = useLocalSearchParams();
+  const { address } = useLocalSearchParams();
+  const {location}=useLocationContext()
   console.log("googleLoc", location)
   const addressDetails = address.split(",")
   console.log("this is Address", addressDetails)
@@ -59,7 +58,10 @@ export default function AddressForm() {
       country: addressDetails[4],
       street: `${contactName},${houseNumber}, ${buildingBlockNumber}`,
       pincode: addressDetails[5],
-      currentLocation: region
+      currentLocation: {
+        lattitude:location?.latitude,
+        logitude:location?.longitude
+      }
     }
 
 
@@ -200,7 +202,6 @@ const styles = {
     padding: 12,
     backgroundColor: "white",
     paddingLeft: 20,
-
 
   }
   ,

@@ -1,6 +1,7 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
+import { COLOR } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
 import { userAuth } from '@/Context/authContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,6 +11,7 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } fr
 import { ActivityIndicator } from 'react-native-paper';
 import { useCart } from '../../Context/cartContext';
 import OrderConfirmationModal from './OrderConfirmation';
+import LoadingScreen from '../ErrorScreens/loadingscreen';
 
 const OrderReviewScreen = () => {
   const { cartItems, subtotal, updateQuantity } = useCart();
@@ -17,6 +19,7 @@ const OrderReviewScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [ medicine, setMedicine]=useState([])
   const [isLoading ,setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(true);
 
   const {ExtractParseToken} = userAuth()
   const {clearCart} = useCart()
@@ -91,6 +94,17 @@ const OrderReviewScreen = () => {
       console.error('Error:', error);
     }
   }
+
+  if (loading) {
+      return <LoadingScreen />;
+    }
+  
+  if(!primaryAddress) return <View style={{marginTop:20 , padding:12}}>
+    <Text style={{marginVertical:12 , color:COLOR.btnPrimary}}>You dont have saved address, add address first</Text>
+    <TouchableOpacity style={{width:"100%" , padding:12 , backgroundColor:COLOR.primary ,borderRadius:12 }} onPress={()=>{router.push('/Maps/addAddress')}}>
+    <Text style={{textAlign:"center" , color:"white"}}>Add Address</Text>
+  </TouchableOpacity>
+  </View>
 
   
 

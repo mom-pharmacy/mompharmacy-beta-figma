@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MomPharmacyScreen = () => {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex:1}}>
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => { router.back()}}>
