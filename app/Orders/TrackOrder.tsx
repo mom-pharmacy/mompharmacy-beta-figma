@@ -6,12 +6,11 @@ import { useOrderActive } from '@/Context/orderContext';
 // import { useOrderActive } from '@/Context/orderContext';
 import { Ionicons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Image, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 
 
 
@@ -24,44 +23,50 @@ export default function TrackOrder() {
 
   const { ExtractParseToken } = userAuth();
 
-  console.log("this is from orders tracking page" , ActiveOrderId)
+  console.log("this is from orders tracking page", ActiveOrderId)
 
 
-const fetchOrderData = useCallback(async () => {
-  const tokenAuth = await ExtractParseToken();
-  if (!tokenAuth) {
-    setError('Token not found');
-    return;
-  }
-  try {
-    const options = {
-      headers: {
-        "Authorization":` Bearer ${tokenAuth}`
-      },
-    };
-    const response = await fetch(`http://192.168.1.16:3000/api/orderbyid/${ActiveOrderId}`, options);
-    if (!response.ok) {
-      throw new Error('Failed to fetch order data');
+  const fetchOrderData = useCallback(async () => {
+    const tokenAuth = await ExtractParseToken();
+    if (!tokenAuth) {
+      setError('Token not found');
+      return;
     }
-    const data = await response.json();
-    setOrder(data.order);
-  } catch (error) {
-    setError(error.message);
-  }
-}, [ActiveOrderId]);
+    try {
+      const options = {
+        headers: {
+          "Authorization": ` Bearer ${tokenAuth}`
+        },
+      };
+      const response = await fetch(`http://192.168.1.16:3000/api/orderbyid/${ActiveOrderId}`, options);
+      if (!response.ok) {
+        throw new Error('Failed to fetch order data');
+      }
+      const data = await response.json();
+      setOrder(data.order);
+    } catch (error) {
+      setError(error.message);
+    }
+  }, [ActiveOrderId]);
 
-useFocusEffect(
-  useCallback(() => {
-    fetchOrderData();
-    const intervalId = setInterval(fetchOrderData, 5000);
-    return () => clearInterval(intervalId);
-  }, [fetchOrderData])
-);
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrderData();
+      const intervalId = setInterval(fetchOrderData, 5000);
+      return () => clearInterval(intervalId);
+    }, [fetchOrderData])
+  );
 
-  const handleCall = (phone) =>{
+  const handleCall = (phone) => {
     let phoneNumber = `tel:${phone}`;
-  Linking.openURL(phoneNumber);
+    Linking.openURL(phoneNumber);
   }
+
+  const handleMessage = (phone) => {
+  let smsUrl = `sms:${phone}`;
+  Linking.openURL(smsUrl);
+}
+
 
   const StatusRender = ({ title, icons }) => (
     <View style={trackPageStyles.orderStatusItems}>
@@ -70,7 +75,7 @@ useFocusEffect(
     </View>
   );
 
-  const generateOrderId = ()=>{
+  const generateOrderId = () => {
     const standaredId = ActiveOrderId
     return standaredId
   }
@@ -88,17 +93,17 @@ useFocusEffect(
       return <Text>No medicines found</Text>;
     }
 
-   
 
-    console.log("this is order" , order)
+
+    console.log("this is order", order)
 
     return (
       <View style={styles.orderItemsContainer}>
         {order.medicines.map((medicine, index) => (
           <View key={index} style={styles.orderItemContainer}>
             <Image
-              source={medicine.imageUrl ?{ uri: medicine.imageUrl } : require("@/assets/images/Categories/babyoil.png")}
-              style={{ width: 40, height: 40 }}
+              source={medicine.imageUrl ? { uri: medicine.imageUrl } : require("@/assets/images/Categories/babyoil.png")}
+              style={{ width: 38, height: 40 }}
             />
             <View style={styles.orderItemQuantityContainer}>
               <Text>x{medicine.quantity}</Text>
@@ -110,122 +115,139 @@ useFocusEffect(
     );
   };
 
-   const formatedDate = ()=>{
-      const orderDate = new Date(order.updatedAt)
-      const dateFormate = `${orderDate.getDate()}/${orderDate.getMonth()}/${orderDate.getFullYear()}`
-      return dateFormate
-    }
+  const formatedDate = () => {
+    const orderDate = new Date(order.updatedAt)
+    const dateFormate = `${orderDate.getDate()}/${orderDate.getMonth()}/${orderDate.getFullYear()}`
+    return dateFormate
+  }
 
   return (
-    <SafeAreaView style={{flex:1}}>
-    <View style={{ backgroundColor: "white", flex: 1 }}>
-      <ScrollView>
-        <StatusHeader title={"Track Order"} />
-        <View style={trackPageStyles.deliveryBoyETA}>
-          <Image source={require("@/assets/images/deliveryboy.png")} style={{ width: 160, height: 180 }} />
-          <View style={trackPageStyles.ETAContainer}>
-            <Text style={trackPageStyles.arriving}>Arriving in</Text>
-            <Text style={trackPageStyles.ETA}>10 MINS</Text>
-            <Text style={trackPageStyles.way}>On the way</Text>
-          </View>
-        </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ backgroundColor: "white", flex: 1 }}>
+        <ScrollView>
+          <StatusHeader title={"Track Order"} />
+          <View style={trackPageStyles.deliveryBoyETA}>
+            <Image source={require("@/assets/images/deliveryboy.png")} style={{ width: 180, height: 163 }} />
 
-        <View style={trackPageStyles.deliveryBoyContainer}>
-          <View style={trackPageStyles.deliveryBoyDetailsContainer}>
-            <Image source={require("@/assets/images/deliveryProfile.png")} style={{ width: 40, height: 40 }} />
-            <View>
-              {/* <Text>Amith Kumar</Text>
-              <Text>Heal Porter</Text> */}
-              <Text>
-      {
-        order?.deliveryboy_id
-          ? order.deliveryboy_id.name ||
-            `${order.deliveryboy_id.firstName || ''} ${order.deliveryboy_id.lastName || ''}`.trim()
-          : 'Delivery Boy'
-      }
-      </Text>
-          
+            <View style={trackPageStyles.ETAContainer}>
+              <View style={trackPageStyles.outerCircle}>
+                <View style={trackPageStyles.innerCircle}>
+                  <Text style={trackPageStyles.arriving}>Arriving in</Text>
+                  <Text style={trackPageStyles.ETA}>10 MINS</Text>
+                  <Text style={trackPageStyles.way}>On the way</Text>
+                </View>
+              </View>
+              {/* <Text style={trackPageStyles.arriving}>Arriving in</Text>
+            <Text style={trackPageStyles.ETA}>10 MINS</Text>
+            <Text style={trackPageStyles.way}>On the way</Text> */}
+
+
             </View>
           </View>
-          <View style={trackPageStyles.deliveryIconsContainer}>
-            <TouchableOpacity style={trackPageStyles.iconsBtn } onPress={()=>{handleCall(order.deliveryboy_id.mobileNumber)}}>
-              <Ionicons name='call' size={20} color={COLOR.primary} />
-            </TouchableOpacity>
-            {/* <TouchableOpacity style={trackPageStyles.iconsBtn }>
-              <MaterialCommunityIcons name="message-text" size={20} color={COLOR.primary} />
-            </TouchableOpacity> */}
-          </View>
-        </View>
 
-        {/* <View style={trackPageStyles.orderStatusContainer}>
+          <View style={trackPageStyles.orderpack}>
+            <Text style={{ marginBottom: 10, marginTop: 10, fontSize: 18, fontWeight: 'bold' }}>Your Order is being packed</Text>
+          </View>
+          <View style={trackPageStyles.deliveryBoyContainer}>
+            <View style={trackPageStyles.deliveryBoyDetailsContainer}>
+              <Image source={require("@/assets/images/deliveryProfile.png")} style={{ width: 40, height: 40 }} />
+              <View>
+                {/* <Text>Amith Kumar</Text>
+              <Text>Heal Porter</Text> */}
+                <Text>
+                  {
+                    order?.deliveryboy_id
+                      ? order.deliveryboy_id.name ||
+                      `${order.deliveryboy_id.firstName || ''} ${order.deliveryboy_id.lastName || ''}`.trim()
+                      : 'Heal Porter'
+                  }
+                </Text>
+                <Text style={{color: 'grey', fontSize: 16}}>Heal Porter</Text>
+
+              </View>
+            </View>
+
+            <View style={trackPageStyles.deliveryIconsContainer}>
+              <TouchableOpacity style={trackPageStyles.iconsBtn} onPress={() => { handleCall(order.deliveryboy_id.mobileNumber); }}>
+                <Ionicons name='call' size={20} color={COLOR.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity style={trackPageStyles.iconsBtn} onPress={() => { handleMessage(order.deliveryboy_id.mobileNumber); }}>
+                <MaterialIcons name="message" size={20} color={COLOR.primary} />
+              </TouchableOpacity>
+            </View>
+
+          </View>
+      {/* </View> */}
+
+      {/* <View style={trackPageStyles.orderStatusContainer}>
           {orderStatusList.map(item => (
             <StatusRender key={item.id} title={item.title} icons={item.icon} />
           ))}
         </View> */}
-     
 
-        <View style={trackPageStyles.orderIdContainer}>
-          <View>
-            <Text style={trackPageStyles.orderStatusTitle}>Order ID</Text>
-            <Text style={{color:"gray"}}>{generateOrderId() || 'N/A'}</Text>
-          </View>
-          <View>
-            <Text style={trackPageStyles.orderStatusTitle}>Order Date & Time</Text>
-            <Text style={{color:"gray"}}>{order?.updatedAt || Date.now()}</Text>
+
+      <View style={trackPageStyles.orderIdContainer}>
+        <View>
+          <Text style={trackPageStyles.orderStatusTitle}>Order ID</Text>
+          <Text style={{ color: "gray", fontSize: 16 , paddingInline: 10, marginTop: 5, marginBottom: 10 }}>{generateOrderId() || 'N/A'}</Text>
+        </View>
+        <View>
+          <Text style={trackPageStyles.orderStatusTitle}>Order Date & Time</Text>
+          <Text style={{ color: "gray", fontSize: 16 , paddingInline: 10, marginTop: 5}}>{order?.updatedAt || Date.now()}</Text>
+        </View>
+      </View>
+
+      <View style={trackPageStyles.orderItemHeadingContainer}>
+        <Text style={trackPageStyles.orderItemHeading}>Item Detail(s)</Text>
+      </View>
+      <View style={trackPageStyles.orderItemAlign}>
+        <OrderItems />
+      </View>
+
+
+      <OrderStatus />
+
+
+      <TouchableOpacity style={trackPageStyles.borderSummaryBtn} onPress={() => setOpenOrderSummary(prev => !prev)}>
+        <Text style={trackPageStyles.orderSummarybtnText}>Order Summary</Text>
+        <AntDesign name={openOrderSummary ? "up" : "down"} size={24} color="black" />
+      </TouchableOpacity>
+
+      {openOrderSummary && (
+        <View style={trackPageStyles.OrderSummaryDropdownContainer}>
+          <View style={styles.summaryBox}>
+            <Text style={styles.OrderSummary}>Order Summary</Text>
+            <View style={styles.summaryRow}>
+
+              <Text style={styles.summaryLabel}>Subtotal</Text>
+              <Text style={styles.summaryValue}>₹{order.subtotal.toFixed(2)}</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Shipping</Text>
+              <Text style={styles.summaryValue}>₹5.00</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Tax</Text>
+              <Text style={styles.summaryValue}>₹2.50</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Discount</Text>
+              <Text style={styles.discountValue}>– ₹3.00</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>₹{(order.subtotal + 5 + 2.5 - 3).toFixed(0)}</Text>
+            </View>
+            <View style={styles.summaryRow}>
+              <Text style={styles.payByLabel}>Pay By</Text>
+              <Text style={styles.cod}>COD/TNPL</Text>
+            </View>
           </View>
         </View>
-
-        <View style={trackPageStyles.orderItemHeadingContainer}>
-          <Text style={trackPageStyles.orderItemHeading}>Order Detail(s)</Text>
-        </View>
-        <View style={trackPageStyles.orderItemAlign}>
-          <OrderItems />
-        </View>
-
-
-         <OrderStatus/>
-
-
-        <TouchableOpacity style={trackPageStyles.borderSummaryBtn} onPress={() => setOpenOrderSummary(prev => !prev)}>
-          <Text style={trackPageStyles.orderSummarybtnText}>Order Summary</Text>
-          <AntDesign name={openOrderSummary ? "up" : "down"} size={24} color="black" />
-        </TouchableOpacity>
-
-        {openOrderSummary && (
-          <View style={trackPageStyles.OrderSummaryDropdownContainer}>
-            <View style={styles.summaryBox}>
-                      <Text style={styles.OrderSummary}>Order Summary</Text>
-                        <View style={styles.summaryRow}>
-                         
-                          <Text style={styles.summaryLabel}>Subtotal</Text>
-                          <Text style={styles.summaryValue}>₹{order.subtotal.toFixed(2)}</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                          <Text style={styles.summaryLabel}>Shipping</Text>
-                          <Text style={styles.summaryValue}>₹5.00</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                          <Text style={styles.summaryLabel}>Tax</Text>
-                          <Text style={styles.summaryValue}>₹2.50</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                          <Text style={styles.summaryLabel}>Discount</Text>
-                          <Text style={styles.discountValue}>– ₹3.00</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                          <Text style={styles.totalLabel}>Total</Text>
-                          <Text style={styles.totalValue}>₹{(order.subtotal + 5 + 2.5 - 3).toFixed(0)}</Text>
-                        </View>
-                        <View style={styles.summaryRow}>
-                          <Text style={styles.payByLabel}>Pay By</Text>
-                          <Text style={styles.cod}>COD/TNPL</Text>
-                        </View>
-                      </View>
-          </View>
-        )}
-      </ScrollView>
-    </View>
-    </SafeAreaView>
+      )}
+    </ScrollView>
+    </View >
+    </SafeAreaView >
   );
 }
 
@@ -244,74 +266,88 @@ const trackPageStyles = StyleSheet.create({
     textAlign: "center"
   },
   orderIdContainer: {
-    flexDirection: "row",
+    // flexDirection: "row",
     justifyContent: "space-between",
     padding: 20,
-    marginHorizontal: 12,
+    marginHorizontal: 10,
+    borderWidth: 0.5,
+    borderRadius: 25,
+
   },
   orderStatusTitle: {
     fontWeight: "bold",
+    fontSize: 16,
+    marginInline: 10,
   },
   orderItemAlign: {
     flexDirection: "row",
     gap: 7,
     padding: 12,
-    flexWrap: "wrap"
+    flexWrap: "wrap",
+    marginTop:0
   },
   orderItemHeadingContainer: {
     padding: 12,
 
-    marginHorizontal: 20,
+    marginHorizontal: 16,
+    marginTop: 5,
   },
   orderItemHeading: {
     fontWeight: "600",
     fontSize: 14
   },
   borderSummaryBtn: {
-    marginTop: 12,
+    marginTop: 0,
     marginHorizontal: 12,
     padding: 12,
     backgroundColor: COLOR.light,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    borderRadius: 20,
   },
   orderSummarybtnText: {
     fontWeight: "bold",
-    fontSize: 18
+    fontSize: 18,
+
   },
   OrderSummaryDropdownContainer: {
     backgroundColor: COLOR.light,
     marginHorizontal: 12
   },
   deliveryBoyETA: {
-    padding: 12,
+    padding: 16,
     flexDirection: "row",
-    margin: 20,
-    borderWidth: 1,
+    margin: 10,
+    borderWidth: 3,
     borderColor: "gray",
     borderRadius: 12,
-    alignItems: "center"
+    alignItems: "center",
   },
   ETAContainer: {
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: 20
+    // paddingHorizontal: 10, 
+    marginRight: 5,
   },
   arriving: {
     fontSize: 15,
     color: "gray",
-    marginBottom: 12
+    marginBottom: 12,
+    marginHorizontal: 16,
+    marginVertical: 25,
   },
   ETA: {
     fontSize: 20,
     color: COLOR.primary,
+    marginHorizontal: 12,
     marginBottom: 12
   },
   way: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 12
+    marginBottom: 12,
+    marginHorizontal: 12,
   },
   deliveryBoyContainer: {
     margin: 12,
@@ -339,6 +375,29 @@ const trackPageStyles = StyleSheet.create({
     height: 30,
     justifyContent: "center",
     alignItems: "center"
+  },
+  outerCircle: {
+    backgroundColor: "#00A99D",
+    height: 160,
+    width: 160,
+    borderRadius: 80,
+    paddingRight: 20,
+    //  alignContent:'center',
+    justifyContent: 'center',
+  },
+  innerCircle: {
+    backgroundColor: 'white',
+    height: 140,
+    width: 140,
+    borderRadius: 70,
+    alignItems: 'center',
+    marginHorizontal: 9,
+  },
+  orderpack: {
+    backgroundColor: '#D5ECE9',
+    alignItems: 'center',
+    borderRadius: 20,
+    marginHorizontal: 20,
   }
 });
 
@@ -368,56 +427,56 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center"
   },
-   OrderSummary: {
-        fontWeight: 'bold',
-        fontSize:15,
-     },
-     
-     addressTitle: {
-        fontWeight: 'bold' 
-       },
-     address: {
-        marginTop: 4
-        },
-        inTime: {
-         color: '#444',
-       
-       },
-     summaryBox: {
-       marginVertical: 20,
-       paddingHorizontal: 20,
-     },
-     summaryRow: {
-       flexDirection: 'row',
-       justifyContent: 'space-between',
-       marginVertical: 4,
-     },
-     summaryLabel: {
-       fontSize: 16,
-       color: '#333',
-     },
-     summaryValue: {
-       fontWeight: '500',
-     },
-     discountValue: {
-        fontWeight: '500',
-        color: 'green',
-      },
-      totalLabel: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#000',
-      },
-      totalValue: {
-        fontWeight: 'bold',
-      },
-      payByLabel: {
-        fontSize: 15,
-        color: '#555',
-      },
-      cod: {
-        fontSize: 16,
-        color: '#0BA29D',
-        fontWeight: '600',
-      },
+  OrderSummary: {
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+
+  addressTitle: {
+    fontWeight: 'bold'
+  },
+  address: {
+    marginTop: 4
+  },
+  inTime: {
+    color: '#444',
+
+  },
+  summaryBox: {
+    marginVertical: 20,
+    paddingHorizontal: 20,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 4,
+  },
+  summaryLabel: {
+    fontSize: 16,
+    color: '#333',
+  },
+  summaryValue: {
+    fontWeight: '500',
+  },
+  discountValue: {
+    fontWeight: '500',
+    color: 'green',
+  },
+  totalLabel: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
+  },
+  totalValue: {
+    fontWeight: 'bold',
+  },
+  payByLabel: {
+    fontSize: 15,
+    color: '#555',
+  },
+  cod: {
+    fontSize: 16,
+    color: '#0BA29D',
+    fontWeight: '600',
+  },
 });

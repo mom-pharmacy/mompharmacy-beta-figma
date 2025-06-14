@@ -9,7 +9,6 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
-  LayoutAnimation,
   Platform,
   Pressable,
   SafeAreaView,
@@ -22,6 +21,7 @@ import {
   View,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import LoadingScreen from '../ErrorScreens/loadingscreen';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -43,13 +43,9 @@ const locationData = {
 
 const FAQItem = ({ question, answer }) => {
   const [expanded, setExpanded] = useState(false);
-  const toggleExpand = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpanded(!expanded);
-  };
   return (
     <View style={styles.faqItem}>
-      <TouchableOpacity style={styles.faqHeader} onPress={toggleExpand}>
+      <TouchableOpacity style={styles.faqHeader} onPress={() => setExpanded((e) => !e)}>
         <Text style={styles.faqQuestion}>{question}</Text>
         <MaterialIcons
           name={expanded ? 'keyboard-arrow-up' : 'keyboard-arrow-down'}
@@ -60,6 +56,34 @@ const FAQItem = ({ question, answer }) => {
       {expanded && <Text style={styles.faqAnswer}>{answer}</Text>}
     </View>
   );
+};
+
+const highlightStyle = {
+  borderColor: "#fff",
+  borderWidth: 2,
+  borderRadius: 8,
+  backgroundColor: "#D5ECE9",
+  minHeight: 48,
+  paddingHorizontal: 12,
+  justifyContent: "center",
+};
+
+const highlightTextStyle = {
+  color: "black",
+  fontSize: 18,
+};
+
+const highlightDropDownContainer = {
+  backgroundColor: "#fff",
+  borderColor: "#00A99D",
+  borderWidth: 2,
+  borderRadius: 8,
+  zIndex: 1000,
+  elevation: 1000,
+};
+
+const highlightSelectedItem = {
+  backgroundColor: "white",
 };
 
 const RegisterScreen = () => {
@@ -141,7 +165,7 @@ const RegisterScreen = () => {
     const dataToSend = {
       name,
       bloodGroup: selectedBloodGroup,
-      dob: dob.toISOString().split('T')[0],
+      dob: dob ? dob.toISOString().split('T')[0] : '',
       phone: mobileNumber,
       email,
       state: selectedState,
@@ -151,9 +175,7 @@ const RegisterScreen = () => {
     };
     setIsLoading(true);
     try {
-      console.log('Sending data to server:', dataToSend);
-      const response = await axios.post(`${BASE_URL}/register, dataToSend`);
-      console.log('Response from server:', response);
+      const response = await axios.post(`${BASE_URL}/register`, dataToSend);
       if (response.status === 201) {
         Alert.alert('Success', 'Registration successful!');
         navigation.goBack();
@@ -161,11 +183,8 @@ const RegisterScreen = () => {
         Alert.alert('Error', response.data.message || 'Registration failed.');
       }
     } catch (error) {
-      console.log('Full error object:', JSON.stringify(error, null, 2));
-      console.log('Error response:', JSON.stringify(error.response, null, 2));
       if (error.response && error.response.data) {
         const errorMessage = error.response.data.message || error.response.data.error || error.response.data.msg || 'Server error or request failed';
-        console.log('Extracted error message:', errorMessage);
         if (
           errorMessage.toLowerCase().includes('phone') &&
           (errorMessage.toLowerCase().includes('exist') ||
@@ -186,11 +205,15 @@ const RegisterScreen = () => {
     }
   };
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <SafeAreaView style={{ flex: 1 }}>
         <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={styles.container}>
+          <ScrollView contentContainerStyle={styles.container} nestedScrollEnabled={true}>
             <View style={styles.header}>
               <TouchableOpacity onPress={() => navigation.goBack()}>
                 <MaterialIcons name="arrow-back" size={24} color="#00A99D" />
@@ -269,8 +292,10 @@ const RegisterScreen = () => {
                 </TouchableOpacity>
               </View>
             )}
+
+            {/* State and District dropdowns in a row */}
             <View style={styles.locationRow}>
-              <View style={[styles.dropdownContainer, { flex: 1 }]}>
+              <View style={{ flex: 1, marginRight: 5, zIndex: 4000 }}>
                 <DropDownPicker
                   open={stateOpen}
                   value={selectedState}
@@ -280,20 +305,22 @@ const RegisterScreen = () => {
                   setItems={setStateItems}
                   placeholder="Select State"
                   placeholderStyle={styles.placeholderStyle}
-                  style={[styles.dropdown, { flex: 1 }]}
-                  textStyle={styles.dropdownText}
-                  listMode="MODAL"
-                  modalProps={{
-                    animationType: 'slide',
-                  }}
+                  style={highlightStyle}
+                  textStyle={highlightTextStyle}
+                  dropDownContainerStyle={highlightDropDownContainer}
+                  selectedItemContainerStyle={highlightSelectedItem}
+                  itemSeparatorStyle={{ backgroundColor: "#fff" }}
+                  zIndex={4000}
+                  zIndexInverse={1000}
+                  modalProps={{ animationType: "slide" }}
                   onOpen={() => {
-                    if (districtOpen) setDistrictOpen(false);
-                    if (cityOpen) setCityOpen(false);
-                    if (bloodOpen) setBloodOpen(false);
+                    setDistrictOpen(false);
+                    setCityOpen(false);
+                    setBloodOpen(false);
                   }}
                 />
               </View>
-              <View style={[styles.dropdownContainer, { flex: 1 }]}>
+              <View style={{ flex: 1, marginLeft: 5, zIndex: 3000 }}>
                 <DropDownPicker
                   open={districtOpen}
                   value={selectedDistrict}
@@ -303,23 +330,26 @@ const RegisterScreen = () => {
                   setItems={setDistrictItems}
                   placeholder="Select District"
                   placeholderStyle={styles.placeholderStyle}
-                  style={[styles.dropdown, { flex: 1 }]}
-                  textStyle={styles.dropdownText}
+                  style={highlightStyle}
+                  textStyle={highlightTextStyle}
+                  dropDownContainerStyle={highlightDropDownContainer}
+                  selectedItemContainerStyle={highlightSelectedItem}
+                  itemSeparatorStyle={{ backgroundColor: "#fff" }}
                   disabled={!selectedState}
-                  listMode="MODAL"
-                  modalProps={{
-                    animationType: 'slide',
-                  }}
+                  zIndex={3000}
+                  zIndexInverse={2000}
+                  modalProps={{ animationType: "slide" }}
                   onOpen={() => {
-                    if (stateOpen) setStateOpen(false);
-                    if (cityOpen) setCityOpen(false);
-                    if (bloodOpen) setBloodOpen(false);
+                    setStateOpen(false);
+                    setCityOpen(false);
+                    setBloodOpen(false);
                   }}
                 />
               </View>
             </View>
+            {/* City dropdown full width, Pincode beside */}
             <View style={styles.locationRow}>
-              <View style={[styles.dropdownContainer, { flex: 2 }]}>
+              <View style={{ flex: 2, marginRight: 5, zIndex: 2000 }}>
                 <DropDownPicker
                   open={cityOpen}
                   value={selectedCity}
@@ -329,21 +359,23 @@ const RegisterScreen = () => {
                   setItems={setCityItems}
                   placeholder="Select City"
                   placeholderStyle={styles.placeholderStyle}
-                  style={styles.dropdown}
-                  textStyle={styles.dropdownText}
+                  style={highlightStyle}
+                  textStyle={highlightTextStyle}
+                  dropDownContainerStyle={highlightDropDownContainer}
+                  selectedItemContainerStyle={highlightSelectedItem}
+                  itemSeparatorStyle={{ backgroundColor: "#fff" }}
                   disabled={!selectedDistrict}
-                  listMode="MODAL"
-                  modalProps={{
-                    animationType: 'slide',
-                  }}
+                  zIndex={2000}
+                  zIndexInverse={3000}
+                  modalProps={{ animationType: "slide" }}
                   onOpen={() => {
-                    if (stateOpen) setStateOpen(false);
-                    if (districtOpen) setDistrictOpen(false);
-                    if (bloodOpen) setBloodOpen(false);
+                    setStateOpen(false);
+                    setDistrictOpen(false);
+                    setBloodOpen(false);
                   }}
                 />
               </View>
-              <View style={[styles.dropdownContainer, { flex: 1, marginLeft: 10 }]}>
+              <View style={{ flex: 1, marginLeft: 10 }}>
                 <TextInput
                   style={styles.input}
                   placeholder="Pincode"
@@ -354,29 +386,41 @@ const RegisterScreen = () => {
                 />
               </View>
             </View>
-            <View style={styles.dropdownContainer}>
-              <DropDownPicker
-                open={bloodOpen}
-                value={selectedBloodGroup}
-                items={bloodItems}
-                setOpen={setBloodOpen}
-                setValue={setSelectedBloodGroup}
-                setItems={setBloodItems}
-                placeholder="Select Blood Group"
-                placeholderStyle={styles.placeholderStyle}
-                style={styles.dropdown}
-                textStyle={styles.dropdownText}
-                listMode="MODAL"
-                modalProps={{
-                  animationType: 'slide',
-                }}
-                onOpen={() => {
-                  if (stateOpen) setStateOpen(false);
-                  if (districtOpen) setDistrictOpen(false);
-                  if (cityOpen) setCityOpen(false);
-                }}
-              />
-            </View>
+
+            {/* Blood group dropdown */}
+            {/* NO zIndex on parent View! */}
+            <DropDownPicker
+              open={bloodOpen}
+              value={selectedBloodGroup}
+              items={bloodItems}
+              setOpen={setBloodOpen}
+              setValue={setSelectedBloodGroup}
+              setItems={setBloodItems}
+              placeholder="Select Blood Group"
+              placeholderStyle={styles.placeholderStyle}
+              style={highlightStyle}
+              textStyle={highlightTextStyle}
+              dropDownContainerStyle={{
+                ...highlightDropDownContainer,
+                position: 'relative',
+                top: 0,
+                height: 200,
+              }}
+              selectedItemContainerStyle={highlightSelectedItem}
+              itemSeparatorStyle={{ backgroundColor: "black" }}
+              zIndex={1000}
+              zIndexInverse={4000}
+              listMode="SCROLLVIEW"
+              scrollViewProps={{
+                nestedScrollEnabled: true,
+              }}
+              onOpen={() => {
+                setStateOpen(false);
+                setDistrictOpen(false);
+                setCityOpen(false);
+              }}
+            />
+
             <View style={styles.checkboxRow}>
               <Checkbox value={authorized} onValueChange={setAuthorized} color="#00A99D" />
               <Text style={styles.checkboxLabel}> Agree for Terms & Condition</Text>
@@ -437,15 +481,6 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   dropdownContainer: { flex: 1 },
-  dropdown: {
-    borderColor: 'transparent',
-    borderWidth: 0,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    minHeight: 48,
-    justifyContent: 'center',
-    backgroundColor: '#E8F5F3',
-  },
   placeholderStyle: {
     color: '#9E9E9E',
     fontSize: 18,
@@ -485,6 +520,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 15,
     marginBottom: 8,
+    paddingTop:10
   },
   checkboxLabel: {
     fontSize: 14,

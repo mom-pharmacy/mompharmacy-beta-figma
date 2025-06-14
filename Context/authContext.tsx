@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     console.log(authToken)
     try {
       if (!authToken) throw new Error("Token not found! you are not loggedin");
-      const response = await fetch('http://192.168.1.16:3000/api/user/user-details', {
+      const response = await fetch('http://192.168.1.14:3000/api/user/user-details', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   const loginWithOtp = async (mobileNo) => {
     
     try {
-      const response = await fetch('http://192.168.1.16:3000/api/user/login', {
+      const response = await fetch('http://192.168.1.14:3000/api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobileNo }),
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
   const verifyOtp = async (otp, mobileNo) => {
     console.log(mobileNo)
     try {
-      const response = await fetch('http://192.168.1.16:3000/api/user/verify-otp', {
+      const response = await fetch('http://192.168.1.14:3000/api/user/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ otp, mobileNo }),

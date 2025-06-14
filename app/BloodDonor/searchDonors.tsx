@@ -1,3 +1,5 @@
+import { router } from 'expo-router';
+
 export const searchDonors = async (filters) => {
   try {
     const query = new URLSearchParams(filters).toString();
@@ -10,6 +12,8 @@ export const searchDonors = async (filters) => {
 
     return data;
   } catch (error) {
-    throw new Error(error.message || 'Search failed');
+    router.replace('/ErrorScreens/page404')
+
+    return []
   }
 };
