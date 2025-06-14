@@ -1,13 +1,13 @@
+import { MaterialIcons } from '@expo/vector-icons';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
-  View,
-  Text,
   FlatList,
-  StyleSheet,
   Platform,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DonorDetails = () => {

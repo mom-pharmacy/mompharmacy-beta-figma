@@ -1,11 +1,10 @@
 
-import React from "react";
-import { useOrderActive } from "@/Context/orderContext"
-import { useEffect } from "react"
-import { ScrollView, StyleSheet, Text, View } from "react-native"
 import ActiveOrderItems from "@/components/TrackOrder/ActiveOrderItems";
-import LoadingScreen from "../ErrorScreens/loadingscreen";
+import { useOrderActive } from "@/Context/orderContext";
+import React from "react";
+import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import LoadingScreen from "../ErrorScreens/loadingscreen";
 
 function CheckOrders() {
   const {orderIDs , loadingOrders} = useOrderActive()
@@ -16,7 +15,10 @@ function CheckOrders() {
   return  <SafeAreaView style={{flex:1}}>
     <ScrollView style={styles.container}>
         <Text style={styles.header}>Multiple orders</Text>
-        {orderIDs.map(item=><ActiveOrderItems activeOrderId={item} />)}
+        {Array.isArray(orderIDs) &&
+          orderIDs.map((item) => (
+            <ActiveOrderItems key={item} activeOrderId={item} />
+          ))}
         </ScrollView>
         </SafeAreaView>
   

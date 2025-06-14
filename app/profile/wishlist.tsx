@@ -1,10 +1,7 @@
-import { userAuth } from '@/Context/authContext';
-import { useCart } from '@/Context/cartContext';
 import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -13,6 +10,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { userAuth } from '@/Context/authContext';
+import { useCart } from '@/Context/cartContext';
+
+import { default as LoadingScreen, default as Page404 } from '../ErrorScreens/loadingscreen';
 
 type Product = {
   _id: string;
@@ -23,23 +25,24 @@ type Product = {
   imageUrl: string;
 };
 
-
 export default function SavedListScreen() {
-  const { cartItems, addToCart , decrementItem , incrementItem  , removeFromCart} = useCart()
-  const [wishlist, setWishlist] = useState([]);
+  const { cartItems, addToCart, decrementItem, incrementItem, removeFromCart } = useCart();
+  const [wishlist, setWishlist] = useState<Product[]>([]);
   const [cart, setCart] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const { ExtractParseToken } = userAuth();
-
-  
 
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
+        setLoading(true);
+        setError(false);
         const token = await ExtractParseToken();
         if (!token) {
           console.warn('No token found');
           setLoading(false);
+          setError(true);
           return;
         }
 
@@ -55,16 +58,19 @@ export default function SavedListScreen() {
           `https://mom-beta-server1.onrender.com/api/wishlist/getwishlist`,
           options
         );
-        const data = await res.json();
-        console.log(data.wishlist.products.map(item=>item))
 
-        if (res.ok) {
-          setWishlist(data.wishlist.products);
-        } else {
-          console.warn(data.message || 'Failed to fetch wishlist');
+        if (!res.ok) {
+          setError(true);
+          setLoading(false);
+          return;
         }
-      } catch (error) {
-        console.error('Failed to fetch wishlist:', error);
+
+        const data = await res.json();
+
+        setWishlist(data.wishlist.products);
+      } catch (err) {
+        console.error('Failed to fetch wishlist:', err);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -92,7 +98,6 @@ export default function SavedListScreen() {
         }
       );
       const data = await res.json();
-      console.log("this is whishilist" , data)
       if (res.ok) {
         setWishlist((prev) => prev.filter((item) => item._id !== id));
         const updatedCart = { ...cart };
@@ -106,42 +111,41 @@ export default function SavedListScreen() {
     }
   };
 
-  const quantity = (itemId) => {
+  const quantity = (itemId: string) => {
     const findItem = cartItems.find((item) => item._id === itemId);
     return findItem ? findItem.quantity : 0;
   };
 
-  
-
-  const renderItem = (item) => {
-    
-  console.log("this wishlistitemId" , item)
+  const renderItem = (item: Product) => {
     return (
       <View key={item._id} style={styles.itemContainer}>
         <Image source={{ uri: item.imageUrl }} style={styles.image} />
         <View style={styles.itemInfo}>
-          <View style={{flexDirection:"row" , justifyContent:"space-between"}}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
             <View>
-          <Text style={styles.name}>{item.medicine_name}</Text>
-          <Text style={styles.price}>
-            Rs {item.price}{' '}
-            <Text style={styles.strikethrough}>Rs {item.originalPrice}</Text>{' '}
-            {item.discount}
-          </Text>
-</View>
-          <View style={{marginTop:29 , marginRight:10}}>
+              <Text style={styles.name}>{item.name || item.medicine_name}</Text>
+              <Text style={styles.price}>
+                Rs {item.price}{' '}
+                <Text style={styles.strikethrough}>Rs {item.originalPrice}</Text>{' '}
+                {item.discount}
+              </Text>
+            </View>
+            <View style={{ marginTop: 29, marginRight: 10 }}>
               <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => handleDelete(item._id)}
-                >
-                <AntDesign name='delete' size={24} color={"gray"} />
+              >
+                <AntDesign name="delete" size={24} color={'gray'} />
               </TouchableOpacity>
-                </View>
-</View>
+            </View>
+          </View>
+
           {quantity(item._id) === 0 ? (
             <TouchableOpacity
               style={styles.addButton}
-              onPress={() => {addToCart(item)}}
+              onPress={() => {
+                addToCart(item);
+              }}
             >
               <Text style={styles.addButtonText}>Add to cart</Text>
             </TouchableOpacity>
@@ -150,7 +154,7 @@ export default function SavedListScreen() {
               <TouchableOpacity
                 style={styles.controlButton}
                 onPress={() => {
-                  quantity(item._id)>1?decrementItem(item._id):removeFromCart(item._id)
+                  quantity(item._id) > 1 ? decrementItem(item._id) : removeFromCart(item._id);
                 }}
               >
                 <Text style={styles.controlText}>−</Text>
@@ -164,11 +168,20 @@ export default function SavedListScreen() {
               </TouchableOpacity>
             </View>
           )}
-          
         </View>
       </View>
     );
   };
+
+  // Show Loading screen
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  // Show Error screen if error
+  if (error) {
+    return <Page404 />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -182,22 +195,16 @@ export default function SavedListScreen() {
         <Text style={styles.title}>Saved Items</Text>
       </View>
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#00A99D" />
-      ) : wishlist.length === 0 ? (
+      {wishlist.length === 0 ? (
         <Text style={styles.emptyText}>Your wishlist is empty</Text>
       ) : (
-        <ScrollView>
-          {wishlist.map(renderItem)}
-        </ScrollView>
+        <ScrollView>{wishlist.map(renderItem)}</ScrollView>
       )}
 
       {wishlist.length > 0 && (
         <TouchableOpacity
           style={styles.proceedButton}
-          onPress={() => router.push("/BottomNavbar/cart")}
-          
-
+          onPress={() => router.push('/BottomNavbar/cart')}
         >
           <Text style={styles.proceedButtonText}>
             Proceed with Cart Items ({Object.keys(wishlist).length})
@@ -240,7 +247,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     elevation: 1,
-    justifyContent:"space-between"
+    justifyContent: 'space-between',
   },
   image: {
     width: 80,
@@ -258,7 +265,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#222',
     marginBottom: 4,
-    width:180
+    width: 180,
   },
   price: {
     color: '#444',
@@ -302,13 +309,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-  deleteButton: {
-    
-  },
-  deleteText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  deleteButton: {},
   proceedButton: {
     marginTop: 30,
     backgroundColor: '#00A99D',

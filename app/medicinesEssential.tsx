@@ -17,9 +17,12 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import LoadingScreen from './ErrorScreens/loadingscreen';
 
 export default function Medicines() {
   const [medicine, setMedicine] = useState([]);
+  const [loading, setLoading] = useState(true); //  loading state
+  const [error, setError] = useState(false);    //  error state
   const { subcategoryId } = useLocalSearchParams();
   const { addToCart, cartItems, incrementItem, decrementItem, removeFromCart } = useCart();
 
@@ -33,20 +36,38 @@ export default function Medicines() {
       .then(res => res.json())
       .then(data => {
         setMedicine(data);
+        setLoading(false);
       })
       .catch(err => {
         console.error('Failed to fetch medicines:', err);
+        setError(true);
+        setLoading(false);
       });
   }, []);
 
   const limitedMedicines = medicine.slice(-3, -1);
 
+  // ✅ Show loading screen
+  if (loading) return <LoadingScreen />;
+
+  // ✅ Optional: Display error message if needed
+  if (error) {
+    return (
+      <SafeAreaView>
+        <View style={{ padding: 20, alignItems: 'center' }}>
+          <Text style={{ color: 'red', fontSize: 16 }}>
+            Failed to load medicines. Please try again later.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <ScrollView>
-    <SafeAreaView>
-      
-      <TopNavbar showBack={true} onBack={undefined} />
-      
+      <SafeAreaView>
+        <TopNavbar showBack={true} onBack={undefined} />
+
         <View style={styles.container}>
           <Search />
           <View style={{ padding: 15 }}>
@@ -84,7 +105,6 @@ export default function Medicines() {
                       subcategories: JSON.stringify(item.subcategories || [])
                     },
                   });
-                  console.log("essential", item.subcategories);
                 }}
               >
                 <Womencare
@@ -107,8 +127,7 @@ export default function Medicines() {
           <Categories1 />
           <Footer />
         </View>
-      
-    </SafeAreaView>
+      </SafeAreaView>
     </ScrollView>
   );
 }
