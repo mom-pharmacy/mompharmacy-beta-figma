@@ -7,7 +7,6 @@ import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, } from 'react';
-
 import {
   Dimensions,
   Image,

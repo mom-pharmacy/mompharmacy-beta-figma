@@ -291,7 +291,6 @@ export default function CategoriesWiseMedicines() {
             </SafeAreaView>
         );
     }
-
     
     return (
         <SafeAreaView style={styles.container}>

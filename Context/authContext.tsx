@@ -7,7 +7,6 @@ import { Alert } from "react-native";
 
 export const AuthContext = createContext(null);
 
-
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
