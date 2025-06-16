@@ -30,7 +30,7 @@ export function OrderProvider({children}){
                     "Content-Type":"application/json"
                 }
             }
-            const activeOrders = await apiClient("api/activeOrder" , options)
+            const activeOrders = await apiClient("api/activeOrders" , options)
             console.log("this is active order",activeOrders)
             setLoadingOrders(false)
             setActiveOrder(activeOrders.data[0]._id)
