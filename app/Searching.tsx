@@ -293,9 +293,9 @@ const styles = StyleSheet.create({
     },
     cardImage: {
         width: '100%',
-        height: 100,
+        height: 80,
         resizeMode: 'contain',
-        marginBottom: 10,
+        marginBottom: 8,
     },
     cardTitle: {
         fontWeight: '600',
