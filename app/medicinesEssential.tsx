@@ -9,14 +9,15 @@ import apiClient from '@/utils/apiClient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from 'react-native';
+
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LoadingScreen from './ErrorScreens/loadingscreen';
 

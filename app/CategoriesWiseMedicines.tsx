@@ -292,6 +292,7 @@ export default function CategoriesWiseMedicines() {
         );
     }
 
+    
     return (
         <SafeAreaView style={styles.container}>
             <StatusHeader title="Categories" />

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+
 export default function Recommended() {
   const { item, cartItems, addToCart, incrementItem, decrementItem, removeFromCart} = useCart();
   const [recommended, setRecommended] = useState([]);
