@@ -1,6 +1,6 @@
 async function apiClient(path , options){
     try{
-        const response = await fetch(`http://192.168.1.57:3000/${path}` , options);
+        const response = await fetch(`https://mom-beta-server1-4afz.onrender.com/${path}` , options);
         console.log("this is res:",response)
 
         if(response.ok){
