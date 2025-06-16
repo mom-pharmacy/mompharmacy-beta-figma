@@ -148,7 +148,7 @@ export default function Details() {
       <StatusHeader title={itemName.slice(0 , 16)} />
       
         <View style={styles.contentWrapper}>
-          <TouchableOpacity onPress={() => router.push('/BottomNavbar/cart')} style={styles.cartContainer}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.cartContainer}>
             <Image source={require('../../assets/images/cart.jpeg')} style={styles.carttxt} />
             {cartItems.length > 0 && (
               <View style={styles.badge}>
