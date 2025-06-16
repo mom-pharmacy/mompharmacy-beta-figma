@@ -5,6 +5,7 @@ import LoadingScreen from '../LoadingScreen'
 import { useOrderActive } from '@/Context/orderContext'
 import { router } from 'expo-router'
 import { userAuth } from '@/Context/authContext'
+import { store } from 'expo-router/build/global-state/router-store'
 export default function ActiveOrderItems({activeOrderId}) {
 
   const [order , setOrder] = useState(null)
@@ -50,8 +51,7 @@ export default function ActiveOrderItems({activeOrderId}) {
 
 
   return (
-    
-    
+
       <View style={styles.card}>
         <View style={styles.orderHeader}>
           <Text style={styles.orderId}>Order ID: {order._id}</Text>
@@ -75,7 +75,6 @@ export default function ActiveOrderItems({activeOrderId}) {
 
   )
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -149,3 +148,5 @@ const styles = StyleSheet.create({
       fontWeight: "600",
     },
   });
+
+
