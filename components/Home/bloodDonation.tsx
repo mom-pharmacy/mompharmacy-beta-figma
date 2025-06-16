@@ -17,7 +17,7 @@ const BloodDonation = () => (
 
     <View style={styles.rightContainer}>
       <Text style={styles.register}>Register Now</Text>
-      <MaterialIcons name="arrow-forward" size={22} color="#B5000A" />
+      <MaterialIcons name="arrow-forward" size={22} color="#B5000A" style={{ marginLeft: 5 }} />
     </View>
   </TouchableOpacity>
 );
@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
   rightContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5, // spacing between text and icon (React Native 0.71+)
   },
   register: {
     color: "#B5000A",

@@ -65,8 +65,9 @@ const highlightStyle = {
   backgroundColor: "#D5ECE9",
   minHeight: 48,
   paddingHorizontal: 12,
-  justifyContent: "center",
+  justifyContent: 'center' as const,
 };
+
 
 const highlightTextStyle = {
   color: "black",
@@ -147,6 +148,10 @@ const RegisterScreen = () => {
 
   const handleSubmit = async () => {
     setPhoneError('');
+    if (!authorized) {
+      Alert.alert('Terms & Conditions', 'You must agree to the Terms & Conditions to register.');
+      return;
+    }
     if (!name || !mobileNumber || !email || !selectedBloodGroup || !selectedState || !selectedDistrict || !selectedCity || !Pincode) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
@@ -172,6 +177,7 @@ const RegisterScreen = () => {
       city: selectedCity,
       district: selectedDistrict,
       pincode: Pincode,
+      availability: true, 
     };
     setIsLoading(true);
     try {
@@ -183,6 +189,7 @@ const RegisterScreen = () => {
         Alert.alert('Error', response.data.message || 'Registration failed.');
       }
     } catch (error) {
+      console.log('Registration error:', error?.response?.data || error?.message || error);
       if (error.response && error.response.data) {
         const errorMessage = error.response.data.message || error.response.data.error || error.response.data.msg || 'Server error or request failed';
         if (
