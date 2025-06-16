@@ -1,19 +1,19 @@
+import apiClient from '@/utils/apiClient';
 import { router } from 'expo-router';
 
 export const searchDonors = async (filters) => {
   try {
     const query = new URLSearchParams(filters).toString();
-    const response = await fetch(`https://mom-beta-server1.onrender.com/api/donar/donar?${query}`);
-    const data = await response.json();
+    const data = await apiClient(`api/donar/donar?${query}`);
 
-    if (!response.ok || !data.length) {
-      throw new Error(data.message || 'No donors found.');
+    if (!data || !data.length) {
+      throw new Error('No donors found.');
     }
 
     return data;
   } catch (error) {
-    router.replace('/ErrorScreens/page404')
-
-    return []
+    console.error('Search donors error:', error.message || error);
+    router.replace('/ErrorScreens/page404');
+    return [];
   }
 };

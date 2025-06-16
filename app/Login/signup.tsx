@@ -1,4 +1,5 @@
 import { userAuth } from '@/Context/authContext';
+import apiClient from '@/utils/apiClient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { BlurView } from 'expo-blur';
 import { router } from 'expo-router';
@@ -114,7 +115,7 @@ const SignUpScreen = () => {
           gender,
         })
       }
-      const response = await fetch("https://mom-beta-server1.onrender.com/api/user/register", options)
+      const response = await apiClient("api/user/register", options)
       if (response.ok) {
         await getUserDetails(AuthToken)
         router.replace("/Login/success")

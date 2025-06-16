@@ -297,7 +297,7 @@ const MyProfile = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: "#fff" },
+  container: { padding: 20, backgroundColor: "#fff", marginTop:"5%" },
   headerRow: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   arrowIcon: { marginLeft: 10 },
   title: { fontSize: 20, color: "black", marginLeft: 10 },

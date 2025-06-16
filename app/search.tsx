@@ -1,3 +1,4 @@
+import apiClient from '@/utils/apiClient';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import React, { useEffect, useState } from 'react';
 import {
@@ -22,15 +23,17 @@ const SearchComponent = () => {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await fetch('https://mom-beta-server.onrender.com/api/medicines');
-        const json = await response.json();
+        const response = await apiClient("api/medicines/medicines");
 
-        if (response.status === 200 && Array.isArray(json)) {
-          setData(json);
-          setSearchData(json);
+        if (Array.isArray(response)) {
+          setData(response);
+          setSearchData(response);
         } else {
-          setError(json?.message || 'Unexpected response from server');
+          console.log("Invalid response from API:", response);
+          setError(response?.message || "Unexpected response from server");
         }
+        
+        
       } catch (err) {
         setError('Failed to fetch medicines');
       }

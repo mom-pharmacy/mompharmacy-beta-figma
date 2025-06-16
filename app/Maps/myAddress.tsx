@@ -1,5 +1,6 @@
 import { COLOR } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
+import apiClient from '@/utils/apiClient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -76,7 +77,7 @@ const MyAddressesScreen = () => {
   const getData = async () => {
     try {
       console.log("error")
-      const response = await fetch("https://mom-beta-server1.onrender.com/address/alladdress");
+      const response = await apiClient("/address/alladdress");
 
       const res = await response.json();
       console.log("jashoww", res);
