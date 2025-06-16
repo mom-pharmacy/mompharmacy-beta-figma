@@ -17,14 +17,20 @@ export default function TrackOrder() {
   const { ActiveOrderId } = useOrderActive();
   const [order, setOrder] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);       
+  const [isFetching, setIsFetching] = useState(false); 
 
   const { ExtractParseToken } = userAuth();
 
-  const fetchOrderData = useCallback(async () => {
+  const fetchOrderData = useCallback(async (isInitial = false) => {
     try {
-      setLoading(true);
+      if (isInitial) {
+        setLoading(true);
+      } else {
+        setIsFetching(true);
+      }
       setError(null);
+
       const tokenAuth = await ExtractParseToken();
       if (!tokenAuth) {
         setError('Authentication required');
@@ -48,58 +54,33 @@ export default function TrackOrder() {
       console.error('Failed to fetch order data:', error);
       setError('Failed to load order data. Please try again.');
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      } else {
+        setIsFetching(false);
+      }
     }
   }, [ActiveOrderId, ExtractParseToken]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchOrderData();
-      const intervalId = setInterval(fetchOrderData, 5000);
+      fetchOrderData(true); 
+      const intervalId = setInterval(() => fetchOrderData(false), 5000); 
       return () => clearInterval(intervalId);
     }, [fetchOrderData])
   );
 
-  const handleCall = (phone) => {
-    let phoneNumber = `tel:${phone}`;
-    Linking.openURL(phoneNumber);
-  }
+  const handleCall = (phone) => Linking.openURL(`tel:${phone}`);
+  const handleMessage = (phone) => Linking.openURL(`sms:${phone}`);
 
-  const handleMessage = (phone) => {
-    let smsUrl = `sms:${phone}`;
-    Linking.openURL(smsUrl);
-  }
-
-  const StatusRender = ({ title, icons }) => (
-    <View style={trackPageStyles.orderStatusItems}>
-      <View>{icons}</View>
-      <Text style={trackPageStyles.statusTitle}>{title}</Text>
-    </View>
-  );
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const orderDate = new Date(dateString);
+    return `${orderDate.getDate()}/${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
+  };
 
   const OrderItems = () => {
-    if (loading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLOR.primary} />
-        </View>
-      );
-    }
-
-    if (error) {
-      return (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity onPress={fetchOrderData} style={styles.retryButton}>
-            <Text style={styles.retryText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    if (!order) {
-      return <Text style={styles.noDataText}>No order data available</Text>;
-    }
+    if (!order) return null;
 
     if (!order.medicines || order.medicines.length === 0) {
       return <Text style={styles.noDataText}>No medicines found in this order</Text>;
@@ -123,12 +104,6 @@ export default function TrackOrder() {
     );
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const orderDate = new Date(dateString);
-    return `${orderDate.getDate()}/${orderDate.getMonth() + 1}/${orderDate.getFullYear()}`;
-  };
-
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -141,7 +116,7 @@ export default function TrackOrder() {
     return (
       <SafeAreaView style={styles.errorContainer}>
         <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity onPress={fetchOrderData} style={styles.retryButton}>
+        <TouchableOpacity onPress={() => fetchOrderData(true)} style={styles.retryButton}>
           <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -177,23 +152,23 @@ export default function TrackOrder() {
                 <Image source={require("@/assets/images/deliveryProfile.png")} style={styles.deliveryBoyProfileImage} />
                 <View>
                   <Text style={styles.deliveryBoyName}>
-                    {order.deliveryboy_id.name || 
-                     `${order.deliveryboy_id.firstName || ''} ${order.deliveryboy_id.lastName || ''}`.trim() || 
-                     'Heal Porter'}
+                    {order.deliveryboy_id.name ||
+                      `${order.deliveryboy_id.firstName || ''} ${order.deliveryboy_id.lastName || ''}`.trim() ||
+                      'Heal Porter'}
                   </Text>
                   <Text style={styles.deliveryBoyRole}>Heal Porter</Text>
                 </View>
               </View>
 
               <View style={trackPageStyles.deliveryIconsContainer}>
-                <TouchableOpacity 
-                  style={trackPageStyles.iconsBtn} 
+                <TouchableOpacity
+                  style={trackPageStyles.iconsBtn}
                   onPress={() => handleCall(order.deliveryboy_id.mobileNumber)}
                 >
                   <Ionicons name='call' size={20} color={COLOR.primary} />
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={trackPageStyles.iconsBtn} 
+                <TouchableOpacity
+                  style={trackPageStyles.iconsBtn}
                   onPress={() => handleMessage(order.deliveryboy_id.mobileNumber)}
                 >
                   <MaterialIcons name="message" size={20} color={COLOR.primary} />
@@ -222,8 +197,8 @@ export default function TrackOrder() {
 
           <OrderStatus />
 
-          <TouchableOpacity 
-            style={trackPageStyles.borderSummaryBtn} 
+          <TouchableOpacity
+            style={trackPageStyles.borderSummaryBtn}
             onPress={() => setOpenOrderSummary(prev => !prev)}
           >
             <Text style={trackPageStyles.orderSummarybtnText}>Order Summary</Text>
@@ -261,11 +236,17 @@ export default function TrackOrder() {
               </View>
             </View>
           )}
+
+          
+          {isFetching && (
+            <ActivityIndicator size="small" color={COLOR.primary} style={{ marginTop: 10 }} />
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -317,6 +298,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 18,
     fontWeight: 'bold',
+    
   },
   deliveryBoyProfileImage: {
     width: 40,
@@ -572,5 +554,6 @@ const trackPageStyles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 20,
     marginHorizontal: 20,
+    marginBottom:10
   }
 });
