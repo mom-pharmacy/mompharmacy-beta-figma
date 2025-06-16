@@ -90,7 +90,7 @@ export default function AddressBook() {
     }
   };
 
-  const handleRequest = () => {
+  const handleRequest = (details: any) => {
     const message = 'Hi, can you share your address with me?';
     const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
     Linking.openURL(whatsappURL);
@@ -154,7 +154,7 @@ export default function AddressBook() {
                 <TouchableOpacity onPress={() => handleDelete(item._id)}>
                   <Text style={styles.actionText}>Delete</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleShare(item.details)}>
+                <TouchableOpacity onPress={() => handleRequest(item.details)}>
                   <Text style={styles.actionText}>Share</Text>
                 </TouchableOpacity>
               </View>

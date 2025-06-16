@@ -1,7 +1,7 @@
 
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
@@ -162,11 +162,12 @@ const pickImage = async () => {
   if (!user) return <View style={styles.center}><Text>No user found</Text></View>;
 
   return (
+    <View style={styles.mainContainer}>
     <SafeAreaView>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.statusContainer}>
           <Pressable style={styles.Container1} onPress={() => router.back()}>
-            <AntDesign name="left" size={24} color={COLOR.secondary} />
+            <MaterialIcons name="arrow-back" size={24} color={COLOR.secondary} />
             <Text style={styles.header}>Edit User Details</Text>
           </Pressable>
         </View>
@@ -233,13 +234,15 @@ const pickImage = async () => {
           options={BLOODGROUP_OPTIONS}
         />
         
-        <Button   title={updating ? 'Updating...' : 'Submit'}  onPress={handleUpdate} disabled={updating} color="#008080"  />
+        <Button title={updating ? 'Updating...' : 'Submit'}  onPress={handleUpdate} disabled={updating} color="#008080"/>
       </ScrollView>
     </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContainer: { flex: 1, backgroundColor: '#fff' },
   container: { padding: 20, paddingBottom: 120, backgroundColor: '#fff', flexGrow: 1 },
   changePhotoText: { color: '#008080', marginTop: 8, fontSize: 14, fontWeight: '500' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
@@ -255,7 +258,8 @@ const styles = StyleSheet.create({
   dropdownContainer: { marginTop: 10, marginBottom: 6 },
   modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.15)' },
   dropdownBox: { marginHorizontal: 32, backgroundColor: '#fff', borderRadius: 8, paddingVertical: 8, elevation: 6 },
-  optionText: { padding: 12, fontSize: 14, color: '#222' },
+  optionText: { padding: 12, fontSize: 14, color: '#222' }
 });
+
 
 export default EditUserScreen;

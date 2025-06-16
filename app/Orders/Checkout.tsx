@@ -1,7 +1,7 @@
 import CartList from '@/components/OrdersComponents/CartList';
 import OrderSummary from '@/components/OrdersComponents/OrderSummary';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
-import { COLOR } from '@/constants/color';
+import { COLOR, screen } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
 import { userAuth } from '@/Context/authContext';
 import apiClient from '@/utils/apiClient';
@@ -100,8 +100,10 @@ const OrderReviewScreen = () => {
   
 
   return (
+    <View style={styles.mainContainer}>
     <SafeAreaView>
-      <ScrollView style={styles.container}>
+    <ScrollView style={styles.container}>
+      
       <StatusHeader title={"Order Review"} />
     
       <CartList/>
@@ -132,16 +134,18 @@ const OrderReviewScreen = () => {
       </TouchableOpacity>
 
       <OrderConfirmationModal visible={modalVisible} orderId={orderId} />
+      
     </ScrollView>
     </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    // padding: 16,
     backgroundColor: '#fff',
-    marginTop:20
+    marginTop:20,
   },
   icon: {
     marginRight: 12,
@@ -170,13 +174,20 @@ const styles = StyleSheet.create({
   inTime: {
     color: '#444',
   },
+  mainContainer: {
+    flex: 1,
+    height: screen.width,
+    backgroundColor:"#fff"
+  },
   proceedButton: {
     backgroundColor: '#00bfa5',
     borderRadius: 20,
     alignItems: 'center',
     paddingVertical: 12,
-    marginTop: -15,
+    // marginTop: -15,
     marginBottom: 5,
+    width: "90%",
+    alignSelf: "center"
   },
   proceedText: {
     color: '#fff',
