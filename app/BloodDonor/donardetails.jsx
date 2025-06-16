@@ -1,8 +1,9 @@
+import { userAuth } from '@/Context/authContext';
 import apiClient from "@/utils/apiClient";
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Alert, FlatList,
   Linking,
@@ -16,6 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const DonorDetails = () => {
+  const {userDetails} = userAuth()
   const { donors } = useLocalSearchParams();
   const donorList = JSON.parse(donors || '[]');
   const [showModal, setShowModal] = useState(false);
@@ -24,6 +26,8 @@ const DonorDetails = () => {
 
   const handleSendReport = async () => {
     const finalReport = (suggestion === 'Other' ? customReason : suggestion)?.trim();
+    const userId= userDetails._id;
+    const donarId = donorList[0]?._id;
   
     if (!finalReport) {
       Alert.alert('Please select or enter a reason');
@@ -36,7 +40,10 @@ const DonorDetails = () => {
       const response = await apiClient('api/report/reportdetails', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ report: finalReport }),
+        body: JSON.stringify({ report: finalReport,
+          userId:userId,
+          Donar:donarId
+         }),
       });
   
       console.log('API Response:', response);
@@ -315,9 +322,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 20
-  }
+    marginBottom: 20
+  }
 });
-
-
-
