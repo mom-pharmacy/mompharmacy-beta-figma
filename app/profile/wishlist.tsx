@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { userAuth } from '@/Context/authContext';
 import { useCart } from '@/Context/cartContext';
-
+import apiClient from '@/utils/apiClient';
 import { default as LoadingScreen, default as Page404 } from '../ErrorScreens/loadingscreen';
 
 type Product = {
@@ -35,79 +35,53 @@ export default function SavedListScreen() {
 
   useEffect(() => {
     const fetchWishlist = async () => {
-      try {
-        setLoading(true);
-        setError(false);
-        const token = await ExtractParseToken();
-        if (!token) {
-          console.warn('No token found');
-          setLoading(false);
-          setError(true);
-          return;
-        }
-
-        const options = {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        };
-
-        const res = await fetch(
-          `https://mom-beta-server1.onrender.com/api/wishlist/getwishlist`,
-          options
-        );
-
-        if (!res.ok) {
-          setError(true);
-          setLoading(false);
-          return;
-        }
-
-        const data = await res.json();
-
-        setWishlist(data.wishlist.products);
-      } catch (err) {
-        console.error('Failed to fetch wishlist:', err);
+      setLoading(true);
+      setError(false);
+      const token = await ExtractParseToken();
+      if (!token) {
         setError(true);
-      } finally {
         setLoading(false);
+        return;
       }
+
+      const data = await apiClient('api/wishlist/getwishlist', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (data?.wishlist?.products) {
+        setWishlist(data.wishlist.products);
+      } else {
+        setError(true);
+      }
+
+      setLoading(false);
     };
 
     fetchWishlist();
   }, [ExtractParseToken]);
 
   const handleDelete = async (id: string) => {
-    try {
-      const token = await ExtractParseToken();
-      if (!token) {
-        console.warn('No token found for deletion');
-        return;
-      }
-      const res = await fetch(
-        'https://mom-beta-server1.onrender.com/api/wishlist/remove',
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ productId: id }),
-        }
-      );
-      const data = await res.json();
-      if (res.ok) {
-        setWishlist((prev) => prev.filter((item) => item._id !== id));
-        const updatedCart = { ...cart };
-        delete updatedCart[id];
-        setCart(updatedCart);
-      } else {
-        console.warn(data.message);
-      }
-    } catch (error) {
-      console.error('Error removing item:', error);
+    const token = await ExtractParseToken();
+    if (!token) return;
+
+    const data = await apiClient('api/wishlist/remove', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId: id }),
+    });
+
+    if (data) {
+      setWishlist((prev) => prev.filter((item) => item._id !== id));
+      const updatedCart = { ...cart };
+      delete updatedCart[id];
+      setCart(updatedCart);
     }
   };
 
@@ -116,72 +90,63 @@ export default function SavedListScreen() {
     return findItem ? findItem.quantity : 0;
   };
 
-  const renderItem = (item: Product) => {
-    return (
-      <View key={item._id} style={styles.itemContainer}>
-        <Image source={{ uri: item.imageUrl }} style={styles.image} />
-        <View style={styles.itemInfo}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <View>
-              <Text style={styles.name}>{item.name || item.medicine_name}</Text>
+  const renderItem = (item: Product) => (
+    <View key={item._id} style={styles.itemContainer}>
+      <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      <View style={styles.itemInfo}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <View>
+              <Text style={styles.name} numberOfLines={1}>{item.name || item.medicine_name}</Text>
               <Text style={styles.price}>
                 Rs {item.price}{' '}
                 <Text style={styles.strikethrough}>Rs {item.originalPrice}</Text>{' '}
                 {item.discount}
               </Text>
             </View>
-            <View style={{ marginTop: 29, marginRight: 10 }}>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(item._id)}
-              >
-                <AntDesign name="delete" size={24} color={'gray'} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {quantity(item._id) === 0 ? (
+          <View style={{ marginTop: 29, marginRight: 10 }}>
             <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => {
-                addToCart(item);
-              }}
+              style={styles.deleteButton}
+              onPress={() => handleDelete(item._id)}
             >
-              <Text style={styles.addButtonText}>Add to cart</Text>
+              <AntDesign name="delete" size={24} color={'gray'} />
             </TouchableOpacity>
-          ) : (
-            <View style={styles.controlsRow}>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() => {
-                  quantity(item._id) > 1 ? decrementItem(item._id) : removeFromCart(item._id);
-                }}
-              >
-                <Text style={styles.controlText}>−</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantity(item._id)}</Text>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() => incrementItem(item._id)}
-              >
-                <Text style={styles.controlText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          </View>
         </View>
+
+        {quantity(item._id) === 0 ? (
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => addToCart(item)}
+          >
+            <Text style={styles.addButtonText}>Add to cart</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.controlsRow}>
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={() =>
+                quantity(item._id) > 1
+                  ? decrementItem(item._id)
+                  : removeFromCart(item._id)
+              }
+            >
+              <Text style={styles.controlText}>−</Text>
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{quantity(item._id)}</Text>
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={() => incrementItem(item._id)}
+            >
+              <Text style={styles.controlText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
-    );
-  };
+    </View>
+  );
 
-  // Show Loading screen
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  // Show Error screen if error
-  if (error) {
-    return <Page404 />;
-  }
+  if (loading) return <LoadingScreen />;
+  if (error) return <Page404 />;
 
   return (
     <SafeAreaView style={styles.container}>
