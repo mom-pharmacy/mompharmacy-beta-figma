@@ -1,4 +1,5 @@
 import LoadingScreen from "@/components/LoadingScreen";
+import apiClient from "@/utils/apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
@@ -15,10 +16,9 @@ export const AuthProvider = ({ children }) => {
   const isRegistrationComplete = userDetails?.name && userDetails?.email && userDetails?.mobileNo;
 
   const getUserDetails = useCallback(async (authToken) => {
-    console.log(authToken)
     try {
       if (!authToken) throw new Error("Token not found! you are not loggedin");
-      const response = await fetch('http://192.168.1.14:3000/api/user/user-details', {
+      const response = await apiClient('api/user/user-details', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -26,14 +26,15 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUserDetails(data.userDetails); // ✅ Update local userDetails
+      if (response) {
+        setUserDetails(response.userDetails);
       } else {
-        console.error('Failed to fetch user details:', response.statusText);
+        console.error('Failed to fetch user details');
+        Alert.alert('Error', 'Failed to fetch user details. Please try again.');
       }
     } catch (error) {
       console.error('Error fetching user details:', error);
+      Alert.alert('Error', 'Failed to fetch user details. Please try again.');
     }
   }, []);
 
@@ -49,6 +50,7 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Error checking user:', error);
+        Alert.alert('Error', 'Failed to check user status. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -57,18 +59,16 @@ export const AuthProvider = ({ children }) => {
   }, [getUserDetails]);
 
   const loginWithOtp = async (mobileNo) => {
-    
     try {
-      const response = await fetch('http://192.168.1.14:3000/api/user/login', {
+      const response = await apiClient('api/user/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mobileNo }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (response) {
         router.replace({ pathname: '/Login/otp', params: { user: mobileNo } });
-        console.log('Login successful:', data);
+        console.log('Login successful:', response);
       } else {
         Alert.alert('Login failed!', 'Unable to login. Please try again.');
       }
@@ -81,22 +81,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const verifyOtp = async (otp, mobileNo) => {
-    console.log(mobileNo)
     try {
-      const response = await fetch('http://192.168.1.14:3000/api/user/verify-otp', {
+      const response = await apiClient('api/user/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ otp, mobileNo }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        await AsyncStorage.setItem('jwt_token', JSON.stringify(data.token));
-        setToken(data.token);
+      if (response) {
+        await AsyncStorage.setItem('jwt_token', JSON.stringify(response.token));
+        setToken(response.token);
         setIsLoggedIn(true);
-        await getUserDetails(data.token); // ✅ Update user details after login
-        console.log('OTP verified:', data);
-        return data;
+        await getUserDetails(response.token);
+        console.log('OTP verified:', response);
+        return response;
       } else {
         Alert.alert('OTP verification failed', 'Invalid OTP. Please try again.');
         return null;
@@ -126,42 +124,42 @@ export const AuthProvider = ({ children }) => {
       const storedToken = await AsyncStorage.getItem("jwt_token");
       const parsedToken = JSON.parse(storedToken);
 
-      const response = await fetch("https://mom-beta-server1.onrender.com/api/user/register", {
-        method: "PUT",
+      const response = await apiClient('api/user/register', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${parsedToken}`
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${parsedToken}`
         },
         body: JSON.stringify({
-          name:name,
+          name,
           dateOfBirth: dob,
-          gender:gender
+          gender
         })
       });
 
-      if (response.ok) {
+      if (response) {
         console.log("User successfully registered");
-
-        // After successful registration, refetch latest user details
         await getUserDetails(parsedToken);
-
-        // router.replace("/Home/home");
       } else {
-        const errorData = await response.text();
-        console.error("Server error response:", errorData);
+        console.error("Registration failed");
         Alert.alert("Registration Error", "Something went wrong. Please try again.");
       }
-    } catch (e) {
-      console.error("this is from fetch signup:", e);
+    } catch (error) {
+      console.error("Registration error:", error);
       Alert.alert("Network Error", "Failed to register. Check your internet or server.");
     }
   };
 
-  const ExtractParseToken = async ()=>{
-    const token = await AsyncStorage.getItem("jwt_token")
-    const parsedToken = JSON.parse(token)
-    return parsedToken
+  const ExtractParseToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("jwt_token");
+      if (!token) throw new Error("No token found");
+      return JSON.parse(token);
+    } catch (error) {
+      console.error("Error extracting token:", error);
+      return null;
     }
+  };
 
   return (
     <AuthContext.Provider value={{
@@ -173,7 +171,7 @@ export const AuthProvider = ({ children }) => {
       userDetails,
       isRegistrationComplete,
       getUserDetails,
-      postData , 
+      postData,
       ExtractParseToken
     }}>
       {loading ? <LoadingScreen /> : children}
@@ -181,8 +179,8 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const userAuth = ()=>{
-  const context = useContext(AuthContext)
-  if(!context) throw new Error("Error in login context")
-  return context
-}
+export const userAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("Error in login context");
+  return context;
+};

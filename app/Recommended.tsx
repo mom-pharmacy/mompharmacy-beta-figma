@@ -1,8 +1,9 @@
 import { useCart } from '@/Context/cartContext';
+import apiClient from '@/utils/apiClient';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaFrameContext, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Recommended() {
   const { item, cartItems, addToCart, incrementItem, decrementItem, removeFromCart} = useCart();
@@ -13,32 +14,33 @@ export default function Recommended() {
     return findItem ? findItem.quantity : 0;
   }
   useEffect(() => {
-
-    const subcategoryIds = cartItems.flatMap(item => item.subcategories || []);
-    const uniqueSubcategoryIds = [...new Set(subcategoryIds)];
-
-
-    const fetchRecommended = async () => {
+    const fetchRecommendedMedicines = async () => {
       try {
+        const subcategoryIds = cartItems.flatMap(item => item.subcategories || []);
+        const uniqueSubcategoryIds = [...new Set(subcategoryIds)];
+
         const allPromises = uniqueSubcategoryIds.map(id =>
-          fetch(`https://mom-beta-server1.onrender.com/api/medicines/subcategories/${id}/medicines`)
-            .then(res => res.json())
+          apiClient(`api/medicines/subcategories/${id}/medicines`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
         );
 
-        const results = await Promise.all(allPromises);
-        const allMedicines = results.flat();
-        const cartMedicineIds = new Set(cartItems.map(item => item._id));
-        const filtered = allMedicines.filter(item => !cartMedicineIds.has(item._id));
+        const responses = await Promise.all(allPromises);
+        const allMedicines = responses.flat();
+        const filtered = allMedicines.filter(medicine => 
+          !cartItems.some(item => item._id === medicine._id)
+        );
 
         setRecommended(filtered);
-      } catch (err) {
-        console.error('Failed to fetch recommended medicines:', err);
+      } catch (error) {
+        console.error('Failed to fetch recommended medicines:', error);
       }
     };
 
-    if (uniqueSubcategoryIds.length > 0) {
-      fetchRecommended();
-    }
+    fetchRecommendedMedicines();
   }, [cartItems]);
 
   return (

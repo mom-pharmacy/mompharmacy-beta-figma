@@ -4,6 +4,7 @@ import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { COLOR } from '@/constants/color';
 import { useAddress } from '@/Context/addressContext';
 import { userAuth } from '@/Context/authContext';
+import apiClient from '@/utils/apiClient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -36,20 +37,18 @@ const OrderReviewScreen = () => {
   // const {primaryAddress} = useAddress()
 
   async function postOrders(medicines) {
-
-    const tokenAuth = await ExtractParseToken()
+    const tokenAuth = await ExtractParseToken();
     
-   
-
     const orderMedicines = medicines.map((item) => {
       console.log(item)
       return({
-      medicine_id: item._id,
-      quantity: item.quantity,
-      price: item.price,
-      imageUrl: item.imageUrl,
-      name:item.medicine_name
-   })});
+        medicine_id: item._id,
+        quantity: item.quantity,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        name: item.medicine_name
+      })
+    });
 
     const orderData = {
       address_id: primaryAddress,
@@ -63,33 +62,31 @@ const OrderReviewScreen = () => {
       paymentMethod: "COD",
     };
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const response = await fetch('https://mom-beta-server1.onrender.com/api/add-order', {
+      const response = await apiClient('api/add-order', {
         method: 'POST',
         headers: {
-          "Authorization":`Bearer ${tokenAuth}`,
+          "Authorization": `Bearer ${tokenAuth}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(orderData),
       });
 
-      const data = await response.json();
-      setIsLoading(false)
-
-      if (response.ok) {
-        console.log('Order placed successfully:', data.order);
-        clearCart()
-        setOrderId(data.order._id);
-        setMedicine(data.order.medicines)
-      
+      if (response && response.order) {
+        console.log('Order placed successfully:', response.order);
+        clearCart();
+        setOrderId(response.order._id);
+        setMedicine(response.order.medicines);
         setModalVisible(true);
       } else {
-        console.error('Error placing order:', data.message);
+        console.error('Error placing order: No order data received');
       }
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -104,8 +101,9 @@ const OrderReviewScreen = () => {
 
   return (
     <SafeAreaView>
+      <ScrollView style={styles.container}>
       <StatusHeader title={"Order Review"} />
-    <ScrollView style={styles.container}>
+    
       <CartList/>
       <View style={styles.addressBox}>
         <Ionicons name="location-outline" size={24} color="#007F5F" style={styles.icon} />
@@ -143,6 +141,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#fff',
+    marginTop:20
   },
   icon: {
     marginRight: 12,

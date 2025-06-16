@@ -1,8 +1,8 @@
-
 import Footer from '@/components/Home/footer';
 import StatusHeader from '@/components/OrdersComponents/StatusHeader';
 import { userAuth } from '@/Context/authContext';
 import { useCart } from '@/Context/cartContext';
+import apiClient from '@/utils/apiClient';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -10,7 +10,6 @@ import React, { useEffect, useState, } from 'react';
 import {
   Dimensions,
   Image,
-  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -93,31 +92,20 @@ export default function Details() {
           return;
         }
 
-        const options = {
-          method: 'GET',
+        const response = await apiClient('api/wishlist/getwishlist', {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        };
+            'Authorization': `Bearer ${token}`
+          }
+        });
 
-        const res = await fetch(
-          `https://mom-beta-server1.onrender.com/api/wishlist/getwishlist`,
-          options
-        );
-        setLoading(false);
-        const data = await res.json();
-        console.log(data.wishlist.products.map(item => item))
-
-        console.log(data)
-        if (res.ok) {
-          setWishlist(data.wishlist.products);
-        } else {
-          console.warn(data.message || 'Failed to fetch wishlist');
+        if (response) {
+          setWishlist(response.wishlist.products);
         }
+        setLoading(false);
       } catch (error) {
         console.error('Failed to fetch wishlist:', error);
-      } finally {
+        setLoading(false);
       }
     };
 
@@ -133,36 +121,32 @@ export default function Details() {
 
     if (newState) {
       try {
-        const response = await fetch('https://mom-beta-server1.onrender.com/api/wishlist/add', {
+        const response = await apiClient('api/wishlist/add', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tokenAuth}`,
+            'Authorization': `Bearer ${tokenAuth}`
           },
           body: JSON.stringify({
             userId: '682354e783196e87d42a7cbc',
-            productId: itemId,
+            productId: itemId
+          })
+        });
 
-          }),
-        })
-
-        const data = await response.json()
-
-        if (response.ok) {
-          console.log('Wishlist added:', data)
-        } else {
-          console.warn('Wishlist failed:', data?.message || 'Error')
+        if (response) {
+          console.log('Wishlist added:', response);
         }
       } catch (error) {
-        console.error('Wishlist error:', error)
+        console.error('Wishlist error:', error);
       }
     }
   }
 
   return (
     <SafeAreaView>
-      <StatusHeader title={itemName.slice(0 , 16)} />
       <ScrollView style={styles.container}>
+      <StatusHeader title={itemName.slice(0 , 16)} />
+      
         <View style={styles.contentWrapper}>
           <TouchableOpacity onPress={() => router.push('/BottomNavbar/cart')} style={styles.cartContainer}>
             <Image source={require('../../assets/images/cart.jpeg')} style={styles.carttxt} />
@@ -210,7 +194,6 @@ export default function Details() {
                       <Feather name="bookmark" size={20} color="gray" />
                     )}
 
-                    {/* </>} */}
                     <Text style={{ right: 55, fontWeight: 'bold', fontSize: 16, color: '#007E71' }}>Save</Text>
                   </View>
                 </>}
@@ -322,11 +305,12 @@ export default function Details() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    bottom: 10
+    bottom: -30
 
   },
   contentWrapper: {
     padding: width * 0.04,
+    marginBottom:100
   },
   imageContainer: {
     alignItems: 'center',
@@ -511,25 +495,26 @@ const styles = StyleSheet.create({
   cartContainer: {
     position: 'relative',
     padding: 10,
-    
-  },
+    marginTop:-65,
+    marginRight:10,
+    },
   carttxt: {
     width: 30,
-    height: 30,
+      height: 30,
     marginLeft:310
    
   },
   badge: {
     position: 'absolute',
-    right: 2,
-    top: 2,
+    right: 25,
+    top: 3,
     backgroundColor: '#00a99d',
     borderRadius: 10,
     minWidth: 16,
     height: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 4,
+    // paddingHorizontal: 4,
   },
   badgeText: {
     color: '#fff',

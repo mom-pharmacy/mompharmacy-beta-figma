@@ -1,23 +1,26 @@
 import TopNavbar from '@/components/Home/topNavbar';
 import { useCart } from '@/Context/cartContext';
+import apiClient from '@/utils/apiClient';
 import { router, useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-    FlatList,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Medicines({ limit }) {
   const [sortType, setSortType] = useState('low');
-const [showDropdown, setShowDropdown] = useState(false);
-// 'low' or 'high'
+  const [showDropdown, setShowDropdown] = useState(false);
   const [medicine, setMedicine] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { subcategoryId } = useLocalSearchParams();
   const { addToCart, cartItems, incrementItem, decrementItem, removeFromCart } = useCart();
 
@@ -26,16 +29,32 @@ const [showDropdown, setShowDropdown] = useState(false);
     return findItem ? findItem.quantity : 0;
   };
 
-  useEffect(() => {
-    fetch(`https://mom-beta-server1.onrender.com/api/medicines/medicines`)
-      .then(res => res.json())
-      .then(data => {
-        setMedicine(data);
-      })
-      .catch(err => {
-        console.error('Failed to fetch medicines:', err);
+  const fetchMedicines = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient('api/medicines/medicines', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+      if (response) {
+        setMedicine(response);
+      } else {
+        setError('No medicines found');
+      }
+    } catch (error) {
+      console.error('Failed to fetch medicines:', error);
+      setError('Failed to load medicines. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchMedicines();
+  }, [fetchMedicines]);
 
   // Sort the medicines before rendering
   const sortedMedicines = [...medicine].sort((a, b) => {
@@ -46,111 +65,112 @@ const [showDropdown, setShowDropdown] = useState(false);
     }
   });
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#00a99d" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity onPress={fetchMedicines} style={styles.retryButton}>
+          <Text style={styles.retryText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView>
-    <View style={styles.container}>
-  
-      <TopNavbar />
+      <View style={styles.container}>
+        <TopNavbar onBack={() => router.back()} />
 
-      <View style={styles.header}>
-        <Text style={styles.title}>Popular Medicines</Text>
-      </View>
+        <View style={styles.header}>
+          <Text style={styles.title}>Popular Medicines</Text>
+        </View>
 
-     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 15, marginBottom: 10 }}>
-  <View>
-    <TouchableOpacity 
-      onPress={() => setShowDropdown(!showDropdown)} 
-      style={{
-        backgroundColor: '#00a99d',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 8,
-      }}
-    >
-      <Text style={{ color: 'white', fontWeight: 'bold' }}>
-        Sort: {sortType === 'low' ? 'Low to High' : 'High to Low'}
-      </Text>
-    </TouchableOpacity>
-
-    {showDropdown && (
-      <View style={{
-        backgroundColor: '#e0f7fa',
-        borderRadius: 8,
-        marginTop: 5,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.3,
-        shadowRadius: 2,
-      }}>
-        <TouchableOpacity
-          style={{ padding: 8 }}
-          onPress={() => {
-            setSortType('low');
-            setShowDropdown(false);
-          }}
-        >
-          <Text>Low to High</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ padding: 8 }}
-          onPress={() => {
-            setSortType('high');
-            setShowDropdown(false);
-          }}
-        >
-          <Text>High to Low</Text>
-        </TouchableOpacity>
-      </View>
-    )}
-  </View>
-</View>
-
-
-      <FlatList
-        data={limit ? sortedMedicines.slice(0, limit) : sortedMedicines}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() =>
-              router.push({
-                pathname: '/Details/details',
-                params: {
-                  itemId: item._id,
-                  itemName: item.medicine_name,
-                  itemImage: item.imageUrl,
-                  itemPrice: item.price,
-                  description: item.description,
-                  use: item.use,
-                  ingredients: item.ingredients,
-                  dose: item.dose,
-                  manufacturer: item.manufacturer,
-                  notFor: item.notFor,
-                  sideEffects: item.sideEffects,
-                  store: item.store,
-                  expiryDate: item.expiryDate,
-                  manufactureDate: item.manufactureDate,
-                },
-              })
-            }
+        <View style={styles.sortContainer}>
+          <TouchableOpacity 
+            onPress={() => setShowDropdown(!showDropdown)} 
+            style={styles.sortButton}
           >
-            <Womencare
-              item={item}
-              cartItems={cartItems}
-              addToCart={addToCart}
-              incrementItem={incrementItem}
-              decrementItem={decrementItem}
-              removeFromCart={removeFromCart}
-              quantity={quantity}
-            />
+            <Text style={styles.sortButtonText}>
+              Sort: {sortType === 'low' ? 'Low to High' : 'High to Low'}
+            </Text>
           </TouchableOpacity>
-        )}
-        numColumns={2}
-        columnWrapperStyle={styles.columnWrapper}
-        contentContainerStyle={styles.grid}
-        scrollEnabled={true}
-      />
-    </View>
+
+          {showDropdown && (
+            <View style={styles.dropdown}>
+              <TouchableOpacity
+                style={styles.dropdownOption}
+                onPress={() => {
+                  setSortType('low');
+                  setShowDropdown(false);
+                }}
+              >
+                <Text>Low to High</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.dropdownOption}
+                onPress={() => {
+                  setSortType('high');
+                  setShowDropdown(false);
+                }}
+              >
+                <Text>High to Low</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        <FlatList
+          data={limit ? sortedMedicines.slice(0, limit) : sortedMedicines}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() =>
+                router.push({
+                  pathname: '/Details/details',
+                  params: {
+                    itemId: item._id,
+                    itemName: item.medicine_name,
+                    itemImage: item.imageUrl,
+                    itemPrice: item.price,
+                    description: item.description,
+                    use: item.use,
+                    ingredients: item.ingredients,
+                    dose: item.dose,
+                    manufacturer: item.manufacturer,
+                    notFor: item.notFor,
+                    sideEffects: item.sideEffects,
+                    store: item.store,
+                    expiryDate: item.expiryDate,
+                    manufactureDate: item.manufactureDate,
+                  },
+                })
+              }
+            >
+              <Womencare
+                item={item}
+                cartItems={cartItems}
+                addToCart={addToCart}
+                incrementItem={incrementItem}
+                decrementItem={decrementItem}
+                removeFromCart={removeFromCart}
+                quantity={quantity}
+              />
+            </TouchableOpacity>
+          )}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
+          contentContainerStyle={styles.grid}
+          scrollEnabled={true}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -202,6 +222,31 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginTop: -20,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: '#00a99d',
+    padding: 10,
+    borderRadius: 5,
+  },
+  retryText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   header: {
     padding: 10,
     backgroundColor: '#fff',
@@ -211,11 +256,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#333',
   },
-  sortButtons: {
+  sortContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 15,
     marginBottom: 10,
+  },
+  sortButton: {
+    backgroundColor: '#00a99d',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  sortButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  dropdown: {
+    position: 'absolute',
+    top: '100%',
+    right: 15,
+    backgroundColor: '#e0f7fa',
+    borderRadius: 8,
+    marginTop: 5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    zIndex: 1000,
+  },
+  dropdownOption: {
+    padding: 8,
   },
   grid: {
     paddingHorizontal: 15,
@@ -259,32 +331,35 @@ const styles = StyleSheet.create({
   },
   medicineBtn: {
     backgroundColor: '#00a99d',
-    paddingVertical: 6,
+    height: 36,
     borderRadius: 16,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   btnText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 14,
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-  },
-  quantityBtn: {
     backgroundColor: '#00a99d',
     borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    height: 36,
+  },
+  quantityBtn: {
+    paddingHorizontal: 10,
   },
   quantityBtnText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   quantity: {
-    marginHorizontal: 10,
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
   },

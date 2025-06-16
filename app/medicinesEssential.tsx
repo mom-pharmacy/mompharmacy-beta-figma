@@ -5,6 +5,7 @@ import Search from '@/components/Home/search';
 import TopNavbar from '@/components/Home/topNavbar';
 import UploadPrescription from '@/components/Home/uploadPrescription';
 import { useCart } from '@/Context/cartContext';
+import apiClient from '@/utils/apiClient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -32,17 +33,26 @@ export default function Medicines() {
   };
 
   useEffect(() => {
-    fetch(`https://mom-beta-server1.onrender.com/api/medicines/medicines`)
-      .then(res => res.json())
-      .then(data => {
-        setMedicine(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to fetch medicines:', err);
+    const fetchEssentialMedicines = async () => {
+      try {
+        const response = await apiClient('api/medicines/medicines', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response) {
+          setMedicine(response);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Failed to fetch essential medicines:', error);
         setError(true);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchEssentialMedicines();
   }, []);
 
   const limitedMedicines = medicine.slice(-3, -1);
