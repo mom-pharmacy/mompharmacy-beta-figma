@@ -4,8 +4,7 @@ import apiClient from '@/utils/apiClient'
 import LoadingScreen from '../LoadingScreen'
 import { useOrderActive } from '@/Context/orderContext'
 import { router } from 'expo-router'
-// import LoadingScreen from '@/app/ErrorScreens/loadingscreen'
-
+import { userAuth } from '@/Context/authContext'
 export default function ActiveOrderItems({activeOrderId}) {
 
   const [order , setOrder] = useState(null)
@@ -13,16 +12,18 @@ export default function ActiveOrderItems({activeOrderId}) {
   const {setActiveOrder , loadingOrders} = useOrderActive()
   const [error , setError ] = useState(false)
 
-  
+   const { ExtractParseToken } = userAuth();
 
     useEffect(() =>{
         async function fetchActiveOrder(){
+          const tokenAuth = await ExtractParseToken();
             try {
               setLoading(true)
             const response = await apiClient('api/orderbyid/' + activeOrderId, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                     Authorization: `Bearer ${tokenAuth}`,
                 },
             })
             setLoading(false)
