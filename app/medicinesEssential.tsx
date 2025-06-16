@@ -185,7 +185,7 @@ const Womencare = ({ item, cartItems, addToCart, incrementItem, decrementItem, r
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    marginTop: -20,
+    marginTop: -5,
   },
   header: {
     padding: 10,

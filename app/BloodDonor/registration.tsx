@@ -1,7 +1,7 @@
+import apiClient from '@/utils/apiClient';
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 import Checkbox from 'expo-checkbox';
 import React, { useEffect, useState } from 'react';
 import {
@@ -147,6 +147,7 @@ const RegisterScreen = () => {
   }, [selectedDistrict]);
 
   const handleSubmit = async () => {
+
     setPhoneError('');
     if (!authorized) {
       Alert.alert('Terms & Conditions', 'You must agree to the Terms & Conditions to register.');
@@ -168,49 +169,40 @@ const RegisterScreen = () => {
       return;
     }
     const dataToSend = {
-      name,
-      bloodGroup: selectedBloodGroup,
-      dob: dob ? dob.toISOString().split('T')[0] : '',
-      phone: mobileNumber,
-      email,
-      state: selectedState,
-      city: selectedCity,
-      district: selectedDistrict,
-      pincode: Pincode,
-      availability: true, 
+        name,
+        bloodGroup: selectedBloodGroup,
+        dob: dob ? dob.toISOString().split('T')[0] : '',
+        phone: mobileNumber,
+        email,
+        state: selectedState,
+        city: selectedCity,
+        district: selectedDistrict,
+        pincode: Pincode,
+        availability: true,
     };
-    setIsLoading(true);
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+    };
+
     try {
-      const response = await axios.post(`${BASE_URL}/register`, dataToSend);
-      if (response.status === 201) {
-        Alert.alert('Success', 'Registration successful!');
-        navigation.goBack();
-      } else {
-        Alert.alert('Error', response.data.message || 'Registration failed.');
-      }
-    } catch (error) {
-      console.log('Registration error:', error?.response?.data || error?.message || error);
-      if (error.response && error.response.data) {
-        const errorMessage = error.response.data.message || error.response.data.error || error.response.data.msg || 'Server error or request failed';
-        if (
-          errorMessage.toLowerCase().includes('phone') &&
-          (errorMessage.toLowerCase().includes('exist') ||
-           errorMessage.toLowerCase().includes('registered') ||
-           errorMessage.toLowerCase().includes('duplicate') ||
-           errorMessage.toLowerCase().includes('already'))
-        ) {
-          setPhoneError('This phone number is already registered.');
-          Alert.alert('Error', 'This phone number is already registered. Please use a different number.');
+        const response = await apiClient('api/donar/register', options);
+        console.log('API Response:', response);
+
+        if (response) {
+            Alert.alert('Success', 'Registration successful!');
         } else {
-          Alert.alert('Error', errorMessage);
+            Alert.alert('Error', 'Failed to register. Please try again.');
         }
-      } else {
-        Alert.alert('Error', 'Network error or server is unreachable. Please check your connection or try again later.');
-      }
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+        console.error('Error:', error);
+        Alert.alert('Error', 'Something went wrong. Please try again.');
     }
-  };
+};
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -480,7 +472,7 @@ Protein: Eggs, cashews, almonds.`}
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: 'white' },
+  container: { padding: 20, backgroundColor: 'white', marginTop:"5%" },
   locationRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
