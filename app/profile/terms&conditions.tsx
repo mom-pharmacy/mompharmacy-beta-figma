@@ -84,13 +84,6 @@ export default function Terms_n_Conditions() {
       <Text style={styles.paragraph}>
         • We may update these terms from time to time. Continued use of the app indicates acceptance.
       </Text>
-
-      <View style={styles.checkboxContainer}>
-        <CheckBox value={isSelected} onValueChange={setSelection} style={styles.checkbox} />
-        <Text style={styles.label}>
-          By continuing to use the app, you agree to these Terms & Conditions.
-        </Text>
-      </View>
     </ScrollView>
     </SafeAreaView>
   );
