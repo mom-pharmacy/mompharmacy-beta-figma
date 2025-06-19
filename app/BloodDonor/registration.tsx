@@ -3,6 +3,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -21,13 +22,11 @@ import {
   View,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import LoadingScreen from '../ErrorScreens/loadingscreen';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const BASE_URL = 'https://mom-beta-server1.onrender.com/api/donar';
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
 const locationData = {
@@ -146,14 +145,29 @@ const RegisterScreen = () => {
     }
   }, [selectedDistrict]);
 
+  // const calculateAge = (birthDate) => {
+  //   const today = new Date();
+  //   const birth = new Date(birthDate);
+  //   let age = today.getFullYear() - birth.getFullYear();
+  //   const m = today.getMonth() - birth.getMonth();
+  //   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+  //     age--;
+  //   }
+  //   return age;
+  // };
+  // const age = calculateAge(dob);
+  // if (age < 18) {
+  //   Alert.alert('Age Restriction', 'You must be at least 18 years old to register.');
+  //   return;
+  // }
   const handleSubmit = async () => {
-
+   setIsLoading(true)
     setPhoneError('');
     if (!authorized) {
       Alert.alert('Terms & Conditions', 'You must agree to the Terms & Conditions to register.');
       return;
     }
-    if (!name || !mobileNumber || !email || !selectedBloodGroup || !selectedState || !selectedDistrict || !selectedCity || !Pincode) {
+    if (!name || !mobileNumber || !email || !selectedBloodGroup || !selectedState || !selectedDistrict || !selectedCity || !Pincode || !dob) {
       Alert.alert('Error', 'Please fill all the fields.');
       return;
     }
@@ -189,24 +203,26 @@ const RegisterScreen = () => {
         body: JSON.stringify(dataToSend),
     };
 
-    try {
+    try {     
         const response = await apiClient('api/donar/register', options);
         console.log('API Response:', response);
 
         if (response) {
+          setIsLoading(false)
             Alert.alert('Success', 'Registration successful!');
+            router.replace('./front')
+           
         } else {
-            Alert.alert('Error', 'Failed to register. Please try again.');
+            Alert.alert('Mobile number already exist.');
         }
+       
     } catch (error) {
         console.error('Error:', error);
         Alert.alert('Error', 'Something went wrong. Please try again.');
     }
 };
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+ 
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -231,6 +247,7 @@ const RegisterScreen = () => {
               placeholder="+91 Enter Mobile Number"
               placeholderTextColor="#9E9E9E"
               keyboardType="phone-pad"
+              maxLength={10}
               value={mobileNumber}
               onChangeText={(text) => {
                 setMobileNumber(text);
@@ -271,7 +288,7 @@ const RegisterScreen = () => {
                     setDob(selectedDate);
                   }
                 }}
-                maximumDate={new Date()}
+                maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
                 style={styles.datePicker}
               />
             )}
@@ -380,6 +397,7 @@ const RegisterScreen = () => {
                   placeholder="Pincode"
                   placeholderTextColor="grey"
                   keyboardType="phone-pad"
+                  maxLength={6}
                   value={Pincode}
                   onChangeText={setPincode}
                 />
