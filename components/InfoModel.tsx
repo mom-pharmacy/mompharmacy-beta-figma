@@ -5,7 +5,7 @@ const InfoModal = ({ visible, onClose }) => (
   <Modal transparent visible={visible} animationType="fade">
     <View style={styles.overlay}>
       <View style={styles.card}>
-        <Text style={styles.message}>Ohh No.... You don't have access to edit.</Text>
+        <Text style={styles.message}>Ohh No.. :{'('} You can't edit this at the moment.</Text>
         <TouchableOpacity onPress={onClose} style={styles.button}>
           <Text style={styles.buttonText}>OK</Text>
         </TouchableOpacity>
@@ -46,5 +46,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
 export default InfoModal;
+
