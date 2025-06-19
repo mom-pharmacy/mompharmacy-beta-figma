@@ -68,6 +68,7 @@ const EditUserScreen = () => {
   const [updating, setUpdating] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [emailError, setEmailError] = useState('');
+  const [nameError, setNameError] = useState('');
 
   // No-access modal visibility
   const [infoVisible, setInfoVisible] = useState(false);
@@ -78,21 +79,34 @@ const EditUserScreen = () => {
   const canEditDOB = false;
   const canEditMobile = false;
 
-  const filledFields = [user?.name, user?.mobileNo, user?.gender, user?.dateOfBirth, user?.bloodgroup]
+  const filledFields = [user?.name, user?.mobileNo, user?.gender, user?.dateOfBirth, user?.bloodgroup, user?.email]
     .filter((f) => f && f.toString().trim() !== '').length;
-  const profileCompletion = Math.round((filledFields / 5) * 100);
+  const profileCompletion = Math.round((filledFields / 6) * 100);
 
-  const validateEmail = (email: string) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError('Email is required');
-      return false;
-    } else if (!re.test(email)) {
-      setEmailError('Please enter a valid email');
-      return false;
+  const validateForm = () => {
+    let isValid = true;
+
+    // Validate name
+    if (!user?.name?.trim()) {
+      setNameError('Name is required');
+      isValid = false;
+    } else {
+      setNameError('');
     }
-    setEmailError('');
-    return true;
+
+    // Validate email
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!user?.email) {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!re.test(user.email)) {
+      setEmailError('Please enter a valid email');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    return isValid;
   };
 
   const handleUpdate = async () => {
@@ -101,7 +115,7 @@ const EditUserScreen = () => {
       return;
     }
 
-    if (!validateEmail(user.email)) {
+    if (!validateForm()) {
       return;
     }
 
@@ -174,10 +188,14 @@ return (
 
       <Text style={styles.label}>Full Name</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, nameError ? styles.inputError : null]}
         value={user.name}
-        onChangeText={(text) => setUser({ ...user, name: text })}
+        onChangeText={(text) => {
+          setUser({ ...user, name: text });
+          if (nameError) setNameError('');
+        }}
       />
+      {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
 
       <Text style={styles.label}>Phone Number</Text>
       <TouchableOpacity onPress={() => setInfoVisible(true)}>
