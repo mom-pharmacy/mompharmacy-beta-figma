@@ -1,36 +1,32 @@
-
+import InfoModal from '@/components/InfoModel';
 import { COLOR } from '@/constants/color';
 import { userAuth } from '@/Context/authContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Alert,
-  Button,
   Image,
   Modal,
   Platform,
   Pressable,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-// import ProfileCompletionCard from './Percentage';
 
 const GENDER_OPTIONS = ['male', 'female', 'others'];
 const BLOODGROUP_OPTIONS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
-
 const Dropdown = ({ label, value, setValue, options }) => {
   const [visible, setVisible] = useState(false);
   return (
+
     <View style={styles.dropdownContainer}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity
@@ -49,10 +45,13 @@ const Dropdown = ({ label, value, setValue, options }) => {
         >
           <View style={styles.dropdownBox}>
             {options.map((opt) => (
-              <TouchableOpacity key={opt} onPress={() => {
-                setValue(opt);
-                setVisible(false);
-              }}>
+              <TouchableOpacity
+                key={opt}
+                onPress={() => {
+                  setValue(opt);
+                  setVisible(false);
+                }}
+              >
                 <Text style={styles.optionText}>{opt}</Text>
               </TouchableOpacity>
             ))}
@@ -68,198 +67,288 @@ const EditUserScreen = () => {
   const [user, setUser] = useState(userDetails);
   const [updating, setUpdating] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [emailError, setEmailError] = useState('');
+
+  // No-access modal visibility
+  const [infoVisible, setInfoVisible] = useState(false);
+
+  // Permission flags (false means no access)
+  const canEditGender = false;
+  const canEditBloodGroup = false;
+  const canEditDOB = false;
+  const canEditMobile = false;
 
   const filledFields = [user?.name, user?.mobileNo, user?.gender, user?.dateOfBirth, user?.bloodgroup]
     .filter((f) => f && f.toString().trim() !== '').length;
   const profileCompletion = Math.round((filledFields / 5) * 100);
-  
+
+  const validateEmail = (email: string) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      setEmailError('Email is required');
+      return false;
+    } else if (!re.test(email)) {
+      setEmailError('Please enter a valid email');
+      return false;
+    }
+    setEmailError('');
+    return true;
+  };
 
   const handleUpdate = async () => {
     if (!user || !user._id) {
-      Alert.alert('Error', 'User information is missing');
+      alert('User information is missing');
       return;
     }
-    
+
+    if (!validateEmail(user.email)) {
+      return;
+    }
+
     setUpdating(true);
     try {
       const tokenStr = await AsyncStorage.getItem('jwt_token');
       if (!tokenStr) {
-        Alert.alert('Error', 'Authentication token is missing. Please login again.');
+        alert('Authentication token is missing. Please login again.');
         return;
       }
 
       const token = JSON.parse(tokenStr);
-      console.log('Starting update request for user:', user._id);
-      
+
       const res = await fetch(`https://mom-beta-server1.onrender.com/api/user/user/update/${user._id}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: user.name,
           gender: user.gender,
           dateOfBirth: user.dateOfBirth,
           bloodgroup: user.bloodgroup,
-          mobileNo: user.mobileNo
+          mobileNo: user.mobileNo,
+          email: user.email,
         }),
       });
 
-      console.log('Response status:', res.status);
       const data = await res.json();
-      console.log('Response data:', data);
 
       if (res.ok) {
-        Alert.alert('Success', 'Profile updated successfully');
         await getUserDetails(token);
-        router.push({ 
-          pathname: '/BottomNavbar/profile', 
-          params: { profileCompletion: profileCompletion.toString() } 
+        router.push({
+          pathname: '/BottomNavbar/profile',
+          params: { profileCompletion: profileCompletion.toString() },
         });
       } else {
-        throw new Error(data.message || 'Failed to update profile');
+        setInfoVisible(true);
       }
     } catch (e) {
-      console.error('Update error:', e);
-      Alert.alert(
-        'Error',
-        e.message || 'Failed to update profile. Please check your connection and try again.'
-      );
+      setInfoVisible(true);
     } finally {
       setUpdating(false);
     }
   };
-  const [imageUri, setImageUri] = useState(null);
-
-useEffect(() => {
-  (async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission denied', 'Camera roll permissions are required to change profile picture.');
-    }
-  })();
-}, []);
-
-const pickImage = async () => {
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [1, 1],
-    quality: 1,
-  });
-
-  if (!result.canceled) {
-    setImageUri(result.assets[0].uri);
-  }
-};
 
   const onDateChange = (_, selectedDate) => {
-    if (selectedDate) setUser({ ...user, dateOfBirth: selectedDate.toISOString().split('T')[0] });
+    if (selectedDate && canEditDOB) {
+      setUser({ ...user, dateOfBirth: selectedDate.toISOString().split('T')[0] });
+    }
     if (Platform.OS === 'android') setShowDatePicker(false);
   };
 
   if (!user) return <View style={styles.center}><Text>No user found</Text></View>;
 
-  return (
-    <View style={styles.mainContainer}>
-    <SafeAreaView>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.statusContainer}>
-          <Pressable style={styles.Container1} onPress={() => router.back()}>
-            <MaterialIcons name="arrow-back" size={24} color={COLOR.secondary} />
-            <Text style={styles.header}>Edit User Details</Text>
-          </Pressable>
-        </View>
+return (
+  <SafeAreaView style={styles.mainContainer}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.statusContainer}>
+        <Pressable style={styles.Container1} onPress={() => router.back()}>
+          <MaterialIcons name="arrow-back" size={24} color={COLOR.secondary} />
+          <Text style={styles.header}>Edit Profile</Text>
+        </Pressable>
+      </View>
 
-        {/* <ProfileCompletionCard percentage={profileCompletion} /> */}
+      <View style={styles.avatarContainer}>
+        <Image source={require('../../assets/images/profileimg.png')} style={styles.avatar} />
+      </View>
 
-        <View style={styles.avatarContainer}>
-          <Image source={require('../../assets/images/profileimg.png')} style={styles.avatar} />
-          {/* <Text style={styles.changePhotoText}>Change Profile Picture</Text> */}
-        </View>
-                         
-            {/* <TouchableOpacity onPress={pickImage} style={{ alignItems: 'center' }}>
-                    <Image
-                      source={imageUri ? { uri: imageUri } : require('../../assets/images/profileimg.png')}
-                      style={styles.avatar}
-                      resizeMode="cover"
-                    />
-                  <Text style={styles.changePhotoText}>Change Profile Picture</Text>
-               </TouchableOpacity> */}
+      <Text style={styles.label}>Full Name</Text>
+      <TextInput
+        style={styles.input}
+        value={user.name}
+        onChangeText={(text) => setUser({ ...user, name: text })}
+      />
 
-           
-        <Text style={styles.label}>Name:</Text>
+      <Text style={styles.label}>Phone Number</Text>
+      <TouchableOpacity onPress={() => setInfoVisible(true)}>
         <TextInput
-          style={styles.input}
-          value={user.name}
-          onChangeText={(text) => setUser({ ...user, name: text })}
+          style={[styles.input, styles.noAccessBackground, { color: '#888' }]}
+          value={user.mobileNo}
+          keyboardType="phone-pad"
+          editable={canEditMobile}
+          onChangeText={(text) => setUser({ ...user, mobileNo: text })}
+          maxLength={10}
         />
+      </TouchableOpacity>
 
-        <Text style={styles.label}>Mobile:</Text>
-        <TextInput style={styles.input} value={user.mobileNo} keyboardType="phone-pad" editable={false} />
+      <Text style={styles.label}>Email</Text>
+      <TextInput
+        style={[styles.input, emailError ? styles.inputError : null]}
+        value={user.email}
+        onChangeText={(text) => {
+          setUser({ ...user, email: text });
+          if (emailError) setEmailError('');
+        }}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
+      <Text style={styles.label}>Gender</Text>
+      {canEditGender ? (
         <Dropdown
           label="Gender"
           value={user.gender}
           setValue={(v) => setUser({ ...user, gender: v })}
           options={GENDER_OPTIONS}
         />
+      ) : (
+        <TouchableOpacity onPress={() => setInfoVisible(true)}>
+          <View style={[styles.input, styles.noAccessBackground]}>
+            <Text style={{ color: '#888', fontSize: 20, fontWeight: '400' }}>{user.gender || 'Not set'}</Text>
+          </View>
+        </TouchableOpacity>
+      )}
 
-        <Text style={styles.label}>Date of Birth:</Text>
-        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+      <Text style={styles.label}>Date of Birth</Text>
+      {canEditDOB ? (
+        <>
+          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+            <TextInput
+              style={styles.input}
+              value={user.dateOfBirth?.substring(0, 10)}
+              editable={false}
+              pointerEvents="none"
+              placeholder="Select date"
+              placeholderTextColor="#888"
+            />
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={user.dateOfBirth ? new Date(user.dateOfBirth) : new Date()}
+              mode="date"
+              display="default"
+              maximumDate={new Date()}
+              onChange={onDateChange}
+            />
+          )}
+        </>
+      ) : (
+        <TouchableOpacity onPress={() => setInfoVisible(true)}>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              styles.noAccessBackground,
+              { color: '#888' }
+            ]}
             value={user.dateOfBirth?.substring(0, 10)}
             editable={false}
             pointerEvents="none"
-            placeholder="Select date"
-            placeholderTextColor="#888"
           />
         </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={user.dateOfBirth ? new Date(user.dateOfBirth) : new Date()}
-            mode="date"
-            display="default"
-            maximumDate={new Date()}
-            onChange={onDateChange}
-          />
-        )}
+      )}
 
+      <Text style={styles.label}>Blood Group</Text>
+      {canEditBloodGroup ? (
         <Dropdown
           label="Blood Group"
           value={user.bloodgroup}
-          setValue={(v) => `setUser({ ...user, bloodgroup: v })`}
+          setValue={(v) => setUser({ ...user, bloodgroup: v })}
           options={BLOODGROUP_OPTIONS}
         />
-        
-        <Button title={updating ? 'Updating...' : 'Submit'}  onPress={handleUpdate} disabled={updating} color="#008080"/>
-      </ScrollView>
-    </SafeAreaView>
-    </View>
-  );
-};
+      ) : (
+        <TouchableOpacity onPress={() => setInfoVisible(true)}>
+          <View style={[styles.input, styles.noAccessBackground]}>
+            <Text style={{ color: '#888', fontSize: 20, fontWeight: '400' }}>{user.bloodgroup || 'Not set'}</Text>
+          </View>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity 
+        style={[styles.submitButton, updating && styles.submitButtonDisabled]}
+        onPress={handleUpdate}
+        disabled={updating}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.submitButtonText}>
+          {updating ? 'Updating...' : 'Submit'}
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
+
+    <InfoModal visible={infoVisible} onClose={() => setInfoVisible(false)} />
+  </SafeAreaView>
+);
+}
+
 
 const styles = StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: '#fff' },
   container: { padding: 20, paddingBottom: 120, backgroundColor: '#fff', flexGrow: 1 },
-  changePhotoText: { color: '#008080', marginTop: 8, fontSize: 14, fontWeight: '500' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  label: { marginTop: 10, fontWeight: '600', color: '#333' },
-  avatar: { width: 90, height: 90, borderRadius: 50, backgroundColor: '#ddd' },
-  input: { backgroundColor: '#e9f0eb', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, marginBottom: 6 },
-  avatarContainer: 
-  { alignItems: 'center', 
-    marginBottom: 10, },
+  label: { marginTop: 10, fontWeight: '600', color: '#333', fontSize: 20},
+  avatar: { width: 90, height: 90, borderRadius: 50, backgroundColor: '#d5ece9' },
+  input: {
+    backgroundColor: '#e8f1f0',
+    borderRadius: 30,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 20,
+    fontWeight: '400',
+    marginBottom: 6,
+    color: '#000',
+    borderWidth: 1,
+    borderColor: '#e9f0eb',
+    width: "100%",
+    height: 52
+  },
+  inputError: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 2,
+    marginBottom: 4,
+  },
+  submitButton: {
+    backgroundColor: '#008080',
+    borderRadius: 30,
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    elevation: 2,
+  },
+  submitButtonDisabled: {
+    opacity: 0.6,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  noAccessBackground: {
+    backgroundColor: '#f0f0f0',
+  },
+  avatarContainer: { alignItems: 'center' },
   statusContainer: { padding: 12, backgroundColor: 'white', paddingLeft: 20 },
   Container1: { flexDirection: 'row', gap: 30 },
-  header: { fontWeight: '700', fontSize: 22, color: '#00a99d', paddingBottom:30},
+  header: { fontWeight: '700', fontSize: 25, color: '#00a99d', paddingBottom: 20 },
   dropdownContainer: { marginTop: 10, marginBottom: 6 },
   modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.15)' },
   dropdownBox: { marginHorizontal: 32, backgroundColor: '#fff', borderRadius: 8, paddingVertical: 8, elevation: 6 },
-  optionText: { padding: 12, fontSize: 14, color: '#222' }
+  optionText: { padding: 12, fontSize: 14, color: '#222' },
 });
-
 
 export default EditUserScreen;

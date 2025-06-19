@@ -58,7 +58,7 @@ export default function About() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D1EDEC',
+    backgroundColor: '#fff',
   },
   scrollContainer: {
     paddingTop: Platform.OS === 'ios' ? 80 : 60,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     padding: 24,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: '#00A99D',
     overflow: 'hidden',
   },
   title: {
