@@ -93,9 +93,9 @@ const DonorDetails = () => {
     </View>
   );
 
-  if (!donorList.length) {
+  if (!donorList || donorList.length === 0) {
     return (
-      <SafeAreaView>
+      <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.centerContent}>
           <Text style={styles.emptyText}>No donors found.</Text>
           <Text style={styles.emptySubText}>
