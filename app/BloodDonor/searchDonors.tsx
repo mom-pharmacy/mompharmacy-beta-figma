@@ -1,5 +1,4 @@
 import apiClient from '@/utils/apiClient';
-import { router } from 'expo-router';
 
 export const searchDonors = async (filters) => {
   try {
@@ -13,7 +12,7 @@ export const searchDonors = async (filters) => {
     return data;
   } catch (error) {
     console.error('Search donors error:', error.message || error);
-    router.replace('/ErrorScreens/page404');
+    // router.replace('/ErrorScreens/page404');
     return [];
   }
 };
