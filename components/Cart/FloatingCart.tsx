@@ -23,7 +23,7 @@ export default function FloatingCartButton() {
  const styles = StyleSheet.create({
   Button: {
     position: 'absolute',
-    bottom: 90,
+    bottom: 50,
     alignSelf: 'center',
     backgroundColor: '#00A99D', 
     borderRadius: 50,
