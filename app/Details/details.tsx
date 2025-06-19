@@ -5,7 +5,7 @@ import { useCart } from '@/Context/cartContext';
 import apiClient from '@/utils/apiClient';
 import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState, } from 'react';
 import {
   Dimensions,
@@ -148,14 +148,14 @@ export default function Details() {
       <StatusHeader title={itemName.slice(0 , 16)} />
       
         <View style={styles.contentWrapper}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.cartContainer}>
+          {/* <TouchableOpacity onPress={() => router.back()} style={styles.cartContainer}>
             <Image source={require('../../assets/images/cart.jpeg')} style={styles.carttxt} />
             {cartItems.length > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{cartItems.length}</Text>
               </View>
             )}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <View style={styles.imageContainer}>
             <Image
