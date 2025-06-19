@@ -1,4 +1,5 @@
 import { userAuth } from '@/Context/authContext';
+import apiClient from '@/utils/apiClient';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -27,10 +28,10 @@ const SuggestProductsScreen: React.FC = () => {
   const [productSuggestion, setProductSuggestion] = useState('');
   const [technicalSuggestion, setTechnicalSuggestion] = useState('');
   const [nonTechnicalSuggestion, setNonTechnicalSuggestion] = useState('');
-  const [showTechnical, setShowTechnical] = useState(false);
-  const [showNonTechnical, setShowNonTechnical] = useState(false);
+  const [showTechnical, setShowTechnical] = useState('');
+  const [showNonTechnical, setShowNonTechnical] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false); 
-  const [loading, setLoading] = useState(false); // ✅ Added loading state
+  const [loading, setLoading] = useState(false); 
 
   const { userDetails, ExtractParseToken } = userAuth();
 
@@ -64,10 +65,14 @@ const SuggestProductsScreen: React.FC = () => {
       default:
         return;
     }
+    if (!suggestionText.trim()) {
+      alert('Please enter your suggestion before submitting.');
+      return;
+    }
 
     try {
-      setLoading(true); // ✅ Show loading
-      const response = await fetch('https://mom-beta-server1.onrender.com/api/suggestions/add/', {
+      setLoading(true); 
+      const response = await apiClient('api/suggestions/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,26 +86,24 @@ const SuggestProductsScreen: React.FC = () => {
         }),
       });
 
-      const data = await response.json();
-      setLoading(false); // ✅ Hide loading
+      
+      setLoading(false); 
 
-      if (response.ok) {
+      if (response) {
         setShowSuccessModal(true);
         setTimeout(() => setShowSuccessModal(false), 2000);
         if (type === 'product') setProductSuggestion('');
         else if (type === 'technical') setTechnicalSuggestion('');
         else if (type === 'non-technical') setNonTechnicalSuggestion('');
       } else {
-        alert(data.message || 'Submission failed');
+        alert(response.message || 'Submission failed');
       }
     } catch (error) {
-      setLoading(false); // ✅ Hide loading on error
+      setLoading(false);
       console.error('Error submitting suggestion:', error);
       alert('An error occurred while submitting your suggestion.');
     }
   };
-
-  // ✅ Show loading screen if loading is true
   if (loading) {
     return <LoadingScreen />;
   }
@@ -189,7 +192,7 @@ const SuggestProductsScreen: React.FC = () => {
           <Modal transparent visible={showSuccessModal} animationType="fade">
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
-                <Text style={styles.modalText}>✅ Suggestion submitted successfully!</Text>
+                <Text style={styles.modalText}> Suggestion submitted successfully!</Text>
               </View>
             </View>
           </Modal>

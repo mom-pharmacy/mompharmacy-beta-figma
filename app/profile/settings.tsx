@@ -1,6 +1,5 @@
-
 import { userAuth } from '@/Context/authContext';
-import {  MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
@@ -42,23 +41,30 @@ export default function SettingsScreen() {
     }
   };
 
-  const requestNotificationPermission = async (enable: boolean) => {
-    setNotificationsEnabled(enable);
-
+  const handleNotificationsToggle = (newValue: boolean) => {
     Alert.alert(
-      enable ? 'Enable Notifications' : 'Disable Notifications',
-      `To ${enable ? 'receive' : 'stop'} notifications, please ${
-        enable ? 'enable' : 'disable'
+      newValue ? 'Enable Notifications' : 'Disable Notifications',
+      `To ${newValue ? 'receive' : 'stop'} notifications, please ${
+        newValue ? 'enable' : 'disable'
       } them manually in your device settings.`,
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Open Settings', onPress: () => Linking.openSettings() },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => {
+            
+            setNotificationsEnabled((prev) => prev);
+          },
+        },
+        {
+          text: 'Open Settings',
+          onPress: () => {
+            setNotificationsEnabled(newValue);
+            Linking.openSettings();
+          },
+        },
       ]
     );
-  };
-
-  const handleNotificationsToggle = (newValue: boolean) => {
-    requestNotificationPermission(newValue);
   };
 
   const handleLogout = async () => {
@@ -158,10 +164,10 @@ const styles = StyleSheet.create({
     color: '#B5000A',
     fontSize: 16,
     fontWeight: '800',
-    marginRight: -10
+    marginRight: -10,
   },
   screen: {
     flex: 1,
     backgroundColor: '#fff',
-  },
+  },
 });
